@@ -1,0 +1,33 @@
+# EcheloNews architecture graph
+# It uses some images from Google Material Icons
+digraph EcheloNews {
+  node [shape=box];
+
+  web   [label="Web Frontend"];
+  api   [label="RESTful API"];
+  auth  [label="User Handler"];
+  mux   [label="News Multiplexer"];
+  org   [label="News Organizer"];
+  fetch [label="News Fetcher"];
+  trans [label="Google Translate API"];
+  user  [label="",shape=none,image="img/user.png"];
+  rss   [label="",shape=none,image="img/rss.png"];
+  db    [label="",shape=none,image="img/db.png"];
+
+  { rank=same; web; api; trans; }
+  { rank=same; mux; }
+
+  web -> api;
+  api -> mux;
+  api -> auth;
+  mux -> trans;
+  fetch -> org;
+
+  auth -> db;
+  mux -> db;
+  org -> db;
+
+  user -> web;
+  user -> api;
+  fetch -> rss;
+}

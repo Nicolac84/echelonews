@@ -11,7 +11,7 @@ which can be easily turned into microservices. The architecture is (i.e. will
 be hopefully) described in the following image:
 
 <p align="center">
-  <img src="resources/images/architecture.png" />
+  <img src="architecture/architecture.png" />
 </p>
 
 ### Modules
