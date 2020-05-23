@@ -1,4 +1,4 @@
-# echelonews
+# Echelonews
 
 EcheloNews is a news multiplexer; basically, it fetches news from all over the
 world, classifying them by topic and giving them back to users according to
