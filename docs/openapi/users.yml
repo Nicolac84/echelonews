@@ -1,0 +1,300 @@
+openapi: 3.0.0
+info:
+  title: echelonews-user-handler
+  description: EcheloNews User Handler API
+  version: 0.0.1
+
+paths:
+  /:
+    get:
+      summary: Get basic informations on the server
+      responses:
+        '200':
+          description: Generic informations on the server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerInfo"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+  /users/byid/{id}:
+    get:
+      summary: Get a user by univocal ID
+      tags:
+        - Fetching
+      parameters:
+        - name: id
+          in: path
+          description: User univocal ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A User entity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update a user by univocal ID
+      tags:
+        - Updating
+      parameters:
+        - name: id
+          in: path
+          description: User univocal ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    delete:
+      summary: Delete a user by univocal ID
+      tags:
+        - Deleting
+      parameters:
+        - name: id
+          in: path
+          description: User univocal ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+  /users/byname/{name}:
+    get:
+      summary: Get a user by name
+      tags:
+        - Fetching
+      parameters:
+        - name: name
+          in: path
+          description: User name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A User entity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update a user by name
+      tags:
+        - Updating
+      parameters:
+        - name: name
+          in: path
+          description: User name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    delete:
+      summary: Delete a user by name
+      tags:
+        - Deleting
+      parameters:
+        - name: name
+          in: path
+          description: User name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+  /users/byemail/{email}:
+    get:
+      summary: Get a user by email
+      tags:
+        - Fetching
+      parameters:
+        - name: email
+          in: path
+          description: User email
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A User entity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update a user by email
+      tags:
+        - Updating
+      parameters:
+        - name: email
+          in: path
+          description: User email
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    delete:
+      summary: Delete a user by email
+      tags:
+        - Deleting
+      parameters:
+        - name: email
+          in: path
+          description: User email
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+  /auth:
+    post:
+      summary: Authenticate a user with login/password credentials
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginCredentials"
+      responses:
+        '200':
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JWT"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error description message
+    ServerInfo:
+      type: object
+      properties:
+        motd:
+          type: string
+          description: TODO - Add something meaningful
+    LoginCredentials:
+      type: object
+      properties:
+        name:
+          type: string
+          description: User name
+        pass:
+          type: string
+          description: User plaintext password
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User univocal ID
+        name:
+          type: string
+          description: User name
+        email:
+          type: string
+          description: User email
+        hash:
+          type: string
+          description: User hashed password
+        created:
+          type: string
+          format: date-time
+          description: Creation timestamp
+    JWT:
+      type: string
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

@@ -4,48 +4,18 @@ EcheloNews is a news multiplexer; basically, it fetches news from all over the
 world, classifying them by topic and giving them back to users according to
 their preferences.
 
-## Architecture
+## Documentation
 
-EcheloNews is (i.e. will be) designed as a set of loosely coupled modules,
-which can be easily turned into microservices. The architecture is (i.e. will
-be hopefully) described in the following image:
-
-<p align="center">
-  <img src="architecture/architecture.png" />
-</p>
-
-### Modules
-
-#### RESTful API
-The main EcheloNews interface, built on top of standard HTTP verbs with the
-REST paradigm and delivered as SaaS
-
-#### Web Frontend
-A website frontend, built on top of the RESTful API
-
-#### News fetcher
-Fetch news via the RSS protocol from various websites (with long-time
-polling), and pass them to the news organizer as a JSON object
-
-#### News organizer
-Organize news and save them in a permanent data structure (e.g. SQL database)
-
-#### News multiplexer
-Multiplex news according to topic or category and return them to a user
-interface microservice (on-demand).
-**NOTE**: It calls the Google Translate API to translate news feeds'
-description and title
-
-#### Logger
-Keep track of logs, storing them in an isolated database
+The entire project documentation is served with GitHub Pages at
+[this address](Nicolac84.github.io/echelonews)
 
 
 ## License
 
 MIT License
 
-Copyright (c) 2020 Nicola Colao
-Copyright (c) 2020 Paolo Lucchesi
+Copyright (c) 2020 Nicola Colao  
+Copyright (c) 2020 Paolo Lucchesi  
 Copyright (c) 2020 Dejan Nuzzi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

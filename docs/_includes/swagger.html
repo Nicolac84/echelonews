@@ -1,0 +1,31 @@
+<link rel="stylesheet" type="text/css" href="/swagger-ui-dist/swagger-ui.css" >
+<script src="/swagger-ui-dist/swagger-ui-bundle.js"> </script>
+<script src="/swagger-ui-dist/swagger-ui-standalone-preset.js"> </script>
+<style>
+.swagger-ui {
+  background-color: #f0f0de;
+  border: 1px solid #f4f4f4;
+  border-radius: 8px;
+}
+.swagger-ui .topbar { display: none }
+</style>
+<script>
+function displaySwaggerUI(spec, dom_id) {
+  SwaggerUIBundle({
+    url: spec,
+    dom_id: dom_id,
+    deepLinking: true,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl,
+      function() {
+        return { statePlugins: { spec: { wrapSelectors: {
+          allowTryItOutFor: () => () => false }}}}}
+    ],
+    layout: "StandaloneLayout"
+  })
+}
+</script>

@@ -1,0 +1,221 @@
+openapi: 3.0.2
+info:
+  title: echelonews
+  description: News multiplexer from all over the world
+  version: 0.0.1
+
+paths:
+  /login:
+    post:
+      summary: Authenticate a user with login/password
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginData'
+      responses:
+        '200':
+          description: A signed JSON Web Token to be used in subsequent calls
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JWT"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /news:
+    get:
+      summary: Fetch news according to known user preferences
+      tags:
+        - News
+      responses:
+        '200':
+          $ref: '#/components/responses/FetchedNews'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Fetch news according to precise requests
+      tags:
+        - News
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                countries:
+                  $ref: '#/components/schemas/Countries'
+                topic:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/FetchedNews'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /countries:
+    get:
+      summary: Get the user preferred countries
+      tags:
+        - Users
+      responses:
+        '200':
+          description: The requested countries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Countries'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Set the user preferred countries
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Countries'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /feedback:
+    get:
+      summary: Get the user feedbacks registered with its account
+      tags:
+        - Users
+      responses:
+        '200':
+          description: An array containing all the feedbacks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      summary: Push a new user feedback
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Feedback' # TODO: Score must be +-1
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete: # TODO: Also return number of feedbacks deleted?
+      summary: Delete all user registered feedbacks
+      tags:
+        - Users
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error description message
+    LoginData:
+      type: object
+      properties:
+        user:
+          type: string
+          description: User name
+        pass:
+          type: string
+          description: User plaintext password
+    JWT:
+      type: object
+      properties:
+        token:
+          type: string
+          format: byte
+          description: Base-64 encoded JSON Web Token
+    News:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: News article univocal ID
+        title:
+          type: string
+          description: News article title
+        desc:
+          type: string
+          description: News article description
+        realTitle:
+          type: string
+          description: News article title in its original language
+        realDesc:
+          type: string
+          description: News article description in its original language
+        url:
+          type: string
+          description: URL reference to the article in it source's site
+        sourceId:
+          type: integer
+          description: Univocal ID for the article source newspaper
+        source:
+          type: string
+          description: Name of the article source newspaper
+    Feedback:
+      type: object
+      properties:
+        user:
+          type: string
+          description: User which generated the feedback
+        newspaper:
+          type: integer
+          description: Univocal ID for the newspaper involved in the feedback
+        score:
+          type: integer
+          description: Signed integer representing the feedback score
+    Countries:
+      type: array
+      items:
+        type: string
+  responses:
+    FetchedNews:
+      description: An array containing the requested news
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/News'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
