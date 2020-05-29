@@ -29,7 +29,7 @@ EcheloNews is designed as a set of loosely coupled modules, which can be easily
 turned into microservices. The architecture is described as follows:
 
 <p align="center">
-  <img src="../architecture/architecture.png" />
+  <img src="{{ site.url }}/architecture/architecture.png" />
 </p>
 
 **NOTE**:

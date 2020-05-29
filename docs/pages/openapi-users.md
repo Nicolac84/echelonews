@@ -11,4 +11,4 @@ The following OpenAPI3 specification describes the composition and behaviour
 of the internal EcheloNews users handler microservice
 
 <div id="apispec" class="swagger-ui"></div>
-<script>window.onload=function(){displaySwaggerUI('/openapi/users.yml','#apispec')}</script>
+<script>window.onload=function(){displaySwaggerUI('{{ site.url }}/openapi/users.yml','#apispec')}</script>
