@@ -7,7 +7,7 @@ their preferences.
 ## Documentation
 
 The entire project documentation is served with GitHub Pages at
-[this address](Nicolac84.github.io/echelonews)
+[this address](https://Nicolac84.github.io/echelonews)
 
 
 ## License
