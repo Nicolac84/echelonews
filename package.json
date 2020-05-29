@@ -1,0 +1,42 @@
+{
+  "name": "echelonews",
+  "version": "0.0.1",
+  "description": "Worldwide news multiplexer",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nicolac84/echelonews.git"
+  },
+  "homepage": "nicolac84.github.io/echelonews",
+  "keywords": [
+    "news"
+  ],
+  "contributors": [
+    "jcondor",
+    "Nicolac84",
+    "includej"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Nicolac84/echelonews/issues"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^7.2.0",
+    "nyc": "^15.0.1",
+    "prettier": "^2.0.5",
+    "standard": "^14.3.4"
+  }
+}

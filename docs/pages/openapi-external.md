@@ -1,5 +1,5 @@
 ---
-title: ENews | OpenAPI3 External API Specification
+title: OpenAPI3 External API Specification
 permalink: /openapi/external
 ---
 

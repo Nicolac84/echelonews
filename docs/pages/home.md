@@ -1,5 +1,5 @@
 ---
-title: ENews | Homepage
+title: Homepage
 permalink: /
 ---
 

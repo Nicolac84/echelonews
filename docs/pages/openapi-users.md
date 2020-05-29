@@ -1,5 +1,5 @@
 ---
-title: ENews | OpenAPI3 User Handler Specification
+title: OpenAPI3 User Handler Specification
 permalink: /openapi/users
 ---
 
