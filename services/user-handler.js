@@ -16,77 +16,33 @@ app.get('/', (req, res) => {
   })
 })
 
-// Get a user by ID
-app.get('/users/byid/:id', async (req, res) => {
-  if (User.validate('id', req.params.id))
-    res.status(400).json({ message: 'Invalid ID' })
-  try {
-    const user = await User.fetch('id', req.params.id)
-    if (!user) res.status(404).json({ message: 'Not Found' })
-    else res.status(200).json(user)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ message: 'Internal database error. Sorry' })
-  }
-})
+// Access users by arbitrary identifier
+for (const id of ['id', 'name', 'email']) {
+  // Fetch a user by arbitrary field
+  app.get(`/users/by${id}/:${id}`, async (req, res) => {
+    const idval = decodeURIComponent(req.params[id])
+    if (!idval || User.validate(id, idval))
+      res.status(400).json({ message: `Invalid ${id} ${idval}` })
+    try {
+      const user = await User.fetch(id, idval)
+      if (!user) res.status(404).json({ message: 'User not found' })
+      else res.status(200).json(user)
+    } catch (err) {
+      console.error(err)
+      res.status(500).json({ message: 'Internal database error. Sorry' })
+    }
+  })
 
-// Get a user by username
-app.get('/users/byname/:name', async (req, res) => {
-  if (User.validate('name', req.params.name))
-    res.status(400).json({ message: 'Invalid ID' })
-  try {
-    const user = await User.fetch('name', req.params.name)
-    if (!user) res.status(404).json({ message: 'Not Found' })
-    else res.status(200).json(user)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ message: 'Internal database error. Sorry' })
-  }
-})
+  // Update a user by arbitrary field
+  app.put(`/users/by${id}/:${id}`, json_parser, (req, res) => {
+    res.status(503).send()
+  })
 
-// Get a user by email
-app.get('/users/byemail/:email', async (req, res) => {
-  if (User.validate('email', req.params.email))
-    res.status(400).json({ message: 'Invalid ID' })
-  try {
-    const user = await User.fetch('email', req.params.email)
-    if (!user) res.status(404).json({ message: 'Not Found' })
-    else res.status(200).json(user)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ message: 'Internal database error. Sorry' })
-  }
-})
-
-// Update a user by ID
-app.put('/users/byid/:id', json_parser, (req, res) => {
-  res.status(503).send()
-})
-
-// Update a user by username
-app.put('/users/byname/:name', json_parser, (req, res) => {
-  res.status(503).send()
-})
-
-// Update a user by email
-app.put('/users/byemail/:email', json_parser, (req, res) => {
-  res.status(503).send()
-})
-
-// Delete a user by ID
-app.delete('/users/byid/:id', (req, res) => {
-  res.status(503).send()
-})
-
-// Delete a user by username
-app.delete('/users/byname/:name', (req, res) => {
-  res.status(503).send()
-})
-
-// Delete a user by email
-app.delete('/users/byemail/:email', (req, res) => {
-  res.status(503).send()
-})
+  // Delete a user by arbitrary field
+  app.delete(`/users/by${id}/:${id}`, (req, res) => {
+    res.status(503).send()
+  })
+}
 
 // Authenticate with login/password credentials
 app.post('/auth', json_parser, (req, res) => {

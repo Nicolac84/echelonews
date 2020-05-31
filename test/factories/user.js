@@ -37,8 +37,8 @@ class UserFactory {
   static async setupTestDB(opt) {
     try {
       // Mock users
-      const existing = await this.create({ name: 'idoalreadyexist' })
-      const nonExisting = await this.create({ name: 'idonotexist' })
+      const existing = await this.create({ name: 'idoalreadyexist', email: 'existing@ema.il' })
+      const nonExisting = await this.create({ name: 'idonotexist', email: 'nonexisting@ema.il'})
 
       // Setup the database for user testing
       User.db.setup(opt)

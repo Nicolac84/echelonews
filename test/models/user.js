@@ -1,6 +1,5 @@
 // echelonews - Test Unit
 // User model
-//const expect = require('expect.js');
 const expect = require('chai').expect
 const { User } = require('../../models/user')
 const { UserFactory } = require('../factories/user')
@@ -13,24 +12,22 @@ const commonTestCases = [
   ['is blank', ''],
 ]
 
-// Existing user
-let existing
-let nonExisting
-
-before(async () => {
-  try {
-    ;[existing, nonExisting] = await UserFactory.setupTestDB(
-      process.env.POSTGRES_URI
-    )
-  } catch (err) {
-    console.error(err)
-    process.exit(1)
-  }
-})
-
-after(UserFactory.cleanupTestDB)
-
 describe('User', function () {
+  // Setup database for testing
+  let existing
+  let nonExisting
+  before(async () => {
+    try {
+      ;[existing, nonExisting] = await UserFactory.setupTestDB(
+        process.env.POSTGRES_URI
+      )
+    } catch (err) {
+      console.error(err)
+      process.exit(1)
+    }
+  })
+  after(UserFactory.cleanupTestDB)
+
   it('should be created with consistent parameters', function (done) {
     UserFactory.create()
       .then(() => done())
