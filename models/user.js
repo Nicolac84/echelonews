@@ -10,7 +10,7 @@
  */
 'use strict'
 const Validable = require('validable')
-const Perseest = require('/home/jcondor/sources/perseest/index')
+const Perseest = require('perseest')
 const bcrypt = require('bcrypt')
 
 class VolatileUser extends Validable.Class {
@@ -90,7 +90,7 @@ class VolatileUser extends Validable.Class {
   static constraints = {
     id: {
       // TODO: Make required?
-      type: 'integer',
+      //type: 'integer',
       numericality: { greaterThanOrEqualTo: 0, strict: true },
     },
     name: {
@@ -104,10 +104,7 @@ class VolatileUser extends Validable.Class {
       email: true,
       presence: { allowEmpty: false },
     },
-    exists: {
-      type: 'boolean',
-      presence: true,
-    },
+    exists: { type: 'boolean' },
     pass: {
       type: 'string',
       length: { minimum: 8, maximum: 72 },
@@ -117,7 +114,7 @@ class VolatileUser extends Validable.Class {
       format: /\$2[aby]?\$\d{1,2}\$[.\/a-zA-Z0-9]{53}/, // bcrypt hash format
     },
     created: {
-      type: 'date',
+      datetime: true,
     },
   }
 
@@ -186,10 +183,21 @@ User.db.addHook('after', 'save', params => {
   params.ret = true
 })
 
+// Convert 'created' timestamp in a Date JS object
+User.db.addHook('after', 'fetch', params => {
+  if (params.ent) params.ent.created = new Date(params.ent.created)
+})
+
 // Validate users fields before performing queries on them
 User.db.addHook('before', 'save', dbSaveValidator)
 User.db.addHook('before', 'update', dbUpdateValidator)
 User.db.addHook('before', 'fetch', dbFetchDeleteValidator)
 User.db.addHook('before', 'delete', dbFetchDeleteValidator)
+
+// Add format and parser to use validate.js datetime
+Validable.validate.extend(Validable.validate.validators.datetime, {
+  parse: value => new Date(value).valueOf(),
+  format: value => new Date(value),
+})
 
 module.exports = { User, VolatileUser }

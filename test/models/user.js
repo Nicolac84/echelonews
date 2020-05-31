@@ -4,7 +4,6 @@
 const expect = require('chai').expect
 const { User } = require('../../models/user')
 const { UserFactory } = require('../factories/user')
-const fs = require('fs')
 
 const commonTestCases = [
   ['is an object', { a: 'b' }],
@@ -20,26 +19,16 @@ let nonExisting
 
 before(async () => {
   try {
-    // Mock users
-    existing = await UserFactory.create({ name: 'idoalreadyexist' })
-    nonExisting = await UserFactory.create({ name: 'idononexist' })
-
-    // Setup the database for user testing
-    User.db.setup(process.env.POSTGRES_URI)
-    await User.db.pool.query(`DROP TABLE ${User.db.table}`).catch(() => {})
-    await User.db.pool.query(fs.readFileSync('sql/account.sql').toString())
-
-    await existing.save()
-
-    // Make sure that none of nonExisting ID columns will actually exist
-    await nonExisting.save()
-    await nonExisting.delete()
+    ;[existing, nonExisting] = await UserFactory.setupTestDB(
+      process.env.POSTGRES_URI
+    )
   } catch (err) {
-    throw err
+    console.error(err)
+    process.exit(1)
   }
 })
 
-after(async () => await User.db.cleanup())
+after(UserFactory.cleanupTestDB)
 
 describe('User', function () {
   it('should be created with consistent parameters', function (done) {
