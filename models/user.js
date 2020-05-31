@@ -132,6 +132,8 @@ class User extends Perseest.Mixin(VolatileUser) {
   })
 }
 
+User.db.row2Entity = row => new User(Object.assign(row, { exists: true }))
+
 // Get fields usable as a univocal ID
 User.db.ids = function* () {
   for (const [c, a] of User.db.columns) if (a && a.id) yield c

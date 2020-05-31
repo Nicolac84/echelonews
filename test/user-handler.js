@@ -67,8 +67,58 @@ describe('User Handler API', function () {
         })
 
         describe('PUT', function () {
-          it(`should be successful with good ${id} and consistent parameters`)
-          it(`should return 404 with inexistent ${id}`)
+          function performUpdateRequest(idval, body) {
+            return conn.put(`/users/by${id}/${encodeURIComponent(idval)}`).send(body)
+          }
+
+          it('should be successful and consistent parameters', async () => {
+            try {
+              const res = await performUpdateRequest(presentUser[id], {
+                countries: ['Italy', 'USA', 'Russia', 'China']
+              })
+              expect(res).to.have.status(200)
+              // TODO: Test if presentUser changed?
+            } catch (err) {
+              throw err
+            }
+          })
+
+          it(`should return 404 with inexistent ${id}`, async () => {
+            try {
+              const res = await performUpdateRequest(absentUser[id], { countries: ['Italy'] })
+              expect(res).to.have.status(404)
+            } catch (err) {
+              throw err
+            }
+          })
+
+          it('should return 403 when trying to update user id', async () => {
+            try {
+              const res = await performUpdateRequest(presentUser[id], { id: 123 })
+              expect(res).to.have.status(403)
+            } catch (err) {
+              throw err
+            }
+          })
+
+          it('should return 400 with invalid update fields', async () => {
+            try {
+              const res = await performUpdateRequest(presentUser[id], { invalidField: 'abc' })
+              expect(res).to.have.status(400)
+            } catch (err) {
+              throw err
+            }
+          })
+
+          it('should return 400 with invalid update values', async () => {
+            try {
+              const res = await performUpdateRequest(presentUser[id], { name: '123@!' })
+              expect(res).to.have.status(400)
+            } catch (err) {
+              throw err
+            }
+          })
+
         })
 
         describe(`DELETE`, function () {
