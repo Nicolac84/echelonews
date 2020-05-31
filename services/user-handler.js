@@ -108,7 +108,7 @@ for (const id of ['id', 'name', 'email']) {
 }
 
 // Authenticate with login/password credentials
-// TODO: Make possible to authenticate aslo with email or id
+// TODO: Make possible to authenticate also with email or id
 app.post('/auth', json_parser, async (req, res) => {
   const name = req.body.name
   for (const f of ['name', 'pass']) {
@@ -129,7 +129,60 @@ app.post('/auth', json_parser, async (req, res) => {
   }
 })
 
+// Attempt to register a new user
+// TODO: Handle duplicate key error
+app.post('/register', json_parser, async (req, res) => {
+  const entries = Object.entries(req.body)
+  let errors
+
+  // Check against inexistent fields
+  errors = entries
+    .map(([f, v]) => {
+      if (!User.db.columns.has(f)) {
+        return [f, `Field ${f} does not exist`]
+      } else if (UPDATE_FORBIDDEN.has(f)) {
+        return [f, `Field ${f} can not be passed`]
+      } else {
+        const verrors = User.validate(f, v)
+        if (verrors) return [f, verrors[f]]
+        else return null
+      }
+    })
+    .filter(e => e && e[0] !== 'pass')
+
+  // Handle missing or invalid password
+  if (!req.body.pass) {
+    errors.push(['pass', ['pass must be specified']])
+  } else {
+    const e = User.validate('pass', req.body.pass)
+    if (e) errors.push(e)
+  }
+
+  // Check mandatory arguments
+  errors.concat(
+    ['name', 'email', 'pass']
+      .filter(e => !req.body.hasOwnProperty(e))
+      .map(f => [f, `Field ${f} is mandatory`])
+  )
+
+  // If errors were encountered, respond immediately
+  if (errors.length) {
+    res.status(400).json(Object.fromEntries(errors))
+    return
+  }
+
+  // Attempt to register the user
+  try {
+    const user = await User.create(req.body)
+    await user.save()
+    res.status(201).json(user.export())
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Internal database error. Sorry' })
+  }
+})
+
 // Fields which can not be updated
-const UPDATE_FORBIDDEN = new Set(['id', 'hash', 'created'])
+const UPDATE_FORBIDDEN = new Set(['id', 'hash', 'created', 'googleId'])
 
 module.exports = app

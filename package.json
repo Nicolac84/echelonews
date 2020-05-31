@@ -8,8 +8,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha test/ test/models",
-    "lint": "standard --fix {services,models}/**/*.js; standard --env mocha --fix test/**/*.js; prettier --write {services,test,models}/**/*.js"
+    "test": "npx mocha test/ test/models",
+    "coverage": "npx nyc npm test",
+    "lint": "npx standard --fix {services,models}/**/*.js; npx standard --env mocha --fix test/{*.js,**/*.js}; npx prettier --write {services,test,models}/{*.js,**/*.js}"
   },
   "repository": {
     "type": "git",

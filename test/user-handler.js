@@ -167,10 +167,14 @@ describe('User Handler API', function () {
           })
 
           it(`should return 404 with inexistent ${id}`, async () => {
-            const res = await conn.delete(
-              `/users/by${id}/${encodeURIComponent(absentUser[id])}`
-            )
-            expect(res).to.have.status(404)
+            try {
+              const res = await conn.delete(
+                `/users/by${id}/${encodeURIComponent(absentUser[id])}`
+              )
+              expect(res).to.have.status(404)
+            } catch (err) {
+              throw err
+            }
           })
 
           it(`should return 400 with invalid ${id}`, async () => {
@@ -190,49 +194,130 @@ describe('User Handler API', function () {
 
   describe('/auth', function () {
     it('should be successful with good credentials', async () => {
-      const res = await conn
-        .post('/auth')
-        .send({ name: presentUser.name, pass: presentUser.pass })
-      expect(res).to.have.status(200)
-      expect(res.body.name).to.equal(presentUser.name)
+      try {
+        const res = await conn
+          .post('/auth')
+          .send({ name: presentUser.name, pass: presentUser.pass })
+        expect(res).to.have.status(200)
+        expect(res.body.name).to.equal(presentUser.name)
+      } catch (err) {
+        throw err
+      }
     })
 
     it('should return 404 on inexistent user', async () => {
-      const res = await conn
-        .post('/auth')
-        .send({ name: absentUser.name, pass: absentUser.pass })
-      expect(res).to.have.status(404)
+      try {
+        const res = await conn
+          .post('/auth')
+          .send({ name: absentUser.name, pass: absentUser.pass })
+        expect(res).to.have.status(404)
+      } catch (err) {
+        throw err
+      }
     })
 
     it('should return 404 on bad password', async () => {
-      const res = await conn
-        .post('/auth')
-        .send({ name: absentUser.name, pass: 'abcdefghi1!A' })
-      expect(res).to.have.status(404)
+      try {
+        const res = await conn
+          .post('/auth')
+          .send({ name: absentUser.name, pass: 'abcdefghi1!A' })
+        expect(res).to.have.status(404)
+      } catch (err) {
+        throw err
+      }
     })
 
     it('should return 400 with invalid name', async () => {
-      const res = await conn
-        .post('/auth')
-        .send({ name: invalidUser.name, pass: 'abcdefghi1!A' })
-      expect(res).to.have.status(400)
+      try {
+        const res = await conn
+          .post('/auth')
+          .send({ name: invalidUser.name, pass: 'abcdefghi1!A' })
+        expect(res).to.have.status(400)
+      } catch (err) {
+        throw err
+      }
     })
 
     it('should return 400 with missing name', async () => {
-      const res = await conn.post('/auth').send({ pass: 'abcdefghi1!A' })
-      expect(res).to.have.status(400)
+      try {
+        const res = await conn.post('/auth').send({ pass: 'abcdefghi1!A' })
+        expect(res).to.have.status(400)
+      } catch (err) {
+        throw err
+      }
     })
 
     it('should return 400 with invalid password', async () => {
-      const res = await conn
-        .post('/auth')
-        .send({ name: presentUser.name, pass: invalidUser.pass })
-      expect(res).to.have.status(400)
+      try {
+        const res = await conn
+          .post('/auth')
+          .send({ name: presentUser.name, pass: invalidUser.pass })
+        expect(res).to.have.status(400)
+      } catch (err) {
+        throw err
+      }
     })
 
     it('should return 400 with missing password', async () => {
-      const res = await conn.post('/auth').send({ name: presentUser.name })
-      expect(res).to.have.status(400)
+      try {
+        const res = await conn.post('/auth').send({ name: presentUser.name })
+        expect(res).to.have.status(400)
+      } catch (err) {
+        throw err
+      }
+    })
+  })
+
+  describe('/register POST', function () {
+    let user
+    beforeEach(async () => (user = await UserFactory.create()))
+
+    function tryRegister(props) {
+      return conn
+        .post('/register')
+        .send(
+          Object.assign(
+            { name: user.name, email: user.email, pass: user.pass },
+            props || {}
+          )
+        )
+    }
+
+    it('should be successful with valid user data', async () => {
+      try {
+        const res = await tryRegister()
+        expect(res).to.have.status(201)
+        expect(res.body).to.have.ownProperty('name')
+        expect(res.body).to.not.have.ownProperty('pass')
+        expect(res.body).to.not.have.ownProperty('hash')
+        expect(res.body.name).to.equal(user.name)
+      } catch (err) {
+        throw err
+      }
+    })
+
+    describe('should return 400', function () {
+      for (const f of ['name', 'email', 'pass']) {
+        specify(`with invalid ${f}`, async () => {
+          try {
+            const res = await tryRegister({ [f]: invalidUser[f] })
+            expect(res).to.have.status(400)
+          } catch (err) {
+            throw err
+          }
+        })
+      }
+
+      for (const f of ['id', 'hash', 'created']) {
+        specify(`when attempting to pass (valid) ${f}`, async () => {
+          try {
+            const res = await tryRegister({ [f]: presentUser[f] })
+            expect(res).to.have.status(400)
+          } catch (err) {
+            throw err
+          }
+        })
+      }
     })
   })
 })

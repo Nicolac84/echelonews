@@ -17,8 +17,6 @@ paths:
                 $ref: "#/components/schemas/ServerInfo"
         '401':
           $ref: "#/components/responses/Unauthorized"
-        '404':
-          $ref: "#/components/responses/NotFound"
 
   /users/byid/{id}:
     get:
@@ -39,6 +37,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -63,6 +63,8 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -81,6 +83,8 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -105,6 +109,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -129,6 +135,8 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -147,6 +155,8 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -171,6 +181,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -195,6 +207,8 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -213,6 +227,8 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -234,10 +250,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
           $ref: "#/components/responses/NotFound"
+
+  /register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '201':
+          description: A sharing-safe representation of the created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
 
 
 components:
@@ -284,6 +323,12 @@ components:
           description: Creation timestamp
 
   responses:
+    MalformedRequest:
+      description: Malformed request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     Unauthorized:
       description: Unauthorized
       content:
