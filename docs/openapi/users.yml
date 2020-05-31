@@ -229,11 +229,11 @@ paths:
               $ref: "#/components/schemas/LoginCredentials"
       responses:
         '200':
-          description: Authenticated
+          description: A user representation which can be shared safely
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JWT"
+                $ref: "#/components/schemas/User"
         '401':
           $ref: "#/components/responses/Unauthorized"
         '404':
@@ -282,8 +282,6 @@ components:
           type: string
           format: date-time
           description: Creation timestamp
-    JWT:
-      type: string
 
   responses:
     Unauthorized:

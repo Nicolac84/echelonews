@@ -24,10 +24,20 @@ class VolatileUser extends Validable.Class {
    * @param {string} opt.hash - User hashed password
    * @param {Date} opt.created - User creation timestamp
    * @param {number} opt.googleId - Google account ID for the user
+   * @param {Array<String>} opt.countries - Countries in the user preferences
+   * @param {Array<String>} opt.topics - Countries in the user preferences
    */
   constructor(opt = {}) {
     super()
-    Object.assign(this, { created: new Date() }, opt)
+    Object.assign(
+      this,
+      {
+        created: new Date(),
+        countries: [],
+        topics: [],
+      },
+      opt
+    )
   }
 
   /** Create a user, hashing its plaintext password if given
@@ -43,6 +53,19 @@ class VolatileUser extends Validable.Class {
   /** Return a string representation of the user */
   toString() {
     return `User ${this.id} (${this.name} - ${this.email})`
+  }
+
+  /** @returns {object} A sharing-safe representation of this user */
+  export() {
+    return {
+      id: this.id,
+      name: this.name,
+      email: this.email,
+      topics: this.topics,
+      created: this.created,
+      googleId: this.googleId,
+      countries: this.countries,
+    }
   }
 
   /** Set user password
@@ -62,28 +85,6 @@ class VolatileUser extends Validable.Class {
    */
   authenticate(pass) {
     return bcrypt.compare(pass, this.hash)
-  }
-
-  // TODO: Test
-  /** Fetch a user from the database, for a passport.js strategy
-   * @param {string} user - Username
-   * @param {string} pass - User password
-   * @param {function} done - Result forwarding callback
-   */
-  static async fetchForPassport(name, pass, done) {
-    try {
-      const user = await this.fetch('name', name)
-      if (!user) return done(null, false, { message: 'Login incorrect' })
-
-      // TODO: Change message to 'Login incorrect'?
-      const authenticated = await user.authenticate(pass)
-      if (!authenticated)
-        return done(null, false, { message: 'Password incorrect' })
-
-      return done(null, user)
-    } catch (err) {
-      return done(err)
-    }
   }
 
   /** @constant {object} - Constraints on User instance properties */

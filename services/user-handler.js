@@ -21,9 +21,12 @@ for (const id of ['id', 'name', 'email']) {
   // Fetch a user by arbitrary field
   app.get(`/users/by${id}/:${id}`, async (req, res) => {
     const idval = decodeURIComponent(req.params[id])
+
     if (!idval || User.validate(id, idval)) {
       res.status(400).json({ message: `Invalid ${id} ${idval}` })
+      return
     }
+
     try {
       const user = await User.fetch(id, idval)
       if (!user) res.status(404).send()
@@ -40,6 +43,7 @@ for (const id of ['id', 'name', 'email']) {
     const idval = decodeURIComponent(req.params[id])
     if (!idval || User.validate(id, idval)) {
       res.status(400).json({ message: `Invalid ${id} ${idval}` })
+      return
     }
 
     let errors
@@ -90,7 +94,9 @@ for (const id of ['id', 'name', 'email']) {
     const idval = decodeURIComponent(req.params[id])
     if (!idval || User.validate(id, idval)) {
       res.status(400).json({ message: `Invalid ${id} ${idval}` })
+      return
     }
+
     try {
       const deleted = await User.delete(id, idval)
       res.status(deleted ? 200 : 404).send()
@@ -102,8 +108,25 @@ for (const id of ['id', 'name', 'email']) {
 }
 
 // Authenticate with login/password credentials
-app.post('/auth', json_parser, (req, res) => {
-  res.status(503).send()
+// TODO: Make possible to authenticate aslo with email or id
+app.post('/auth', json_parser, async (req, res) => {
+  const name = req.body.name
+  for (const f of ['name', 'pass']) {
+    if (!req.body[f] || User.validate(f, req.body[f])) {
+      res.status(400).json({ message: `Invalid ${f}` })
+      return
+    }
+  }
+
+  try {
+    const user = await User.fetch('name', name)
+    if (user && (await user.authenticate(req.body.pass))) {
+      res.status(200).json(user.export())
+    } else res.status(404).json({ message: 'Login incorrect' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: 'Internal database error. Sorry' })
+  }
 })
 
 // Fields which can not be updated

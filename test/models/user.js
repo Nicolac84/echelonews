@@ -305,6 +305,16 @@ describe('User', function () {
     expect(str.includes(existing.name)).to.be.true
     expect(str.includes(existing.email)).to.be.true
   })
+
+  it('should return a sharing-safe representation with export()', () => {
+    const obj = existing.export()
+    for (const p of ['id', 'name', 'email', 'countries', 'topics']) {
+      expect(obj).to.have.ownProperty(p)
+    }
+    for (const p of ['pass', 'hash']) {
+      expect(obj).to.not.have.ownProperty(p)
+    }
+  })
 })
 
 // Pseudo-randomly shuffle a string
