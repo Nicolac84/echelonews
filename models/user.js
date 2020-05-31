@@ -89,8 +89,6 @@ class VolatileUser extends Validable.Class {
   /** @constant {object} - Constraints on User instance properties */
   static constraints = {
     id: {
-      // TODO: Make required?
-      //type: 'integer',
       numericality: { greaterThanOrEqualTo: 0, strict: true },
     },
     name: {

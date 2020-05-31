@@ -12,7 +12,7 @@ describe('User Handler API', function () {
   let presentUser, absentUser
   before(async () => {
     try {
-      [presentUser, absentUser] = await UserFactory.setupTestDB(
+      ;[presentUser, absentUser] = await UserFactory.setupTestDB(
         process.env.POSTGRES_URI
       )
     } catch (err) {
@@ -28,36 +28,72 @@ describe('User Handler API', function () {
   after(() => conn.close())
 
   specify('GET / should return general information on the server', async () => {
-    const res = await conn.get('/')
-    expect(res).to.have.status(200)
-    expect(res.body).to.have.ownProperty('message')
-    expect(res.body).to.have.ownProperty('uptime')
+    try {
+      const res = await conn.get('/')
+      expect(res).to.have.status(200)
+      expect(res.body).to.have.ownProperty('message')
+      expect(res.body).to.have.ownProperty('uptime')
+    } catch (err) {
+      throw err
+    }
   })
 
   describe('/users', function () {
     for (const id of ['id', 'name', 'email']) {
-      describe(`/by${id}/{${id}}`, function() {
-        describe('GET', function() {
+      describe(`/by${id}/{${id}}`, function () {
+        describe('GET', function () {
           it(`should be successful with good ${id}`, async () => {
-            const res = await conn.get(`/users/by${id}/${encodeURIComponent(presentUser[id])}`)
-            expect(res).to.have.status(200)
-            expect(User.validateObject(res.body)).to.equal(undefined)
+            try {
+              const res = await conn.get(
+                `/users/by${id}/${encodeURIComponent(presentUser[id])}`
+              )
+              expect(res).to.have.status(200)
+              expect(User.validateObject(res.body)).to.equal(undefined)
+            } catch (err) {
+              throw err
+            }
           })
 
           it(`should return 404 with inexistent ${id}`, async () => {
-            const res = await conn.get(`/users/by${id}/${encodeURIComponent(absentUser[id])}`)
-            expect(res).to.have.status(404)
+            try {
+              const res = await conn.get(
+                `/users/by${id}/${encodeURIComponent(absentUser[id])}`
+              )
+              expect(res).to.have.status(404)
+            } catch (err) {
+              throw err
+            }
           })
         })
 
-      describe('PUT', function () {
-        it(`should be successful with good ${id} and consistent parameters`)
-        it(`should return 404 with inexistent ${id}`)
-      })
-      describe(`DELETE`, function () {
-        it(`should be successful with good ${id}`)
-        it(`should return 404 with inexistent ${id}`)
-      })
+        describe('PUT', function () {
+          it(`should be successful with good ${id} and consistent parameters`)
+          it(`should return 404 with inexistent ${id}`)
+        })
+
+        describe(`DELETE`, function () {
+          it(`should be successful with good ${id}`, async () => {
+            try {
+              // Use another user instead of 'presentUser'
+              const user = await UserFactory.create()
+              await user.save()
+              const res = await conn.delete(
+                `/users/by${id}/${encodeURIComponent(user[id])}`
+              )
+              expect(res).to.have.status(200)
+              expect(await User.fetch('id', user.id)).to.equal(null)
+            } catch (err) {
+              throw err
+            }
+          })
+
+          it(`should return 404 with inexistent ${id}`, async () => {
+            const res = await conn.delete(
+              `/users/by${id}/${encodeURIComponent(absentUser[id])}`
+            )
+            expect(res).to.have.status(404)
+          })
+        })
       })
     }
   })

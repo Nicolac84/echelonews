@@ -142,9 +142,9 @@ describe('User', function () {
         specify(field, done => {
           User.fetch(field, nonExisting[field])
             .then(user => {
-              if (user)
+              if (user) {
                 done(new Error(`Fetched user with ${field} ${user[field]}`))
-              else done()
+              } else done()
             })
             .catch(err => done(err))
         })
