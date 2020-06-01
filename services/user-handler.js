@@ -63,14 +63,15 @@ for (const id of ['id', 'name', 'email']) {
       return
     }
 
-    // TODO: Handle password update
-
     // Attempt to update the user
     try {
       const user = await User.fetch(id, idval)
       if (!user) res.status(404).send()
       else {
         Object.assign(user, req.body)
+        if (user.pass) {
+          await user.setPassword(user.pass)
+        }
         await user.update()
         res.status(200).send() // TODO: Handle duplicate key error
       }

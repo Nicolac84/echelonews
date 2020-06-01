@@ -105,6 +105,29 @@ describe('User Handler API', function () {
             }
           })
 
+          it('should properly update password', async () => {
+            function restorePass() {
+              return performUpdateRequest(presentUser[id], {
+                pass: presentUser2.pass,
+              })
+            }
+            try {
+              const res = await performUpdateRequest(presentUser[id], {
+                pass: 'abcdefghi123%^$',
+              })
+              expect(res).to.have.status(200)
+              const res2 = await conn.post('/auth').send({
+                name: presentUser.name,
+                pass: 'abcdefghi123%^$',
+              })
+              expect(res2).to.have.status(200)
+              await restorePass()
+            } catch (err) {
+              await restorePass()
+              throw err
+            }
+          })
+
           it(`should return 404 with inexistent ${id}`, async () => {
             try {
               const res = await performUpdateRequest(absentUser[id], {
