@@ -9,6 +9,49 @@ their preferences.
 The entire project documentation is served with GitHub Pages at
 [this address](https://Nicolac84.github.io/echelonews)
 
+## Testing
+
+EcheloNews is shipped with a test suite, which uses the following NPM packages:
+
+* [mocha](https://mochajs.org/) as the test framework
+* [chai](https://www.chaijs.com/) as the assertion library
+* [chai-http](https://www.chaijs.com/plugins/chai-http/) to make assertion for
+RESTful APIs
+* [dotenv](https://github.com/motdotla/dotenv) for environment setup (parsing
+the file `.env.test`)
+* [nyc](https://istanbul.js.org/) for test coverage
+
+These utilities are specified in the `package.json` as dev dependencies.
+
+### Environment setup
+
+In order to perform tests, you have to specify the following environment
+variables:
+
+**Variable** | **Description** | **Example**
+:-:|---|---
+`POSTGRES_URI` | URI to a postgres database | `postgres://user:pass@so.me.db/testdb`
+`ENVIRONMENT` | Execution environment - Should be `test` | `test`
+`PORT` | Port to which servers and APIs can be exposed | `8080`
+
+### Performing tests
+
+After having done a consistent setup, you can run the entire test suite with:
+
+```sh
+# Just run tests
+npm test 
+
+# Run tests and verify test coverage with nyc
+npm run coverage
+```
+
+Alternatively, you can perform single tests with _mocha_:
+
+```
+npx mocha <test-unit-files>  # e.g.: npx mocha test/models/user.js
+```
+
 
 ## License
 

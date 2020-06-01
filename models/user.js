@@ -13,9 +13,9 @@ const Validable = require('validable')
 const Perseest = require('perseest')
 const bcrypt = require('bcrypt')
 
+/** User entity, with no support for persistence */
 class VolatileUser extends Validable.Class {
-  /** User entity, with no support for persistence
-   * NOTE: The constructor will assign any other property included in 'opt'
+  /** Instantiate a new User
    * @param {object} opt - Constructor parameters
    * @param {number} opt.id - User univocal ID
    * @param {string} opt.name - Username
@@ -121,7 +121,12 @@ class VolatileUser extends Validable.Class {
   static BCRYPT_SALT_ROUNDS = process.env.ENVIRONMENT === 'test' ? 1 : 10
 }
 
+/** User with persistence capability via the perseest package
+ * @extends VolatileUser
+ */
 class User extends Perseest.Mixin(VolatileUser) {
+  /** @lends User */
+  /** Database configuration for perseest */
   static db = new Perseest.Config('Account', 'id', {
     id: { id: true, serial: true },
     name: { id: true },

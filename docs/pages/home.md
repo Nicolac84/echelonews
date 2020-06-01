@@ -16,12 +16,21 @@ EcheloNews is released under the **MIT license**
 
 ## Documentation
 
+### RESTful APIs
+
 EcheloNews internal and external RESTful APIs are designed and built as a set
 of OpenAPI3 YAML specifications. To view them, you can visit the following
 links:
 
 * [Exposed API]({{ site.url }}/openapi/external)
 * [Internal User Handler]({{ site.url }}/openapi/users)
+
+### Libraries and Programming APIs
+
+Libraries (and code portions in general) are documented with JSDoc and made
+available at the following links:
+
+* [User model]({{ site.url }}/models/user)
 
 ## Architecture
 

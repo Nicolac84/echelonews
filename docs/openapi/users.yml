@@ -67,6 +67,8 @@ paths:
           $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
         '404':
           $ref: "#/components/responses/NotFound"
     delete:
@@ -139,6 +141,8 @@ paths:
           $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
         '404':
           $ref: "#/components/responses/NotFound"
     delete:
@@ -211,6 +215,8 @@ paths:
           $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
         '404':
           $ref: "#/components/responses/NotFound"
     delete:
@@ -277,6 +283,8 @@ paths:
           $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: "#/components/responses/Unauthorized"
+        '403':
+          $ref: "#/components/responses/Forbidden"
 
 
 components:
@@ -287,12 +295,32 @@ components:
         message:
           type: string
           description: Error description message
+    ValidationError:
+      type: object
+      description: "Error in the form { field: [ error1, ... ], ... }"
+      example:
+        name: ['Name is too long', 'Name can not contain symbols']
+        pass: ['Missing password']
     ServerInfo:
       type: object
       properties:
-        motd:
+        message:
           type: string
-          description: TODO - Add something meaningful
+          description: Message by the user handler server
+        uptime:
+          type: number
+          description: Server uptime in seconds
+        platform:
+          type: string
+          description: Server host platform type
+        databaseStatus:
+          type: string
+          enum: [Available, Unavailable]
+          description: Status of the user database
+        users:
+          type: integer
+          nullable: true
+          description: Number of users present in the database
     LoginCredentials:
       type: object
       properties:
@@ -314,13 +342,18 @@ components:
         email:
           type: string
           description: User email
-        hash:
-          type: string
-          description: User hashed password
         created:
           type: string
           format: date-time
           description: Creation timestamp
+        topics:
+          type: array
+          items:
+            type: string
+        countries:
+          type: array
+          items:
+            type: string
 
   responses:
     MalformedRequest:
@@ -328,9 +361,15 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/ValidationError'
     Unauthorized:
       description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Operation can not be performed
       content:
         application/json:
           schema:
