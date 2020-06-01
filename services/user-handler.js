@@ -5,7 +5,16 @@
  */
 const express = require('express')
 const json_parser = require('body-parser').json()
+const Validable = require('validable')
 const { User } = require('../models/user')
+
+// Fields which can be written by the API interlocutor
+const UPDATE_ALLOWED = new Set(User.db.columns.keys())
+for (const x of ['id', 'hash', 'created', 'googleId']) {
+  UPDATE_ALLOWED.delete(x)
+}
+UPDATE_ALLOWED.add('pass')
+
 const app = express()
 
 // Get metadata for the current user handler server instance
@@ -13,6 +22,8 @@ app.get('/', (req, res) => {
   res.status(200).json({
     message: 'EcheloNews User Handler server',
     uptime: process.uptime(),
+    platform: process.platform,
+    versions: process.versions,
   })
 })
 
@@ -46,33 +57,13 @@ for (const id of ['id', 'name', 'email']) {
       return
     }
 
-    let errors
-    const fields = Object.getOwnPropertyNames(req.body)
-
-    // Check against inexistent fields
-    errors = fields
-      .filter(f => !User.db.columns.has(f))
-      .map(f => [f, [`Field ${f} does not exist`]])
-    if (errors.length) {
-      res.status(400).json(Object.fromEntries(errors))
+    const errors = Validable.whitelist(req.body, UPDATE_ALLOWED)
+    if (errors) {
+      res.status(400).json(errors)
       return
     }
 
-    // Check against non-updateable fields
-    errors = fields
-      .filter(f => UPDATE_FORBIDDEN.has(f))
-      .map(f => [f, [`${f} can not be updated`]])
-    if (errors.length) {
-      res.status(403).json(Object.fromEntries(errors))
-      return
-    }
-
-    // Check against malformed values
-    errors = fields.map(f => User.validate(f, req.body[f])).filter(e => e)
-    if (errors.length) {
-      res.status(400).json(Object.fromEntries(errors))
-      return
-    }
+    // TODO: Handle password update
 
     // Attempt to update the user
     try {
@@ -84,8 +75,7 @@ for (const id of ['id', 'name', 'email']) {
         res.status(200).send() // TODO: Handle duplicate key error
       }
     } catch (err) {
-      console.error(err)
-      res.status(500).json({ message: 'Internal database error. Sorry' })
+      handleTransactionError(err, res)
     }
   })
 
@@ -132,42 +122,12 @@ app.post('/auth', json_parser, async (req, res) => {
 // Attempt to register a new user
 // TODO: Handle duplicate key error
 app.post('/register', json_parser, async (req, res) => {
-  const entries = Object.entries(req.body)
-  let errors
-
-  // Check against inexistent fields
-  errors = entries
-    .map(([f, v]) => {
-      if (!User.db.columns.has(f)) {
-        return [f, `Field ${f} does not exist`]
-      } else if (UPDATE_FORBIDDEN.has(f)) {
-        return [f, `Field ${f} can not be passed`]
-      } else {
-        const verrors = User.validate(f, v)
-        if (verrors) return [f, verrors[f]]
-        else return null
-      }
-    })
-    .filter(e => e && e[0] !== 'pass')
-
-  // Handle missing or invalid password
-  if (!req.body.pass) {
-    errors.push(['pass', ['pass must be specified']])
-  } else {
-    const e = User.validate('pass', req.body.pass)
-    if (e) errors.push(e)
-  }
-
-  // Check mandatory arguments
-  errors.concat(
-    ['name', 'email', 'pass']
-      .filter(e => !req.body.hasOwnProperty(e))
-      .map(f => [f, `Field ${f} is mandatory`])
+  const errors = Validable.merge(
+    Validable.whitelist(req.body, UPDATE_ALLOWED),
+    Validable.requirelist(req.body, ['name', 'email', 'pass'])
   )
-
-  // If errors were encountered, respond immediately
-  if (errors.length) {
-    res.status(400).json(Object.fromEntries(errors))
+  if (errors) {
+    res.status(400).json(errors)
     return
   }
 
@@ -177,12 +137,25 @@ app.post('/register', json_parser, async (req, res) => {
     await user.save()
     res.status(201).json(user.export())
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ message: 'Internal database error. Sorry' })
+    handleTransactionError(err, res)
   }
 })
 
-// Fields which can not be updated
-const UPDATE_FORBIDDEN = new Set(['id', 'hash', 'created', 'googleId'])
+// Handle a database or validation error
+function handleTransactionError(err, res) {
+  if (err.constructor.name === Validable.Error.name) {
+    res.status(400).json(err.errors)
+  } else if (err.code === '23505') {
+    // Duplicate key
+    const matcher = /.*\(([a-zA-Z0-9]+)\)=\(([a-zA-Z0-9]+)\).*/
+    const dupErr = err.detail.replace(matcher, '$1 $2').split(' ')
+    res
+      .status(403)
+      .json({ [dupErr[0]]: `${dupErr[0]} '${dupErr[1]}' is already taken` })
+  } else {
+    console.error(err)
+    res.status(500).json({ message: 'Internal database error. Sorry' })
+  }
+}
 
 module.exports = app

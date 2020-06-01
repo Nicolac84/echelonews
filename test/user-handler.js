@@ -9,7 +9,7 @@ chai.use(require('chai-http'))
 
 describe('User Handler API', function () {
   // Initialize test database with mock users
-  let presentUser, absentUser, invalidUser
+  let presentUser, presentUser2, absentUser, invalidUser
   before(async () => {
     invalidUser = new User({
       id: -123,
@@ -21,7 +21,7 @@ describe('User Handler API', function () {
       googleId: 'ghi!@',
     })
     try {
-      ;[presentUser, absentUser] = await UserFactory.setupTestDB(
+      ;[presentUser, absentUser, presentUser2] = await UserFactory.setupTestDB(
         process.env.POSTGRES_URI
       )
     } catch (err) {
@@ -116,10 +116,23 @@ describe('User Handler API', function () {
             }
           })
 
-          it('should return 403 when trying to update user id', async () => {
+          for (const f of ['id', 'created', 'googleId', 'hash']) {
+            it(`should return 400 when trying to update ${f}`, async () => {
+              try {
+                const res = await performUpdateRequest(presentUser[id], {
+                  [f]: presentUser[f],
+                })
+                expect(res).to.have.status(400)
+              } catch (err) {
+                throw err
+              }
+            })
+          }
+
+          it('should return 403 when a unique field is already taken', async () => {
             try {
               const res = await performUpdateRequest(presentUser[id], {
-                id: 123,
+                name: presentUser2.name,
               })
               expect(res).to.have.status(403)
             } catch (err) {
@@ -317,6 +330,18 @@ describe('User Handler API', function () {
             throw err
           }
         })
+      }
+    })
+
+    it('should return 404 if if a unique field is already taken', async () => {
+      try {
+        const res = await tryRegister({
+          name: presentUser.name,
+          pass: presentUser.pass,
+        })
+        expect(res).to.have.status(403)
+      } catch (err) {
+        throw err
       }
     })
   })

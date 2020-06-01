@@ -29,15 +29,15 @@ class VolatileUser extends Validable.Class {
    */
   constructor(opt = {}) {
     super()
-    Object.assign(
-      this,
-      {
-        created: new Date(),
-        countries: [],
-        topics: [],
-      },
-      opt
-    )
+    this.id = opt.id
+    this.name = opt.name
+    this.pass = opt.pass
+    this.hash = opt.hash
+    this.email = opt.email
+    this.googleId = opt.googleId
+    this.topics = opt.topics || []
+    this.countries = opt.countries || []
+    this.created = opt.created || new Date()
   }
 
   /** Create a user, hashing its plaintext password if given

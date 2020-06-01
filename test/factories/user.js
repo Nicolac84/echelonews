@@ -20,6 +20,7 @@ class UserFactory {
       name: `uniqueUser${id}`,
       email: `uniqueUser${id}@mo.ck`,
       pass: this.GOOD_PASSWORD,
+      googleId: id + 1000, // NEVER ATTEMPT TO PASS IT TO GOOGLE!!!!
       countries: [],
       topics: [],
     }
@@ -41,6 +42,10 @@ class UserFactory {
         name: 'idoalreadyexist',
         email: 'existing@ema.il',
       })
+      const existing2 = await this.create({
+        name: 'idoalreadyexist2',
+        email: 'existing2@ema.il',
+      })
       const nonExisting = await this.create({
         name: 'idonotexist',
         email: 'nonexisting@ema.il',
@@ -55,12 +60,13 @@ class UserFactory {
       await User.db.pool.query(fs.readFileSync('sql/account.sql').toString())
 
       await existing.save()
+      await existing2.save()
 
       // Make sure that none of nonExisting ID columns will actually exist
       await nonExisting.save()
       await nonExisting.delete()
 
-      return [existing, nonExisting]
+      return [existing, nonExisting, existing2]
     } catch (err) {
       throw err
     }
