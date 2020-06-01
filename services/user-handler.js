@@ -3,8 +3,9 @@
  * Copyright (c) 2020 Nicola Colao, Paolo Lucchesi, Dejan Nuzzi
  * All rights reserved
  */
+'use strict'
 const express = require('express')
-const json_parser = require('body-parser').json()
+const jsonParser = require('body-parser').json()
 const Validable = require('validable')
 const { User } = require('../models/user')
 
@@ -18,12 +19,20 @@ UPDATE_ALLOWED.add('pass')
 const app = express()
 
 // Get metadata for the current user handler server instance
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+  let users
+  try {
+    const pgRes = await User.db.pool.query('SELECT COUNT(*) AS n FROM Account')
+    users = pgRes.rows[0].n
+  } catch (err) {
+    users = null
+  }
   res.status(200).json({
     message: 'EcheloNews User Handler server',
     uptime: process.uptime(),
     platform: process.platform,
-    versions: process.versions,
+    databaseStatus: users === null ? 'Unavailable' : 'Available',
+    users: users,
   })
 })
 
@@ -50,7 +59,7 @@ for (const id of ['id', 'name', 'email']) {
 
   // Update a user by arbitrary field
   // TODO: Avoid performing 2 queries
-  app.put(`/users/by${id}/:${id}`, json_parser, async (req, res) => {
+  app.put(`/users/by${id}/:${id}`, jsonParser, async (req, res) => {
     const idval = decodeURIComponent(req.params[id])
     if (!idval || User.validate(id, idval)) {
       res.status(400).json({ message: `Invalid ${id} ${idval}` })
@@ -73,7 +82,7 @@ for (const id of ['id', 'name', 'email']) {
           await user.setPassword(user.pass)
         }
         await user.update()
-        res.status(200).send() // TODO: Handle duplicate key error
+        res.status(200).send()
       }
     } catch (err) {
       handleTransactionError(err, res)
@@ -100,15 +109,18 @@ for (const id of ['id', 'name', 'email']) {
 
 // Authenticate with login/password credentials
 // TODO: Make possible to authenticate also with email or id
-app.post('/auth', json_parser, async (req, res) => {
-  const name = req.body.name
-  for (const f of ['name', 'pass']) {
-    if (!req.body[f] || User.validate(f, req.body[f])) {
-      res.status(400).json({ message: `Invalid ${f}` })
-      return
-    }
+app.post('/auth', jsonParser, async (req, res) => {
+  const errors = Validable.merge(
+    Validable.requirelist(req.body, ['name', 'pass']),
+    Validable.whitelist(req.body, ['name', 'pass']),
+    User.validateObject(req.body, true)
+  )
+  if (errors) {
+    res.status(400).json(errors)
+    return
   }
 
+  const name = req.body.name
   try {
     const user = await User.fetch('name', name)
     if (user && (await user.authenticate(req.body.pass))) {
@@ -121,8 +133,7 @@ app.post('/auth', json_parser, async (req, res) => {
 })
 
 // Attempt to register a new user
-// TODO: Handle duplicate key error
-app.post('/register', json_parser, async (req, res) => {
+app.post('/register', jsonParser, async (req, res) => {
   const errors = Validable.merge(
     Validable.whitelist(req.body, UPDATE_ALLOWED),
     Validable.requirelist(req.body, ['name', 'email', 'pass'])
@@ -148,7 +159,7 @@ function handleTransactionError(err, res) {
     res.status(400).json(err.errors)
   } else if (err.code === '23505') {
     // Duplicate key
-    const matcher = /.*\(([a-zA-Z0-9]+)\)=\(([a-zA-Z0-9]+)\).*/
+    const matcher = /.*\(([a-zA-Z0-9]+)\)=\((.+)\).*/
     const dupErr = err.detail.replace(matcher, '$1 $2').split(' ')
     res
       .status(403)
@@ -157,6 +168,15 @@ function handleTransactionError(err, res) {
     console.error(err)
     res.status(500).json({ message: 'Internal database error. Sorry' })
   }
+}
+
+// If this is the main module, launch the user handler server
+if (require.main === module) {
+  const port = process.env.PORT || 8080
+  console.log('[INFO] Setting up database')
+  User.db.setup(process.env.POSTGRES_URI)
+  console.log(`[INFO] Launching server on port ${port}`)
+  app.listen(port)
 }
 
 module.exports = app

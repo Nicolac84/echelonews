@@ -1,5 +1,7 @@
 // echelonews - Factory for test units
 // User model
+'use strict'
+require('dotenv').config({ path: './.env.test' })
 const fs = require('fs')
 const { User } = require('../../models/user')
 

@@ -118,7 +118,7 @@ class VolatileUser extends Validable.Class {
   }
 
   /** @constant {number} - BCrypt hash cost */
-  static BCRYPT_SALT_ROUNDS = process.env['ENVIRONMENT'] === 'test' ? 1 : 12
+  static BCRYPT_SALT_ROUNDS = process.env.ENVIRONMENT === 'test' ? 1 : 10
 }
 
 class User extends Perseest.Mixin(VolatileUser) {
