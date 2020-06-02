@@ -1,0 +1,68 @@
+openapi: 3.0.0
+info:
+  title: echelonews-organizer
+  description: EcheloNews news organizer
+  version: 0.0.1
+
+paths:
+  /:
+    get:
+      summary: Get basic informations on the server
+      responses:
+        '200':
+          description: Generic informations on the server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerInfo"
+  /store:
+    post:
+      summary: Store a new article
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Article"
+      responses:
+        '201':
+          description: Successfully created new article
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
+
+
+components:
+  schemas:
+    ServerInfo:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message by the news organizer server
+        uptime:
+          type: number
+          description: Server uptime in seconds
+        platform:
+          type: string
+          description: Server host platform type
+        databaseStatus:
+          type: string
+          enum: [Available, Unavailable]
+          description: Status of the database
+        articles:
+          type: integer
+          nullable: true
+          description: Number of articles present in the database
+    ValidationError:
+      type: object
+      description: "Error in the form { field: [ error1, ... ], ... }"
+      example:
+        title: ['Title is too long', 'Title is not valid']
+        source: ['Source is not an existing newspaper ID']
+  responses:
+    MalformedRequest:
+      description: Malformed request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
