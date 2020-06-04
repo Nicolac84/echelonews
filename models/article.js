@@ -10,6 +10,7 @@
 'use strict'
 const Validable = require('validable')
 const Perseest = require('perseest')
+const modHelpers = require('./helpers/perseest')
 
 /** Article, with no persistence support */
 class VolatileArticle extends Validable.Class {
@@ -20,7 +21,7 @@ class VolatileArticle extends Validable.Class {
    * @param {string} opt.title - Article title
    * @param {string} opt.preview - Article short description
    * @param {string} opt.origin - Reference URL to the full article
-   * @param {Array>string>} opt.topics - Treated topics
+   * @param {Array<string>} opt.topics - Treated topics
    * @param {Date} opt.created - Article creation date and time
    */
   constructor(opt = {}) {
@@ -56,6 +57,7 @@ class VolatileArticle extends Validable.Class {
       presence: { allowEmpty: false },
     },
     created: { datetime: true },
+    topics: { type: 'array' },
     exists: { type: 'boolean' },
   }
 }
@@ -89,33 +91,8 @@ Validable.validate.extend(Validable.validate.validators.datetime, {
   format: value => new Date(value),
 })
 
-// Override default save query
-Article.db.queries.create({
-  name: 'save',
-  transform: ({ res }) => res.rows[0],
-  generate: ({ conf, ent, columns }) => {
-    const [cols, vals] = Perseest.aux.entityCV(ent, columns)
-    return {
-      text: `INSERT INTO ${conf.table} (
-  ${cols.join(', ')}
-) VALUES (
-  ${Perseest.aux.placeholders(cols.length)}
-) RETURNING id`,
-      values: vals,
-    }
-  },
-})
-
-// Retrieve and apply user ID after insertion
-Article.db.addHook('after', 'save', params => {
-  if (!params.res.rows.length) params.ret = false
-  params.ent.id = params.res.rows[0].id
-  params.ret = true
-})
-
-// Convert 'created' timestamp in a Date JS object
-Article.db.addHook('after', 'fetch', params => {
-  if (params.ent) params.ent.created = new Date(params.ent.created)
-})
+modHelpers.setIDAfterSaving(Article, 'id')
+modHelpers.tm2DateAfterFetch(Article, 'created')
+modHelpers.validateBeforeQuery(Article)
 
 module.exports = { VolatileArticle, Article }

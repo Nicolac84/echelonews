@@ -37,10 +37,7 @@ app.get('/', async (req, res) => {
 
 // Store an incoming article
 app.post('/store', jsonParser, async (req, res) => {
-  const errors = Validable.merge(
-    Validable.whitelist(req.body, UPDATE_ALLOWED),
-    Article.validateObject(req.body)
-  )
+  const errors = Validable.whitelist(req.body, UPDATE_ALLOWED)
   if (errors) {
     res.status(400).json(errors)
     return
@@ -51,10 +48,14 @@ app.post('/store', jsonParser, async (req, res) => {
     await new Article(req.body).save()
     res.status(201).send()
   } catch (err) {
-    if (err.code === '23503') { // Inexistent foreign key
+    if (err.constructor.name === Validable.Error.name) {
+      res.status(400).json(err.errors)
+    } else if (err.code === '23503') {
+      // Inexistent foreign key
       const matcher = /.*\(([a-zA-Z0-9]+)\)=\((.+)\).*/
       const fkErr = err.detail.replace(matcher, '$1 $2').split(' ')
-      res.status(403)
+      res
+        .status(403)
         .json({ [fkErr[0]]: `${fkErr[0]} '${fkErr[1]}' does not exist` })
     } else {
       console.error(err)
@@ -73,8 +74,6 @@ if (require.main === module) {
 }
 
 // Handle a database or validation error
-function handleTransactionError(err, res) {
-}
-
+function handleTransactionError(err, res) {}
 
 module.exports = app

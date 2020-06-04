@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "npx mocha test/ test/models",
+    "test": "npx mocha test/{models,services}",
     "coverage": "npx nyc npm test",
     "lint": "npx standard --fix {services,models}/**/*.js; npx standard --env mocha --fix test/{*.js,**/*.js}; npx prettier --write {services,test,models}/{*.js,**/*.js}"
   },

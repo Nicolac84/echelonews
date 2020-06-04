@@ -1,12 +1,12 @@
 // echelonews - Test Unit
 // User handler API
 'use strict'
-require('dotenv').config({ path: './.env.test' })
+require('dotenv').config({ path: '.env.test' })
 const chai = require('chai')
 const expect = chai.expect
-const app = require('../services/user-handler')
-const { User } = require('../models/user')
-const { UserFactory } = require('./factories/user')
+const app = require('../../services/user-handler')
+const { User } = require('../../models/user')
+const { UserFactory } = require('../factories/user')
 chai.use(require('chai-http'))
 
 describe('User Handler API', function () {

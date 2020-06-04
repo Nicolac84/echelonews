@@ -12,6 +12,7 @@
 const Validable = require('validable')
 const Perseest = require('perseest')
 const bcrypt = require('bcrypt')
+const modHelpers = require('./helpers/perseest')
 
 /** User entity, with no support for persistence */
 class VolatileUser extends Validable.Class {
@@ -103,7 +104,6 @@ class VolatileUser extends Validable.Class {
       email: true,
       presence: { allowEmpty: false },
     },
-    exists: { type: 'boolean' },
     pass: {
       type: 'string',
       length: { minimum: 8, maximum: 72 },
@@ -115,6 +115,9 @@ class VolatileUser extends Validable.Class {
     created: {
       datetime: true,
     },
+    exists: { type: 'boolean' },
+    topics: { type: 'array' },
+    countries: { type: 'array' },
   }
 
   /** @constant {number} - BCrypt hash cost */
@@ -145,60 +148,9 @@ User.db.ids = function* () {
   for (const [c, a] of User.db.columns) if (a && a.id) yield c
 }
 
-// Update validator
-function dbUpdateValidator({ columns, values }) {
-  const props = {}
-  for (let i = 0; i < columns.length; ++i) props[columns[i]] = values[i]
-  const errs = User.validateObject(props, true)
-  if (errs) throw new Validable.Error(errs)
-}
-
-// Save validator
-function dbSaveValidator({ ent }) {
-  const errs = ent.validate()
-  if (errs) throw new Validable.Error(errs)
-}
-
-// Delete validator (static and instance)
-function dbFetchDeleteValidator({ key, kval }) {
-  const errs = User.validate(key, kval)
-  if (errs) throw new Validable.Error(errs)
-}
-
-// Override default save query
-User.db.queries.create({
-  name: 'save',
-  transform: ({ res }) => res.rows[0],
-  generate: ({ conf, ent, columns }) => {
-    const [cols, vals] = Perseest.aux.entityCV(ent, columns)
-    return {
-      text: `INSERT INTO ${conf.table} (
-  ${cols.join(', ')}
-) VALUES (
-  ${Perseest.aux.placeholders(cols.length)}
-) RETURNING id`,
-      values: vals,
-    }
-  },
-})
-
-// Retrieve and apply user ID after insertion
-User.db.addHook('after', 'save', params => {
-  if (!params.res.rows.length) params.ret = false
-  params.ent.id = params.res.rows[0].id
-  params.ret = true
-})
-
-// Convert 'created' timestamp in a Date JS object
-User.db.addHook('after', 'fetch', params => {
-  if (params.ent) params.ent.created = new Date(params.ent.created)
-})
-
-// Validate users fields before performing queries on them
-User.db.addHook('before', 'save', dbSaveValidator)
-User.db.addHook('before', 'update', dbUpdateValidator)
-User.db.addHook('before', 'fetch', dbFetchDeleteValidator)
-User.db.addHook('before', 'delete', dbFetchDeleteValidator)
+modHelpers.setIDAfterSaving(User, 'id')
+modHelpers.tm2DateAfterFetch(User, 'created')
+modHelpers.validateBeforeQuery(User)
 
 // Add format and parser to use validate.js datetime
 Validable.validate.extend(Validable.validate.validators.datetime, {

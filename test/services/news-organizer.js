@@ -1,13 +1,13 @@
 // echelonews - Test Unit
 // News organizer API
 'use strict'
-require('dotenv').config({ path: './.env.test' })
+require('dotenv').config({ path: '.env.test' })
 const chai = require('chai')
 const expect = chai.expect
-const app = require('../services/news-organizer')
-const { Article } = require('../models/article')
-const { ArticleFactory } = require('./factories/article')
-const { NewspaperFactory } = require('./factories/newspaper')
+const app = require('../../services/news-organizer')
+const { Article } = require('../../models/article')
+const { ArticleFactory } = require('../factories/article')
+const { NewspaperFactory } = require('../factories/newspaper')
 chai.use(require('chai-http'))
 
 // Setup database
