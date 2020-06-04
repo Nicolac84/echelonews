@@ -31,32 +31,32 @@ class VolatileArticle extends Validable.Class {
     this.source = opt.source
     this.origin = opt.origin
     this.topics = opt.topics || []
-    this.created = opt.created
+    this.created = opt.created || new Date()
   }
 
   /** @constant {object} - Constraints on Article instance properties */
   static constraints = {
     id: {
       numericality: { greaterThanOrEqualTo: 0, strict: true },
-      presence: true
     },
     source: {
       numericality: { greaterThanOrEqualTo: 0, strict: true },
-      presence: true
+      presence: true,
     },
     title: {
       type: 'string',
-      presence: { allowEmpty: false }
+      presence: { allowEmpty: false },
     },
     preview: {
       type: 'string',
-      presence: { allowEmpty: false }
+      presence: { allowEmpty: false },
     },
     origin: {
       type: 'string',
-      presence: { allowEmpty: false }
+      presence: { allowEmpty: false },
     },
     created: { datetime: true },
+    exists: { type: 'boolean' },
   }
 }
 
@@ -65,6 +65,12 @@ class VolatileArticle extends Validable.Class {
  */
 class Article extends Perseest.Mixin(VolatileArticle) {
   /** @lends Article */
+  /** Create a new persistent article */
+  constructor(opt) {
+    super(opt)
+    if (opt.exists) this.exists = opt.exists
+  }
+
   /** Database configuration for perseest */
   static db = new Perseest.Config('Article', 'id', [
     ['id', { serial: true, id: true }],
@@ -73,6 +79,7 @@ class Article extends Perseest.Mixin(VolatileArticle) {
     'preview',
     'origin',
     'topics',
+    'created',
   ])
 }
 
@@ -80,6 +87,35 @@ class Article extends Perseest.Mixin(VolatileArticle) {
 Validable.validate.extend(Validable.validate.validators.datetime, {
   parse: value => new Date(value).valueOf(),
   format: value => new Date(value),
+})
+
+// Override default save query
+Article.db.queries.create({
+  name: 'save',
+  transform: ({ res }) => res.rows[0],
+  generate: ({ conf, ent, columns }) => {
+    const [cols, vals] = Perseest.aux.entityCV(ent, columns)
+    return {
+      text: `INSERT INTO ${conf.table} (
+  ${cols.join(', ')}
+) VALUES (
+  ${Perseest.aux.placeholders(cols.length)}
+) RETURNING id`,
+      values: vals,
+    }
+  },
+})
+
+// Retrieve and apply user ID after insertion
+Article.db.addHook('after', 'save', params => {
+  if (!params.res.rows.length) params.ret = false
+  params.ent.id = params.res.rows[0].id
+  params.ret = true
+})
+
+// Convert 'created' timestamp in a Date JS object
+Article.db.addHook('after', 'fetch', params => {
+  if (params.ent) params.ent.created = new Date(params.ent.created)
 })
 
 module.exports = { VolatileArticle, Article }

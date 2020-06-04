@@ -32,17 +32,18 @@ class VolatileNewspaper extends Validable.Class {
   static constraints = {
     id: {
       numericality: { greaterThanOrEqualTo: 0, strict: true },
-      presence: true
+      presence: true,
     },
     sourceType: {
       type: 'string',
-      presence: { allowEmpty: false }
+      presence: { allowEmpty: false },
     },
     country: {
       type: 'string',
-      presence: { allowEmpty: false }
+      presence: { allowEmpty: false },
     },
     info: { type: 'object' },
+    exists: { type: 'boolean' },
   }
 }
 
@@ -59,5 +60,29 @@ class Newspaper extends Perseest.Mixin(VolatileNewspaper) {
     'info',
   ])
 }
+
+// Override default save query
+Newspaper.db.queries.create({
+  name: 'save',
+  transform: ({ res }) => res.rows[0],
+  generate: ({ conf, ent, columns }) => {
+    const [cols, vals] = Perseest.aux.entityCV(ent, columns)
+    return {
+      text: `INSERT INTO ${conf.table} (
+  ${cols.join(', ')}
+) VALUES (
+  ${Perseest.aux.placeholders(cols.length)}
+) RETURNING id`,
+      values: vals,
+    }
+  },
+})
+
+// Retrieve and apply user ID after insertion
+Newspaper.db.addHook('after', 'save', params => {
+  if (!params.res.rows.length) params.ret = false
+  params.ent.id = params.res.rows[0].id
+  params.ret = true
+})
 
 module.exports = { VolatileNewspaper, Newspaper }
