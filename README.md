@@ -52,6 +52,20 @@ Alternatively, you can perform single tests with _mocha_:
 npx mocha <test-unit-files>  # e.g.: npx mocha test/models/user.js
 ```
 
+### Testing manually
+
+Of course, you can launch and test manually any microservice. After having
+initialized the required environment variables and the database (refer to the
+queries under the `sql/` directory), you can launch a service with:
+
+```
+node services/<service-name>.js
+```
+
+If the `PORT` environment variable is not specified `8080` will be used.
+
+You can verify the general status of any microservice with a `GET /` request.
+
 
 ## License
 

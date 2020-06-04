@@ -27,10 +27,8 @@ links:
 
 ### Libraries and Programming APIs
 
-Libraries (and code portions in general) are documented with JSDoc and made
-available at the following links:
-
-* [User model]({{ site.url }}/models/user)
+Libraries (and code portions in general) are documented with JSDoc; the
+documentation is available at [this page]({{ site.url }}/jsdoc/models)
 
 ## Architecture
 

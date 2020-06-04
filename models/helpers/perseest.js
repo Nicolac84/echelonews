@@ -1,4 +1,5 @@
 /** echelonews - Model helpers
+ * @module perseest-helper
  * @requires validable
  * @requires perseest
  * @license

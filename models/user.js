@@ -72,7 +72,7 @@ class VolatileUser extends Validable.Class {
   /** Set user password
    * @param {string} pass - Plaintext password
    * @throws Password must be valid
-   * @returns undefined
+   * @returns {undefined}
    */
   async setPassword(pass) {
     const verrors = this.constructor.validate('pass', pass)
