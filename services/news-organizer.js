@@ -51,9 +51,15 @@ app.post('/store', jsonParser, async (req, res) => {
     await new Article(req.body).save()
     res.status(201).send()
   } catch (err) {
-    // TODO: Handle foreign key errors
-    console.error(err)
-    res.status(500).json({ message: 'Internal database error. Sorry' })
+    if (err.code === '23503') { // Inexistent foreign key
+      const matcher = /.*\(([a-zA-Z0-9]+)\)=\((.+)\).*/
+      const fkErr = err.detail.replace(matcher, '$1 $2').split(' ')
+      res.status(403)
+        .json({ [fkErr[0]]: `${fkErr[0]} '${fkErr[1]}' does not exist` })
+    } else {
+      console.error(err)
+      res.status(500).json({ message: 'Internal database error. Sorry' })
+    }
   }
 })
 
@@ -65,5 +71,10 @@ if (require.main === module) {
   console.log(`[INFO] Launching server on port ${port}`)
   app.listen(port)
 }
+
+// Handle a database or validation error
+function handleTransactionError(err, res) {
+}
+
 
 module.exports = app

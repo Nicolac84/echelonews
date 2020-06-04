@@ -116,5 +116,14 @@ describe('News Organizer API', function () {
     })
   })
 
-  it('should return 403 if source newspaper does not exist')
+  it('should return 403 if source newspaper does not exist', async () => {
+    const art = ArticleFactory.create({ source: npapers.absent.id })
+    try {
+      const res = await conn.post('/store').send(art)
+      expect(res).to.have.status(403)
+      expect(res.body).to.have.ownProperty('source')
+    } catch (err) {
+      throw err
+    }
+  })
 })
