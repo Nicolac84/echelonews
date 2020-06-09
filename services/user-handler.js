@@ -11,9 +11,7 @@ const { User } = require('../models/user')
 
 // Fields which can be written by the API interlocutor
 const UPDATE_ALLOWED = new Set(User.db.columns.keys())
-for (const x of ['id', 'hash', 'created', 'googleId']) {
-  UPDATE_ALLOWED.delete(x)
-}
+;['id', 'hash', 'created'].forEach(x => UPDATE_ALLOWED.delete(x))
 UPDATE_ALLOWED.add('pass')
 
 const app = express()

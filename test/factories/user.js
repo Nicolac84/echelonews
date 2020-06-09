@@ -22,7 +22,6 @@ class UserFactory {
       name: `uniqueUser${id}`,
       email: `uniqueUser${id}@mo.ck`,
       pass: this.GOOD_PASSWORD,
-      googleId: id + 1000, // NEVER ATTEMPT TO PASS IT TO GOOGLE!!!!
       countries: [],
       topics: [],
     }

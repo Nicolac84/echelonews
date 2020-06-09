@@ -24,7 +24,6 @@ class VolatileUser extends Validable.Class {
    * @param {string} opt.pass - User plaintext password
    * @param {string} opt.hash - User hashed password
    * @param {Date} opt.created - User creation timestamp
-   * @param {number} opt.googleId - Google account ID for the user
    * @param {Array<String>} opt.countries - Countries in the user preferences
    * @param {Array<String>} opt.topics - Countries in the user preferences
    */
@@ -35,7 +34,6 @@ class VolatileUser extends Validable.Class {
     this.pass = opt.pass
     this.hash = opt.hash
     this.email = opt.email
-    this.googleId = opt.googleId
     this.topics = opt.topics || []
     this.countries = opt.countries || []
     this.created = opt.created || new Date()
@@ -64,7 +62,6 @@ class VolatileUser extends Validable.Class {
       email: this.email,
       topics: this.topics,
       created: this.created,
-      googleId: this.googleId,
       countries: this.countries,
     }
   }

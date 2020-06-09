@@ -20,7 +20,6 @@ describe('User Handler API', function () {
       pass: 'a',
       countries: 'abc',
       topics: 'def',
-      googleId: 'ghi!@',
     })
     try {
       ;[presentUser, absentUser, presentUser2] = await UserFactory.setupTestDB(
@@ -141,7 +140,7 @@ describe('User Handler API', function () {
             }
           })
 
-          for (const f of ['id', 'created', 'googleId', 'hash']) {
+          for (const f of ['id', 'created', 'hash']) {
             it(`should return 400 when trying to update ${f}`, async () => {
               try {
                 const res = await performUpdateRequest(presentUser[id], {
