@@ -85,6 +85,8 @@ class Article extends Perseest.Mixin(VolatileArticle) {
   ])
 }
 
+Article.db.row2Entity = row => new Article(Object.assign(row, { exists: true }))
+
 // Add format and parser to use validate.js datetime
 Validable.validate.extend(Validable.validate.validators.datetime, {
   parse: value => new Date(value).valueOf(),
