@@ -25,8 +25,9 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(express.urlencoded({extended: false}))
 
 app.set('view engine', 'ejs')
+app.use(express.static('public'));
 
-app.use(express.static('public'))
+
 
 app.use(flash())
 
@@ -35,7 +36,6 @@ secret: process.env.SESSION_SECRET,
 resave: false,
 saveUnitialized: false
 
-
 }))
 
 
@@ -43,7 +43,6 @@ app.get('/',chekAuthenticated ,(req, res)=> {
    res.render('index.ejs',{name: req.user.name})
 
 })
-
 
 app.get('/login',checkNotAuthenticated,(req, res) => {
   res.render('login.ejs')
