@@ -1,27 +1,99 @@
-const express = require('express');
-const app = express();
-const bodyparser = require('body-parser');
+if (process.env.NODE_ENV !== 'production'){
+   require('dotenv').config()
+}
 
-app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({extended: true }));
+const express =require('express')
+const app = express()
+const bodyParser = require('body-parser')
+const bcrypt = require ('bcrypt')
+const passport =require('passport')
+const flash = require('express-flash')
+const session = require('express-session')
 
-app.use(express.static('public'));
+
+const initializePassport = require('./passport-conf')
+initializePassport(
+ passport,
+ email => users.find (user => user.email === email ),
+ id => users.find(user => user.id === id )
+)
+const user =[]
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
+
+app.use(express.urlencoded({extended: false}))
+
+app.set('view engine', 'ejs')
+
+app.use(express.static('public'))
+
+app.use(flash())
+
+app.use(session({ 
+secret: process.env.SESSION_SECRET,
+resave: false,
+saveUnitialized: false
 
 
+}))
 
-app.get('/prova', function(req,res){
-res.render('index',{title: 'ciao' , message:' bella rega' });
+
+app.get('/',chekAuthenticated ,(req, res)=> {
+   res.render('index.ejs',{name: req.user.name})
+
 })
 
-app.post('/new-user', (req,res)=>{
-console.log('body:',req.body);
-var nome = req.body.nome;
-var cognome = req.body.cognome;
+
+app.get('/login',checkNotAuthenticated,(req, res) => {
+  res.render('login.ejs')
 })
 
+app.post('/login',checkNotAuthenticated,passport.authenticate('local',{
+    successRedirect: '/',
+    failureRedirect:  '/login',
+    failureFlash: true
+}))
+ 
+ 
+app.get('/register', checkNotAuthenticated, (req,res) => {
+   res.render('register.ejs')
+})
 
-app.listen(3000, function(){
-   console.log('server listening on port 3000');
-   
+app.post('/register',checkNotAuthenticated, async (req, res)=>{
+try {
+   const hashedPassword = await bcrypt.hash(req.body.password, 10)
+   user.push({
+      id: Date.now().toString(),
+      name: req.body.name, 
+      email: req.body.email,
+      password: hashedPassword
+})
+   res.redirect('/login')
+   }catch {
+   res.redirec('/register')
+}
+})
+
+app.delete('/logout',(req, res)=>{
+   req.logOut()
+   req.redirect('/login')
 
 })
+
+function chekAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+  return next()
+  }
+
+res.redirect('/login')
+}
+
+function checkNotAuthenticated(req, res, next){
+   if (req.isAuthenticated()){
+       return res.redirect('/')
+   }
+    next()
+}
+
+app.listen(3000)
