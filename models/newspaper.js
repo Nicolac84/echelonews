@@ -61,6 +61,9 @@ class Newspaper extends Perseest.Mixin(VolatileNewspaper) {
   ])
 }
 
+Newspaper.db.row2Entity = row =>
+  new Newspaper(Object.assign(row, { exists: true }))
+
 modHelpers.setIDAfterSaving(Newspaper, 'id')
 modHelpers.validateBeforeQuery(Newspaper)
 
