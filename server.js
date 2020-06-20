@@ -16,6 +16,8 @@ initializePassport(
  email => users.find (user => user.email === email ),
  id => users.find(user => user.id === id )
 )
+
+// database da inserire !
 const user =[]
 app.use(express.json())
 
