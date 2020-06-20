@@ -10,7 +10,6 @@ const passport =require('passport')
 const flash = require('express-flash')
 const session = require('express-session')
 
-
 const initializePassport = require('./passport-conf')
 initializePassport(
  passport,
@@ -18,6 +17,7 @@ initializePassport(
  id => users.find(user => user.id === id )
 )
 const user =[]
+app.use(express.json())
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
@@ -40,9 +40,23 @@ saveUnitialized: false
 
 
 app.get('/',chekAuthenticated ,(req, res)=> {
-   res.render('index.ejs',{name: req.user.name})
+
 
 })
+
+app.post('/users', async (req, res) => {
+  try { const salt = await bcrypt.genSalt()
+      const hashedPassword = await bcrypt.hash(req.body.password, salt)
+      console.log(salt)
+      console.log(hashedPassword) 
+      const user = { name: req.body.name, password: hashedPassword }
+      users.push(user)
+      res.status(201).send()
+  }   catch {
+      res.status(500).send()
+  }
+})
+
 
 app.get('/login',checkNotAuthenticated,(req, res) => {
   res.render('login.ejs')
