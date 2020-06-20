@@ -1,7 +1,7 @@
 // echelonews - Test Unit
 // User model
 'use strict'
-require('dotenv').config({ path: './.env.test' })
+require('dotenv').config({ path: '.env.test' })
 const expect = require('chai').expect
 const { User } = require('../../models/user')
 const { UserFactory } = require('../factories/user')

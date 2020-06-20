@@ -1,7 +1,7 @@
 // echelonews - Factory for test units
 // Article model
 'use strict'
-require('dotenv').config({ path: './.env.test' })
+require('dotenv').config({ path: '.env.test' })
 const { Article, VolatileArticle } = require('../../models/article')
 const fs = require('fs')
 

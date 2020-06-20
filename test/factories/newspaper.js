@@ -1,7 +1,7 @@
 // echelonews - Factory for test units
 // Newspaper model
 'use strict'
-require('dotenv').config({ path: './.env.test' })
+require('dotenv').config({ path: '.env.test' })
 const { Newspaper } = require('../../models/newspaper')
 const fs = require('fs')
 

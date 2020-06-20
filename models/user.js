@@ -14,6 +14,8 @@ const Perseest = require('perseest')
 const bcrypt = require('bcrypt')
 const modHelpers = require('./helpers/perseest')
 
+console.log(process.env.ENVIRONMENT)
+
 /** User entity, with no support for persistence */
 class VolatileUser extends Validable.Class {
   /** Instantiate a new User
