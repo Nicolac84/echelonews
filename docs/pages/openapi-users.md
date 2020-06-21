@@ -1,5 +1,5 @@
 ---
-title: OpenAPI3 User Handler Specification
+title: User Handler OpenAPI3 Specification
 permalink: /openapi/users
 ---
 

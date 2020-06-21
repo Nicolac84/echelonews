@@ -1,5 +1,5 @@
 ---
-title: OpenAPI3 External API Specification
+title: Exposed API OpenAPI3 Specification
 permalink: /openapi/external
 ---
 

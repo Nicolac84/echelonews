@@ -10,7 +10,8 @@
   "scripts": {
     "test": "npx mocha test/{models,services} --exit",
     "coverage": "npx nyc npm test",
-    "lint": "npx standard --fix {services,models}/**/*.js; npx standard --env mocha --fix test/{*.js,**/*.js}; npx prettier --write {services,test,models}/{*.js,**/*.js}"
+    "lint": "npx standard --fix {services,models}/**/*.js; npx standard --env mocha --fix test/{*.js,**/*.js}; npx prettier --write {services,test,models}/{*.js,**/*.js}",
+    "start": "node services/$SERVICE | npx pino-pretty -c -t \"yyyy-mm-dd HH:MM:ss\" -i pid,hostname"
   },
   "repository": {
     "type": "git",
@@ -37,6 +38,7 @@
     "express-pino-logger": "^5.0.0",
     "node-fetch": "^2.6.0",
     "perseest": "^1.5.1",
+    "pino": "^6.3.2",
     "rss-parser": "^3.7.6",
     "validable": "^0.3.1"
   },
@@ -46,7 +48,6 @@
     "mocha": "^7.2.0",
     "nock": "^12.0.3",
     "nyc": "^15.0.1",
-    "pino": "^6.3.2",
     "prettier": "^2.0.5",
     "sinon": "^9.0.2",
     "standard": "^14.3.4"
