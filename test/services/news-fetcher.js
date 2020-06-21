@@ -31,8 +31,9 @@ before(async () => {
   }
 })
 after(async () => {
-  NewspaperFactory.cleanupTestDB()
-  ArticleFactory.cleanupTestDB()
+  //await Fetcher.cleanup()
+  await NewspaperFactory.cleanupTestDB()
+  await ArticleFactory.cleanupTestDB()
 })
 
 
@@ -104,7 +105,10 @@ describe('RSS News Fetcher', () => {
   describe('.setup()', () => {
     let fetcher;
     beforeEach(() => fetcher = new Fetcher())
-    afterEach(() => sinon.restore())
+    afterEach(async () => {
+      sinon.restore()
+      await Fetcher.cleanup()
+    })
 
     it('should initialize the fetcher when successful', async () => {
       try {
@@ -119,9 +123,9 @@ describe('RSS News Fetcher', () => {
 
     it('should fail when the database is unavailable', done => {
       const fake = sinon.fake.rejects(new Error('Rejecting fake'))
-      sinon.replace(Newspaper.db.pool, 'query', fake)
+      sinon.replace(Newspaper, 'fetchMany', fake)
       fetcher.setup()
-        .then(() => done(new Error('Fetcher setup performed succesfully')))
+        .then(ret => done(new Error(`.setup() resolved with ${JSON.stringify(ret)}`)))
         .catch(() => done())
     })
   })
@@ -164,8 +168,8 @@ describe('RSS News Fetcher', () => {
     })
   })
 
-  //describe('.task()')
-  //describe('.run()')
+  describe.skip('.task()')
+  describe.skip('.run()')
 })
 
 function newNasa() {

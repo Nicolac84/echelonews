@@ -8,15 +8,20 @@ const express = require('express')
 const jsonParser = require('body-parser').json()
 const Validable = require('validable')
 const { Article } = require('../models/article')
+const pino = require('pino')
+const pinoExpress = require('express-pino-logger')
 
 // Fields which can be written by the API interlocutor
 const UPDATE_ALLOWED = new Set(Article.db.columns.keys())
 UPDATE_ALLOWED.delete('id')
 
+const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 const app = express()
+app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
 
 // Get metadata for the current user handler server instance
 app.get('/', async (req, res) => {
+  log.info('Requested news organizer status')
   let articles
   try {
     const pgRes = await Article.db.pool.query(
@@ -39,26 +44,31 @@ app.get('/', async (req, res) => {
 app.post('/store', jsonParser, async (req, res) => {
   const errors = Validable.whitelist(req.body, UPDATE_ALLOWED)
   if (errors) {
+    log.info('Validation failed while storing article\n%o', errors)
     res.status(400).json(errors)
     return
   }
 
   // TODO: Check strict adding
   try {
-    await new Article(req.body).save()
+    const art = new Article(req.body)
+    await art.save()
+    log.info(`Successfully stored article (id: ${art})`)
     res.status(201).send()
   } catch (err) {
     if (err.constructor.name === Validable.Error.name) {
+      log.info('Validation failed while storing article\n%o', err.errors)
       res.status(400).json(err.errors)
     } else if (err.code === '23503') {
       // Inexistent foreign key
       const matcher = /.*\(([a-zA-Z0-9]+)\)=\((.+)\).*/
       const fkErr = err.detail.replace(matcher, '$1 $2').split(' ')
+      log.warn(`${fkErr[0]} '${fkErr[1]}' does not exist`)
       res
         .status(403)
         .json({ [fkErr[0]]: `${fkErr[0]} '${fkErr[1]}' does not exist` })
     } else {
-      console.error(err)
+      log.error(err)
       res.status(500).json({ message: 'Internal database error. Sorry' })
     }
   }
@@ -67,13 +77,10 @@ app.post('/store', jsonParser, async (req, res) => {
 // If this is the main module, launch the news organizer server
 if (require.main === module) {
   const port = process.env.PORT || 8080
-  console.log('[INFO] Setting up database')
+  log.info('Setting up database')
   Article.db.setup(process.env.POSTGRES_URI)
-  console.log(`[INFO] Launching server on port ${port}`)
+  log.info(`Launching server on port ${port}`)
   app.listen(port)
 }
-
-// Handle a database or validation error
-function handleTransactionError(err, res) {}
 
 module.exports = app

@@ -42,8 +42,14 @@ class RssFetcher {
       }.bind(this))
   }
 
+  /** Cleanup the news fetcher, closing the pool for ALL the fetcher instances
+   * @returns {undefined}
+   */
+  static async cleanup() { await Newspaper.db.cleanup() }
+
   /** Execute the fetcher task, i.e. fetch an RSS feed, process it and store
    * the related articles (if any)
+   * @returns {undefined}
    */
   async task() {
     log.info('Fetcher task started')
