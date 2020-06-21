@@ -1,0 +1,15 @@
+body{
+padding-top: 55px;
+}
+
+h1 {
+    color: white;
+    text-align: center;
+  }
+  
+  p {
+    font-family: verdana;
+    font-size: 20px;
+  }
+
+.big-padding{padding: 6 px 0;}
