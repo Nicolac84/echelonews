@@ -200,7 +200,7 @@ function handleTransactionError(err, res) {
 app.launch = function({ postgresUri, port = 8080 } = {}) {
   log.info('Setting up database')
   User.db.setup(postgresUri)
-  app.listen(port, () => log.info(`Server listening on port ${port}`))
+  return app.listen(port, () => log.info(`Server listening on port ${port}`))
 }
 
 // If this is the main module, launch the user handler server

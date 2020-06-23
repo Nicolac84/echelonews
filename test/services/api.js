@@ -5,16 +5,29 @@ require('dotenv').config({ path: '.env.test' })
 const chai = require('chai')
 const expect = chai.expect
 const { UserFactory } = require('../factories/user')
-const app = require('../../services/external.js')
+const app = require('../../services/api.js')
+const userHandlerApp = require('../../services/user-handler')
 chai.use(require('chai-http'))
 
 let user, absentUser
 before(async () => {
+  // Setup the database
   try {
     [user,absentUser] = await UserFactory.setupTestDB(process.env.POSTGRES_URI)
   } catch (err) {
     throw err
   }
+  UserFactory.cleanupTestDB() // The user handler will take care of the pool
+  // Launch the user handler server
+  userHandlerApp.launch({
+    postgresUri: process.env.POSTGRES_URI,
+    port: 8081 // TODO: Handle this better
+  })
+  // Perform the API setup
+  app.setup({
+    userHandlerUrl: 'http://localhost:8081',
+    jwtSecret: 'none',
+  })
 })
 after(async () => {
   UserFactory.cleanupTestDB()
@@ -57,25 +70,25 @@ describe('Exposed API', function() {
       }
     })
 
-    it('should return 404 with inexistent username', async () => {
+    it('should return 401 with inexistent username', async () => {
       try {
         const res = await conn.post('/login').send({
           name: absentUser.name,
           pass: absentUser.pass
         })
-        expect(res).to.have.status(404)
+        expect(res).to.have.status(401)
       } catch (err) {
         throw err
       }
     })
 
-    it('should return 404 with incorrect password', async () => {
+    it('should return 401 with incorrect password', async () => {
       try {
         const res = await conn.post('/login').send({
           name: user.name,
           pass: user.pass + 'abc'
         })
-        expect(res).to.have.status(404)
+        expect(res).to.have.status(401)
       } catch (err) {
         throw err
       }
