@@ -74,13 +74,20 @@ app.post('/store', jsonParser, async (req, res) => {
   }
 })
 
+// Perform the required setup operations and launch the server
+app.launch = function({ postgresUri, port = 8080 } = {}) {
+  log.info('Setting up database')
+  Article.db.setup(postgresUri)
+  app.listen(port, () => log.info(`Server listening on port ${port}`))
+}
+
 // If this is the main module, launch the news organizer server
 if (require.main === module) {
-  const port = process.env.PORT || 8080
-  log.info('Setting up database')
-  Article.db.setup(process.env.POSTGRES_URI)
-  log.info(`Launching server on port ${port}`)
-  app.listen(port)
+  log.info('Starting News Organizer server in standalone mode')
+  app.launch({
+    postgresUri: process.env.POSTGRES_URI,
+    port: process.env.PORT
+  })
 }
 
 module.exports = app

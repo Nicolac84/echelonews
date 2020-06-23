@@ -196,13 +196,20 @@ function handleTransactionError(err, res) {
   }
 }
 
+// Perform the required setup operations and launch the server
+app.launch = function({ postgresUri, port = 8080 } = {}) {
+  log.info('Setting up database')
+  User.db.setup(postgresUri)
+  app.listen(port, () => log.info(`Server listening on port ${port}`))
+}
+
 // If this is the main module, launch the user handler server
 if (require.main === module) {
-  log.info('Launching user handler as a standalone server')
-  const port = process.env.PORT || 8080
-  log.info('Setting up database')
-  User.db.setup(process.env.POSTGRES_URI)
-  app.listen(port, () => log.info(`Server listening on port ${port}`))
+  log.info('Starting User Handler as a standalone server')
+  app.launch({
+    postgresUri: process.env.POSTGRES_URI,
+    port: process.env.PORT
+  })
 }
 
 module.exports = app
