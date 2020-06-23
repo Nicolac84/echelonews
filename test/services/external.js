@@ -4,18 +4,82 @@
 require('dotenv').config({ path: '.env.test' })
 const chai = require('chai')
 const expect = chai.expect
+const { UserFactory } = require('../factories/user')
 const app = require('../../services/external.js')
 chai.use(require('chai-http'))
 
+let user, absentUser
+before(async () => {
+  try {
+    [user,absentUser] = await UserFactory.setupTestDB(process.env.POSTGRES_URI)
+  } catch (err) {
+    throw err
+  }
+})
+after(async () => {
+  UserFactory.cleanupTestDB()
+})
+
 describe('Exposed API', function() {
+  // Open a persistent connection before testing
+  let conn
+  before(() => (conn = chai.request(app).keepOpen()))
+  after(() => conn.close())
+
   describe('GET /', () => {
   })
 
-  describe('GET /login', () => {
-    it('should be successful with good credentials')
-    it('should return 400 with invalid credential properties')
-    it('should return 404 with inexistent username')
-    it('should return 404 with incorrect password')
+  describe('POST /login', () => {
+    it('should be successful with good credentials', async () => {
+      try {
+        const res = await conn.post('/login').send({
+          name: user.name,
+          pass: user.pass
+        })
+        expect(res).to.have.status(200)
+        expect(res.body).to.have.ownProperty('token')
+        expect(res.body.token).to.be.a('string')
+      } catch (err) {
+        throw err
+      }
+    })
+
+    it('should return 400 with invalid credential properties', async () => {
+      try {
+        const res = await conn.post('/login').send({
+          name: user.name,
+          pass: user.pass,
+          nonExistentField: 'ciaone'
+        })
+        expect(res).to.have.status(400)
+      } catch (err) {
+        throw err
+      }
+    })
+
+    it('should return 404 with inexistent username', async () => {
+      try {
+        const res = await conn.post('/login').send({
+          name: absentUser.name,
+          pass: absentUser.pass
+        })
+        expect(res).to.have.status(404)
+      } catch (err) {
+        throw err
+      }
+    })
+
+    it('should return 404 with incorrect password', async () => {
+      try {
+        const res = await conn.post('/login').send({
+          name: user.name,
+          pass: user.pass + 'abc'
+        })
+        expect(res).to.have.status(404)
+      } catch (err) {
+        throw err
+      }
+    })
   })
 
   describe('GET /countries', () => {
