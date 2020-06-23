@@ -14,30 +14,30 @@ const { Newspaper } = require('../../models/newspaper')
 const expect = chai.expect
 chai.use(require('chai-http'))
 
-// Setup database
-let nasa, articles
 const nasaRss = fs.readFileSync('./test/assets/nasa-breaking-news.rss').toString()
 const absNasaUrl = 'http://www.nasa.gov'
 const relNasaUrl = '/rss/dyn/breaking_news.rss'
-before(async () => {
-  nasa = newNasa()
-  try {
-    const nps = await NewspaperFactory.setupTestDB(process.env.POSTGRES_URI)
-    articles = await ArticleFactory
-      .setupTestDB([nps[0], nps[2]], process.env.POSTGRES_URI)
-  } catch (err) {
-    console.error(err)
-    throw err
-  }
-})
-after(async () => {
-  //await Fetcher.cleanup()
-  await NewspaperFactory.cleanupTestDB()
-  await ArticleFactory.cleanupTestDB()
-})
-
 
 describe('RSS News Fetcher', () => {
+  let nasa, articles
+  before(async () => {
+    // Setup database
+    nasa = newNasa()
+    try {
+      const nps = await NewspaperFactory.setupTestDB(process.env.POSTGRES_URI)
+      articles = await ArticleFactory
+        .setupTestDB([nps[0], nps[2]], process.env.POSTGRES_URI)
+    } catch (err) {
+      console.error(err)
+      throw err
+    }
+  })
+  after(async () => {
+    //await Fetcher.cleanup()
+    await NewspaperFactory.cleanupTestDB()
+    await ArticleFactory.cleanupTestDB()
+  })
+
   describe('static method .download()', () => {
     it('should return an XML string if the RSS feed has been modified', async () => {
       nock(absNasaUrl).get(relNasaUrl).reply(200, nasaRss)

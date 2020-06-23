@@ -28,7 +28,7 @@ describe('User', function () {
       process.exit(1)
     }
   })
-  after(UserFactory.cleanupTestDB)
+  after(async () => await UserFactory.cleanupTestDB())
 
   it('should be created with consistent parameters', function (done) {
     UserFactory.create()

@@ -10,31 +10,29 @@ const { ArticleFactory } = require('../factories/article')
 const { NewspaperFactory } = require('../factories/newspaper')
 chai.use(require('chai-http'))
 
-// Setup database
-let npapers
-before(async () => {
-  try {
-    const nps = await NewspaperFactory.setupTestDB(process.env.POSTGRES_URI)
-    npapers = {
-      present: [nps[0], nps[2]],
-      absent: nps[1],
-    }
-    await ArticleFactory.setupTestDB(npapers.present, process.env.POSTGRES_URI)
-  } catch (err) {
-    console.error(err)
-    throw err
-  }
-})
-after(async () => {
-  NewspaperFactory.cleanupTestDB()
-  ArticleFactory.cleanupTestDB()
-})
-
 describe('News Organizer API', function () {
-  // Open a persistent connection before testing
-  let conn
-  before(() => (conn = chai.request(app).keepOpen()))
-  after(() => conn.close())
+  let npapers, conn
+  before(async () => {
+    try {
+      // Setup database
+      const nps = await NewspaperFactory.setupTestDB(process.env.POSTGRES_URI)
+      npapers = {
+        present: [nps[0], nps[2]],
+        absent: nps[1],
+      }
+      await ArticleFactory.setupTestDB(npapers.present, process.env.POSTGRES_URI)
+      // Open a persistent connection with the organizer
+      conn = chai.request(app).keepOpen()
+    } catch (err) {
+      console.error(err)
+      throw err
+    }
+  })
+  after(async () => {
+    await NewspaperFactory.cleanupTestDB()
+    await ArticleFactory.cleanupTestDB()
+    conn.close()
+  })
 
   specify('GET / should return general information on the server', async () => {
     try {

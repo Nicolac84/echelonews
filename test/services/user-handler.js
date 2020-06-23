@@ -30,7 +30,7 @@ describe('User Handler API', function () {
       process.exit(1)
     }
   })
-  after(() => UserFactory.cleanupTestDB())
+  after(async () => await UserFactory.cleanupTestDB())
 
   // Open a persistent connection before testing
   let conn

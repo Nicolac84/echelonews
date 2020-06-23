@@ -9,35 +9,33 @@ const app = require('../../services/api.js')
 const userHandlerApp = require('../../services/user-handler')
 chai.use(require('chai-http'))
 
-let user, absentUser
-before(async () => {
-  // Setup the database
-  try {
-    [user,absentUser] = await UserFactory.setupTestDB(process.env.POSTGRES_URI)
-  } catch (err) {
-    throw err
-  }
-  UserFactory.cleanupTestDB() // The user handler will take care of the pool
-  // Launch the user handler server
-  userHandlerApp.launch({
-    postgresUri: process.env.POSTGRES_URI,
-    port: 8081 // TODO: Handle this better
-  })
-  // Perform the API setup
-  app.setup({
-    userHandlerUrl: 'http://localhost:8081',
-    jwtSecret: 'none',
-  })
-})
-after(async () => {
-  UserFactory.cleanupTestDB()
-})
-
 describe('Exposed API', function() {
-  // Open a persistent connection before testing
-  let conn
-  before(() => (conn = chai.request(app).keepOpen()))
-  after(() => conn.close())
+  let user, absentUser, conn
+  before(async () => {
+    // Setup the database
+    try {
+      [user,absentUser] = await UserFactory.setupTestDB(process.env.POSTGRES_URI)
+    } catch (err) {
+      throw err
+    }
+    UserFactory.cleanupTestDB() // The user handler will take care of the pool
+    // Launch the user handler server
+    userHandlerApp.launch({
+      postgresUri: process.env.POSTGRES_URI,
+      port: 8081 // TODO: Handle this better
+    })
+    // Perform the API setup
+    app.setup({
+      userHandlerUrl: 'http://localhost:8081',
+      jwtSecret: 'none',
+    })
+    // Open a persistent connection before testing
+    conn = chai.request(app).keepOpen()
+  })
+  after(async () => {
+    await UserFactory.cleanupTestDB()
+    conn.close()
+  })
 
   describe('GET /', () => {
   })

@@ -74,7 +74,7 @@ class UserFactory {
   }
 
   static async cleanupTestDB() {
-    User.db.cleanup()
+    await User.db.cleanup()
   }
 }
 
