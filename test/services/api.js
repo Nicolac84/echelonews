@@ -124,8 +124,43 @@ describe('Exposed API', function() {
     })
 
     describe('POST /countries', () => {
-      it('should save the given of countries if they are consistent')
-      it('should return 400 with inconsistent countries')
+      it('should be successful with consistent countries', async () => {
+        try {
+          const res = await conn
+            .post('/countries')
+            .set('Authorization', token)
+            .send(['Italy', 'Russia', 'USA'])
+          expect(res).to.have.status(200)
+        } catch (err) {
+          throw err
+        }
+      })
+
+      it('should be successful with an empty array of countries', async () => {
+        try {
+          const res = await conn
+            .post('/countries')
+            .set('Authorization', token)
+            .send([])
+          expect(res).to.have.status(200)
+        } catch (err) {
+          throw err
+        }
+      })
+
+      it('should return 400 with inconsistent countries', async () => {
+        try {
+          for (const body of [['USA', 123, 'Japan'], 'abc', null, { a: 1 }]) {
+            const res = await conn
+              .post('/countries')
+              .set('Authorization', token)
+              .send(body)
+            expect(res).to.have.status(400)
+          }
+        } catch (err) {
+          throw err
+        }
+      })
     })
 
     describe('GET /feedback', () => {

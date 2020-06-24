@@ -10,7 +10,7 @@ const fetch = require('node-fetch')
 const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
 const Auth = require('../lib/authstar')
-const { validate } = require('validable')
+const { User } = require('../models/user')
 
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 const app = express()
@@ -38,22 +38,19 @@ app.get('/countries', Auth.middlewares.jwt, async (req, res) => {
 })
 
 app.post('/countries', jsonParser, Auth.middlewares.jwt, async (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
-  /*
   try {
     const countries = req.body
-    if (!validate.isArray(countries) || (countries.length && countries.filter(c => !c || !validate.isString(c)).length)) {
+    const errors = User.validate('countries', countries)
+    if (errors) {
       log.warn(`Malformed countries update attempt by user ${req.user.id}\n%o`, countries)
-      res.sendStatus(400)
+      return res.status(400).json({ errors })
     }
     await updateUser(req.user.id, req.body)
     res.sendStatus(200)
   } catch (err) {
     log.error(err)
     res.status(500).json({ message: 'Internal server error. Sorry' })
-    throw err
   }
-  */
 })
 
 app.get('/feedback', Auth.middlewares.jwt, (req, res) => {

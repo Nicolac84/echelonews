@@ -75,6 +75,44 @@ describe('User', function () {
           })
         })
     })
+
+    describe('when countries', function() {
+      specify('are not an array', () => {
+        for (const cs of [{}, 'ciao', new Set([1,2,3])]) {
+          user.countries = cs
+          expect(user.validate()).to.have.property('countries')
+        }
+      })
+
+      specify('some element is not a string', () => {
+        user.countries = ['Italy', 123, 'Russia']
+        expect(user.validate()).to.have.property('countries')
+      })
+
+      specify('some element is blank', () => {
+        user.countries = ['Italy', '', 'Russia']
+        expect(user.validate()).to.have.property('countries')
+      })
+    })
+
+    describe('when topics', function() {
+      specify('are not an array', () => {
+        for (const ts of [{}, 'ciao', new Set([1,2,3])]) {
+          user.topics = ts
+          expect(user.validate()).to.have.property('topics')
+        }
+      })
+
+      specify('some element is not a string', () => {
+        user.topics = ['politics', 123, 'sport']
+        expect(user.validate()).to.have.property('topics')
+      })
+
+      specify('some element is blank', () => {
+        user.topics = ['politics', '', 'sport']
+        expect(user.validate()).to.have.property('topics')
+      })
+    })
   })
 
   describe('password', function () {
