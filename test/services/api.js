@@ -108,7 +108,22 @@ describe('Exposed API', function() {
     })
 
     describe('GET /profile', function() {
-      it('should return the user profile')
+      it('should return the user profile', async () => {
+        try {
+          const res = await conn.get('/profile').set('Authorization', token)
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('object')
+          expect(res.body).to.have.ownProperty('name')
+          expect(res.body).to.have.ownProperty('email')
+          expect(res.body).to.have.ownProperty('countries')
+          expect(res.body).to.have.ownProperty('topics')
+          expect(res.body).to.not.have.ownProperty('pass')
+          expect(res.body).to.not.have.ownProperty('hash')
+          expect(res.body).to.not.have.ownProperty('exists')
+        } catch (err) {
+          throw err
+        }
+      })
     })
 
     describe('GET /countries', () => {
@@ -187,6 +202,7 @@ describe('Exposed API', function() {
     [ ['GET',  '/news'],
       ['GET',  '/feedback'],
       ['GET',  '/countries'],
+      ['GET',  '/profile'],
       ['PUT',  '/feedback'],
       ['POST', '/news'],
       ['POST', '/countries'],

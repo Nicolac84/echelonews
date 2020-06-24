@@ -22,8 +22,14 @@ app.get('/', (req, res) => {
 
 app.post('/login', jsonParser, Auth.middlewares.login)
 
-app.get('/profile', Auth.middlewares.jwt, (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
+app.get('/profile', Auth.middlewares.jwt, async (req, res) => {
+  try {
+    const user = await fetchUser(req.user.id)
+    res.status(200).json(user)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
 })
 
 app.get('/countries', Auth.middlewares.jwt, async (req, res) => {
@@ -33,7 +39,6 @@ app.get('/countries', Auth.middlewares.jwt, async (req, res) => {
   } catch (err) {
     log.error(err)
     res.status(500).json({ message: 'Internal server error. Sorry' })
-    throw err
   }
 })
 
