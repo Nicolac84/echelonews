@@ -15,8 +15,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerInfo"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
 
   /users/byid/{id}:
     get:
@@ -39,8 +37,6 @@ paths:
                 $ref: "#/components/schemas/User"
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '404':
           $ref: "#/components/responses/NotFound"
     put:
@@ -65,8 +61,6 @@ paths:
           description: OK
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '403':
           $ref: "#/components/responses/Forbidden"
         '404':
@@ -87,8 +81,6 @@ paths:
           description: OK
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '404':
           $ref: "#/components/responses/NotFound"
 
@@ -113,8 +105,6 @@ paths:
                 $ref: "#/components/schemas/User"
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '404':
           $ref: "#/components/responses/NotFound"
     put:
@@ -139,8 +129,6 @@ paths:
           description: OK
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '403':
           $ref: "#/components/responses/Forbidden"
         '404':
@@ -161,8 +149,6 @@ paths:
           description: OK
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '404':
           $ref: "#/components/responses/NotFound"
 
@@ -187,8 +173,6 @@ paths:
                 $ref: "#/components/schemas/User"
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '404':
           $ref: "#/components/responses/NotFound"
     put:
@@ -213,8 +197,6 @@ paths:
           description: OK
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '403':
           $ref: "#/components/responses/Forbidden"
         '404':
@@ -235,8 +217,6 @@ paths:
           description: OK
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '404':
           $ref: "#/components/responses/NotFound"
 
@@ -258,8 +238,6 @@ paths:
                 $ref: "#/components/schemas/User"
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '404':
           $ref: "#/components/responses/NotFound"
 
@@ -281,8 +259,6 @@ paths:
                 $ref: "#/components/schemas/User"
         '400':
           $ref: "#/components/responses/MalformedRequest"
-        '401':
-          $ref: "#/components/responses/Unauthorized"
         '403':
           $ref: "#/components/responses/Forbidden"
 
@@ -362,12 +338,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ValidationError'
-    Unauthorized:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     Forbidden:
       description: Operation can not be performed
       content:

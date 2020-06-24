@@ -22,6 +22,10 @@ app.get('/', (req, res) => {
 
 app.post('/login', jsonParser, Auth.middlewares.login)
 
+app.get('/profile', Auth.middlewares.jwt, (req, res) => {
+  res.status(503).json({ message: 'Not Implemented' })
+})
+
 app.get('/countries', Auth.middlewares.jwt, async (req, res) => {
   try {
     const user = await fetchUser(req.user.id)

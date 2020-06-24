@@ -23,6 +23,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/JWT"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: '#/components/responses/Unauthorized'
   /news:
@@ -55,6 +57,20 @@ paths:
           $ref: '#/components/responses/FetchedNews'
         '401':
           $ref: '#/components/responses/Unauthorized'
+  /profile:
+    get:
+      summary: Get the user profile
+      tags:
+        - Users
+      responses:
+        '200':
+          description: The user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: "#/components/responses/Unauthorized"
   /countries:
     get:
       summary: Get the user preferred countries
@@ -79,6 +95,37 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Countries'
+      responses:
+        '200':
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /topics:
+    get:
+      summary: Get the user preferred topics
+      tags:
+        - Users
+      responses:
+        '200':
+          description: The requested topics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Topics'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Set the user preferred topics
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Topics'
       responses:
         '200':
           description: OK
@@ -207,6 +254,12 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/News'
+    MalformedRequest:
+      description: Malformed request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
     Unauthorized:
       description: Unauthorized
       content:

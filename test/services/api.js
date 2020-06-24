@@ -107,6 +107,10 @@ describe('Exposed API', function() {
       }
     })
 
+    describe('GET /profile', function() {
+      it('should return the user profile')
+    })
+
     describe('GET /countries', () => {
       it('should give an array of countries', async () => {
         try {
