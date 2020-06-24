@@ -178,6 +178,58 @@ describe('Exposed API', function() {
       })
     })
 
+    describe('GET /topics', () => {
+      it('should give an array of topics', async () => {
+        try {
+          const res = await conn.get('/topics').set('Authorization', token)
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('array')
+        } catch (err) {
+          throw err
+        }
+      })
+    })
+
+    describe('POST /topics', () => {
+      it('should be successful with consistent topics', async () => {
+        try {
+          const res = await conn
+            .post('/topics')
+            .set('Authorization', token)
+            .send(['politics', 'sport'])
+          expect(res).to.have.status(200)
+        } catch (err) {
+          throw err
+        }
+      })
+
+      it('should be successful with an empty array of topics', async () => {
+        try {
+          const res = await conn
+            .post('/topics')
+            .set('Authorization', token)
+            .send([])
+          expect(res).to.have.status(200)
+        } catch (err) {
+          throw err
+        }
+      })
+
+      it('should return 400 with inconsistent topics', async () => {
+        try {
+          for (const body of [['sport', 123, 'ia'], 'abc', null, { a: 1 }]) {
+            const res = await conn
+              .post('/topics')
+              .set('Authorization', token)
+              .send(body)
+            expect(res).to.have.status(400)
+          }
+        } catch (err) {
+          throw err
+        }
+      })
+    })
+
     describe('GET /feedback', () => {
       it('should return all the feedbacks registered by a user')
     })

@@ -58,6 +58,32 @@ app.post('/countries', jsonParser, Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
+app.get('/topics', Auth.middlewares.jwt, async (req, res) => {
+  try {
+    const user = await fetchUser(req.user.id)
+    res.status(200).json(user.topics)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
+})
+
+app.post('/topics', jsonParser, Auth.middlewares.jwt, async (req, res) => {
+  try {
+    const topics = req.body
+    const errors = User.validate('topics', topics)
+    if (errors) {
+      log.warn(`Malformed topics update attempt by user ${req.user.id}\n%o`, topics)
+      return res.status(400).json({ errors })
+    }
+    await updateUser(req.user.id, req.body)
+    res.sendStatus(200)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
+})
+
 app.get('/feedback', Auth.middlewares.jwt, (req, res) => {
   res.status(503).json({ message: 'Not Implemented' })
 })
