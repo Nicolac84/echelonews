@@ -59,6 +59,9 @@ describe('User Handler API', function () {
               )
               expect(res).to.have.status(200)
               expect(User.validateObject(res.body)).to.equal(undefined)
+              expect(res.body).to.not.have.ownProperty('pass')
+              expect(res.body).to.not.have.ownProperty('hash')
+              expect(res.body).to.not.have.ownProperty('exists')
             } catch (err) {
               throw err
             }

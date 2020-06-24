@@ -58,7 +58,7 @@ for (const id of ['id', 'name', 'email']) {
         res.status(404).send()
       } else {
         log.info(`Successfully fetched user of ${id} ${idval}`)
-        res.status(200).json(user)
+        res.status(200).json(user.export())
       }
     } catch (err) {
       log.error(err)
