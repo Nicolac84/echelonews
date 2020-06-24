@@ -93,31 +93,55 @@ describe('Exposed API', function() {
     })
   })
 
-  describe('GET /countries', () => {
-    it('should give an array of countries')
-  })
+  describe('protected routes', function() {
+    let token
+    before(async () => {
+      try {
+        const res = await conn.post('/login').send({
+          name: user.name,
+          pass: user.pass
+        })
+        token = 'Bearer ' + res.body.token
+      } catch (err) {
+        throw err
+      }
+    })
 
-  describe('POST /countries', () => {
-    it('should save the given of countries if they are consistent')
-  })
+    describe('GET /countries', () => {
+      it('should give an array of countries', async () => {
+        try {
+          const res = await conn.get('/countries').set('Authorization', token)
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('array')
+        } catch (err) {
+          throw err
+        }
+      })
+    })
 
-  describe('GET /feedback', () => {
-    it('should return all the feedbacks registered by a user')
-  })
+    describe('POST /countries', () => {
+      it('should save the given of countries if they are consistent')
+      it('should return 400 with inconsistent countries')
+    })
 
-  describe('PUT /feedback', () => {
-    it('should create a new feedback if none is related to the newspaper')
-    it('should update a feedback if one related to the newspaper already exists')
-  })
+    describe('GET /feedback', () => {
+      it('should return all the feedbacks registered by a user')
+    })
 
-  describe('DELETE /feedback', () => {
-    it('should delete all the feedbacks related to the user')
-  })
+    describe('PUT /feedback', () => {
+      it('should create a new feedback if none is related to the newspaper')
+      it('should update a feedback if one related to the newspaper already exists')
+    })
 
-  describe.skip('GET /news', () => {
-  })
+    describe('DELETE /feedback', () => {
+      it('should delete all the feedbacks related to the user')
+    })
 
-  describe.skip('POST /news', () => {
+    describe.skip('GET /news', () => {
+    })
+
+    describe.skip('POST /news', () => {
+    })
   })
 
   describe('when bearer JWT is missing', function() {
@@ -126,11 +150,17 @@ describe('Exposed API', function() {
       ['GET',  '/countries'],
       ['PUT',  '/feedback'],
       ['POST', '/news'],
-      ['POST', '/feedback'],
       ['POST', '/countries'],
       ['DELETE', '/feedback'],
     ].forEach(([method, path]) => {
-      specify(`${method} ${path} should return 401`)
+      specify(`${method} ${path} should return 401`, async () => {
+        try {
+          const res = await conn[method.toLowerCase()](path)
+          expect(res).to.have.status(401)
+        } catch (err) {
+          throw err
+        }
+      })
     })
   })
 })

@@ -6,10 +6,11 @@
 'use strict'
 const express = require('express')
 const jsonParser = require('body-parser').json()
-//const fetch = require('node-fetch')
+const fetch = require('node-fetch')
 const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
 const Auth = require('../lib/authstar')
+const { validate } = require('validable')
 
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 const app = express()
@@ -21,31 +22,53 @@ app.get('/', (req, res) => {
 
 app.post('/login', jsonParser, Auth.middlewares.login)
 
-app.get('/countries', (req, res) => {
+app.get('/countries', Auth.middlewares.jwt, async (req, res) => {
+  try {
+    const user = await fetchUser(req.user.id)
+    res.status(200).json(user.countries)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+    throw err
+  }
+})
+
+app.post('/countries', jsonParser, Auth.middlewares.jwt, async (req, res) => {
+  res.status(503).json({ message: 'Not Implemented' })
+  /*
+  try {
+    const countries = req.body
+    if (!validate.isArray(countries) || (countries.length && countries.filter(c => !c || !validate.isString(c)).length)) {
+      log.warn(`Malformed countries update attempt by user ${req.user.id}\n%o`, countries)
+      res.sendStatus(400)
+    }
+    await updateUser(req.user.id, req.body)
+    res.sendStatus(200)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+    throw err
+  }
+  */
+})
+
+app.get('/feedback', Auth.middlewares.jwt, (req, res) => {
   res.status(503).json({ message: 'Not Implemented' })
 })
 
-app.post('/countries', jsonParser, (req, res) => {
+app.put('/feedback', jsonParser, Auth.middlewares.jwt, (req, res) => {
   res.status(503).json({ message: 'Not Implemented' })
 })
 
-app.get('/feedback', (req, res) => {
+app.delete('/feedback', Auth.middlewares.jwt, (req, res) => {
   res.status(503).json({ message: 'Not Implemented' })
 })
 
-app.put('/feedback', jsonParser, (req, res) => {
+app.get('/news', Auth.middlewares.jwt, (req, res) => {
   res.status(503).json({ message: 'Not Implemented' })
 })
 
-app.delete('/feedback', (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
-})
-
-app.get('/news', (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
-})
-
-app.post('/news', jsonParser, (req, res) => {
+app.post('/news', jsonParser, Auth.middlewares.jwt, (req, res) => {
   res.status(503).json({ message: 'Not Implemented' })
 })
 
@@ -68,6 +91,35 @@ app.launch = function({ port = 8080, userHandlerUrl, jwtSecret} = {}) {
 if (require.main === module) {
   log.info('Launching EcheloNews RESTful API in standalone mode')
   app.launch({ port: process.env.PORT })
+}
+
+async function fetchUser(id) {
+  try {
+    if (!Number.isInteger(id))
+      return new TypeError('User ID is not an integer')
+    const res = await fetch(Auth.userHandlerUrl + `/users/byid/${id}`)
+    if (!res.ok)
+      return new Error(`User handler returned status ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    throw err
+  }
+}
+
+async function updateUser(id, body) {
+  try {
+    if (!Number.isInteger(id))
+      return new TypeError('User ID is not an integer')
+    const res = await fetch(Auth.userHandlerUrl + `/users/byid/${id}`, {
+      method: 'put',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    if (!res.ok)
+      return new Error(`User handler returned status ${res.status}`)
+  } catch (err) {
+    throw err
+  }
 }
 
 module.exports = app
