@@ -53,7 +53,7 @@ app.post('/store', jsonParser, async (req, res) => {
   try {
     const art = new Article(req.body)
     await art.save()
-    log.info(`Successfully stored article (id: ${art})`)
+    log.info(`Successfully stored article (id: ${art.id})`)
     res.status(201).send()
   } catch (err) {
     if (err.constructor.name === Validable.Error.name) {

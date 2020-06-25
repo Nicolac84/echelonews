@@ -50,7 +50,7 @@ app.post('/countries', jsonParser, Auth.middlewares.jwt, async (req, res) => {
       log.warn(`Malformed countries update attempt by user ${req.user.id}\n%o`, countries)
       return res.status(400).json({ errors })
     }
-    await updateUser(req.user.id, req.body)
+    await updateUser(req.user.id, { countries })
     res.sendStatus(200)
   } catch (err) {
     log.error(err)
@@ -71,7 +71,7 @@ app.get('/topics', Auth.middlewares.jwt, async (req, res) => {
 app.post('/topics', jsonParser, Auth.middlewares.jwt, async (req, res) => {
   try {
     const topics = req.body
-    const errors = User.validate('topics', topics)
+    const errors = User.validate('topics', { topics })
     if (errors) {
       log.warn(`Malformed topics update attempt by user ${req.user.id}\n%o`, topics)
       return res.status(400).json({ errors })
@@ -125,6 +125,7 @@ if (require.main === module) {
   app.launch({ port: process.env.PORT })
 }
 
+// Fetch a user calling the user handler
 async function fetchUser(id) {
   try {
     if (!Number.isInteger(id))
@@ -138,6 +139,7 @@ async function fetchUser(id) {
   }
 }
 
+// Update a user calling the user handler
 async function updateUser(id, body) {
   try {
     if (!Number.isInteger(id))
