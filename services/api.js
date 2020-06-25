@@ -71,12 +71,12 @@ app.get('/topics', Auth.middlewares.jwt, async (req, res) => {
 app.post('/topics', jsonParser, Auth.middlewares.jwt, async (req, res) => {
   try {
     const topics = req.body
-    const errors = User.validate('topics', { topics })
+    const errors = User.validate('topics', topics)
     if (errors) {
       log.warn(`Malformed topics update attempt by user ${req.user.id}\n%o`, topics)
       return res.status(400).json({ errors })
     }
-    await updateUser(req.user.id, req.body)
+    await updateUser(req.user.id, { topics })
     res.sendStatus(200)
   } catch (err) {
     log.error(err)
