@@ -68,9 +68,9 @@ class VolatileArticle extends Validable.Class {
 class Article extends Perseest.Mixin(VolatileArticle) {
   /** @lends Article */
   /** Create a new persistent article */
-  constructor(opt) {
+  constructor(opt = {}) {
     super(opt)
-    if (opt.exists) this.exists = opt.exists
+    this.exists = opt.exists || false
   }
 
   /** Database configuration for perseest */

@@ -126,6 +126,12 @@ class VolatileUser extends Validable.Class {
  */
 class User extends Perseest.Mixin(VolatileUser) {
   /** @lends User */
+  /** Create a new persistent user */
+  constructor(opt = {}) {
+    super(opt)
+    this.exists = opt.exists || false
+  }
+
   /** Database configuration for perseest */
   static db = new Perseest.Config('Account', 'id', {
     id: { id: true, serial: true },
