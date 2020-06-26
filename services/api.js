@@ -44,7 +44,7 @@ app.get('/countries', Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-app.post('/countries', jsonParser, Auth.middlewares.jwt, async (req, res) => {
+app.post('/countries', Auth.middlewares.jwt, jsonParser, async (req, res) => {
   try {
     const countries = req.body
     const errors = User.validate('countries', countries)
@@ -70,7 +70,7 @@ app.get('/topics', Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-app.post('/topics', jsonParser, Auth.middlewares.jwt, async (req, res) => {
+app.post('/topics', Auth.middlewares.jwt, jsonParser, async (req, res) => {
   try {
     const topics = req.body
     const errors = User.validate('topics', topics)
@@ -99,7 +99,7 @@ app.get('/feedback', Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-app.put('/feedback', jsonParser, Auth.middlewares.jwt, async (req, res) => {
+app.put('/feedback', Auth.middlewares.jwt, jsonParser, async (req, res) => {
   try {
     const errors = Validable.merge(
       Validable.requirelist(req.body, ['npaper', 'score']),
@@ -135,7 +135,7 @@ app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
 app.get('/news', Auth.middlewares.jwt, (req, res) => {
 })
 
-app.post('/news', jsonParser, Auth.middlewares.jwt, (req, res) => {
+app.post('/news', Auth.middlewares.jwt, jsonParser, (req, res) => {
   res.status(503).json({ message: 'Not Implemented' })
 })
 
