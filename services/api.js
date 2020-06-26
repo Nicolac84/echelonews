@@ -11,6 +11,7 @@ const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
 const Auth = require('../lib/authstar')
 const { User } = require('../models/user')
+const { Feedback } = require('../models/feedback')
 
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 const app = express()
@@ -84,16 +85,32 @@ app.post('/topics', jsonParser, Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-app.get('/feedback', Auth.middlewares.jwt, (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
+app.get('/feedback', Auth.middlewares.jwt, async (req, res) => {
+  try {
+    const fbs = await Feedback.fetchMany({ account: req.user.id })
+    res.status(200).json(fbs.map(f => ({
+      npaper: f.npaper,
+      score: f.score
+    })))
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
 })
 
 app.put('/feedback', jsonParser, Auth.middlewares.jwt, (req, res) => {
+  // TODO: Validate feedback
   res.status(503).json({ message: 'Not Implemented' })
 })
 
-app.delete('/feedback', Auth.middlewares.jwt, (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
+app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
+  try {
+    await Feedback.deleteMany({ account: req.user.id })
+    res.sendStatus(200)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
 })
 
 app.get('/news', Auth.middlewares.jwt, (req, res) => {
@@ -115,6 +132,7 @@ app.setup = function({ logger, userHandlerUrl, jwtSecret } = {}) {
 
 // Perform the required setup operations and launch the server
 app.launch = function({ port = 8080, userHandlerUrl, jwtSecret} = {}) {
+  Feedback.db.setup(process.env.POSTGRES_URI)
   app.setup({ userHandlerUrl, jwtSecret })
   app.listen(port, () => log.info(`Server listening on port ${port}`))
 }

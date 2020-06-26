@@ -21,6 +21,7 @@ class VolatileFeedback extends Validable.Class {
    * @param {number} opt.score - Newspaper score
    */
   constructor({ account, npaper, score=0 } = {}) {
+    super()
     this.account = account
     this.npaper = npaper
     this.score = score

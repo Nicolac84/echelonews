@@ -5,20 +5,25 @@ require('dotenv').config({ path: '.env.test' })
 const chai = require('chai')
 const expect = chai.expect
 const { UserFactory } = require('../factories/user')
+const { NewspaperFactory } = require('../factories/newspaper')
+const { Feedback } = require('../../models/feedback')
 const app = require('../../services/api.js')
 const userHandlerApp = require('../../services/user-handler')
 chai.use(require('chai-http'))
 
 describe('Exposed API', function() {
-  let user, absentUser, conn
+  let user, absentUser, npaper, conn
   before(async () => {
     // Setup the database
     try {
-      [user,absentUser] = await UserFactory.setupTestDB(process.env.POSTGRES_URI)
+      ;[user,absentUser] = await UserFactory.setupTestDB(process.env.POSTGRES_URI)
+      ;[npaper] = await NewspaperFactory.setupTestDB(process.env.POSTGRES_URI)
+      await UserFactory.cleanupTestDB() // We don't need the user db directly
+      await NewspaperFactory.cleanupTestDB() // Same thing for newspapers
+      Feedback.db.setup(process.env.POSTGRES_URI)
     } catch (err) {
       throw err
     }
-    UserFactory.cleanupTestDB() // The user handler will take care of the pool
     // Launch the user handler server
     userHandlerApp.launch({
       postgresUri: process.env.POSTGRES_URI,
@@ -32,10 +37,7 @@ describe('Exposed API', function() {
     // Open a persistent connection before testing
     conn = chai.request(app).keepOpen()
   })
-  after(async () => {
-    await UserFactory.cleanupTestDB()
-    conn.close()
-  })
+  after(async () => { conn.close() })
 
   describe('GET /', () => {
   })
@@ -231,16 +233,76 @@ describe('Exposed API', function() {
     })
 
     describe('GET /feedback', () => {
-      it('should return all the feedbacks registered by a user')
+      it('should return all the feedbacks registered by a user', async () => {
+        try {
+          const res = await conn.get('/feedback').set('Authorization', token)
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('array')
+        } catch (err) {
+          throw err
+        }
+      })
     })
 
     describe('PUT /feedback', () => {
-      it('should create a new feedback if none is related to the newspaper')
-      it('should update a feedback if one related to the newspaper already exists')
+      it('should create a new feedback if none is related to the newspaper', async () => {
+        try {
+          await Feedback.deleteMany({ account: user.id })
+          const res = await conn
+            .put('/feedback')
+            .set('Authorization', token)
+            .send({ npaper: npaper.id, score: -1 })
+          expect(res).to.have.status(200)
+          const fbs = await conn.get('/feedback').set('Authorization', token)
+          expect(fbs[0].npaper).to.equal(npaper.id)
+          expect(fbs[0].score).to.equal(-1)
+        } catch (err) {
+          throw err
+        }
+      })
+
+      it('should update a feedback if one related to the newspaper already exists', async () => {
+        try {
+          await Feedback.deleteMany({ account: user.id })
+          const fb = new Feedback({
+            account: user.id,
+            npaper: npaper.id,
+            score: 1
+          })
+          await fb.save()
+          const res = await conn
+            .put('/feedback')
+            .set('Authorization', token)
+            .send({ npaper: npaper.id, score: 1 })
+          expect(res).to.have.status(200)
+          const fbs = await conn.get('/feedback').set('Authorization', token)
+          expect(fbs[0].npaper).to.equal(npaper.id)
+          expect(fbs[0].score).to.equal(2)
+        } catch (err) {
+          throw err
+        }
+      })
     })
 
     describe('DELETE /feedback', () => {
-      it('should delete all the feedbacks related to the user')
+      it('should delete all the feedbacks related to the user', async () => {
+        try {
+          const fb = new Feedback({
+            account: user.id,
+            npaper: npaper.id,
+            score: 1
+          })
+          await fb.save()
+          const res = await conn.delete('/feedback').set('Authorization', token)
+          expect(res).to.have.status(200)
+          const fbs = await conn.get('/feedback').set('Authorization', token)
+          expect(fbs).to.have.status(200)
+          expect(fbs.body).to.be.an('array')
+          expect(fbs.body.length).to.equal(0)
+        } catch (err) {
+          throw err
+        }
+      })
     })
 
     describe.skip('GET /news', () => {

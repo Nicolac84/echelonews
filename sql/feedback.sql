@@ -7,5 +7,5 @@ CREATE TABLE Feedback (
   score SMALLINT NOT NULL,   -- Feedback score
 
   FOREIGN KEY (account) REFERENCES Account(id),
-  FOREIGN KEY (source)  REFERENCES Newspaper(id)
+  FOREIGN KEY (npaper)  REFERENCES Newspaper(id)
 )

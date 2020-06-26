@@ -39,9 +39,10 @@ class ArticleFactory {
       // Setup the database for article testing
       Article.db.setup(opt)
       await Article.db.pool
-        .query(`DROP TABLE ${Article.db.table}`)
-        .catch(() => {}) // Ignore errors, table could be inexistent
+        .query(`DROP TABLE ${Article.db.table} CASCADE`)
+        .catch(() => {})
       await Article.db.pool.query(fs.readFileSync('sql/article.sql').toString())
+        .catch(err => { if (err.code != '42P07') throw err })
 
       await existing.save()
       await existing2.save()
