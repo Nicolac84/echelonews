@@ -55,9 +55,8 @@ class UserFactory {
       // Setup the database for user testing
       User.db.setup(opt)
       await User.db.pool
-        .query(`DROP TABLE ${User.db.table}`)
+        .query(`DROP TABLE ${User.db.table} CASCADE`)
         .catch(() => {})
-        .catch(() => {}) // Ignore errors, table could be inexistent
       await User.db.pool.query(fs.readFileSync('sql/account.sql').toString())
 
       await existing.save()
@@ -69,6 +68,7 @@ class UserFactory {
 
       return [existing, nonExisting, existing2]
     } catch (err) {
+      console.log(err)
       throw err
     }
   }

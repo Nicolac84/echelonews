@@ -9,11 +9,3 @@ CREATE TABLE Account (
   topics VARCHAR[] NOT NULL,     -- Preferred topics
   created TIMESTAMP NOT NULL     -- User creation date and time
 );
-
--- User account Google relation
---CREATE TABLE AccountGoogle (
---  account INTEGER PRIMARY KEY,  -- User ID
---  gid INTEGER UNIQUE NOT NULL,  -- Google account ID
---
---  FOREIGN KEY (account) REFERENCES Account.id
---);

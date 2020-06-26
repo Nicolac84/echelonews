@@ -52,6 +52,12 @@ class VolatileNewspaper extends Validable.Class {
  */
 class Newspaper extends Perseest.Mixin(VolatileNewspaper) {
   /** @lends Newspaper */
+  /** Create a new persistent newspaper */
+  constructor(opt = {}) {
+    super(opt)
+    this.exists = opt.exists || false
+  }
+
   /** Database configuration for perseest */
   static db = new Perseest.Config('Newspaper', 'id', [
     ['id', { serial: true, id: true }],

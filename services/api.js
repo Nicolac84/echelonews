@@ -9,8 +9,10 @@ const jsonParser = require('body-parser').json()
 const fetch = require('node-fetch')
 const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
+const Validable = require('validable')
 const Auth = require('../lib/authstar')
 const { User } = require('../models/user')
+const { Feedback } = require('../models/feedback')
 
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 const app = express()
@@ -42,7 +44,7 @@ app.get('/countries', Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-app.post('/countries', jsonParser, Auth.middlewares.jwt, async (req, res) => {
+app.post('/countries', Auth.middlewares.jwt, jsonParser, async (req, res) => {
   try {
     const countries = req.body
     const errors = User.validate('countries', countries)
@@ -68,7 +70,7 @@ app.get('/topics', Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-app.post('/topics', jsonParser, Auth.middlewares.jwt, async (req, res) => {
+app.post('/topics', Auth.middlewares.jwt, jsonParser, async (req, res) => {
   try {
     const topics = req.body
     const errors = User.validate('topics', topics)
@@ -84,23 +86,56 @@ app.post('/topics', jsonParser, Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-app.get('/feedback', Auth.middlewares.jwt, (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
+app.get('/feedback', Auth.middlewares.jwt, async (req, res) => {
+  try {
+    const fbs = await Feedback.fetchMany({ account: req.user.id })
+    res.status(200).json(fbs.map(f => ({
+      npaper: f.npaper,
+      score: f.score
+    })))
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
 })
 
-app.put('/feedback', jsonParser, Auth.middlewares.jwt, (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
+app.put('/feedback', Auth.middlewares.jwt, jsonParser, async (req, res) => {
+  try {
+    const errors = Validable.merge(
+      Validable.requirelist(req.body, ['npaper', 'score']),
+      Validable.whitelist(req.body, ['npaper', 'score']),
+      Feedback.validateObject(req.body, true)
+    )
+    if (errors) {
+      log.warn(`User ${req.user.id} performed bad feedback update request\n%o`, req.body)
+      return res.status(400).json({ errors })
+    }
+
+    const fb = await Feedback.retrieve(req.user.id, req.body.npaper)
+    fb.score += req.body.score
+    if (fb.exists) await fb.update('score')
+    else await fb.save()
+    res.sendStatus(200)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
 })
 
-app.delete('/feedback', Auth.middlewares.jwt, (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
+app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
+  try {
+    await Feedback.deleteMany({ account: req.user.id })
+    res.sendStatus(200)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
 })
 
 app.get('/news', Auth.middlewares.jwt, (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
 })
 
-app.post('/news', jsonParser, Auth.middlewares.jwt, (req, res) => {
+app.post('/news', Auth.middlewares.jwt, jsonParser, (req, res) => {
   res.status(503).json({ message: 'Not Implemented' })
 })
 
@@ -115,6 +150,7 @@ app.setup = function({ logger, userHandlerUrl, jwtSecret } = {}) {
 
 // Perform the required setup operations and launch the server
 app.launch = function({ port = 8080, userHandlerUrl, jwtSecret} = {}) {
+  Feedback.db.setup(process.env.POSTGRES_URI)
   app.setup({ userHandlerUrl, jwtSecret })
   app.listen(port, () => log.info(`Server listening on port ${port}`))
 }
