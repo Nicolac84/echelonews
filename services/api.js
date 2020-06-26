@@ -9,6 +9,7 @@ const jsonParser = require('body-parser').json()
 const fetch = require('node-fetch')
 const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
+const Validable = require('validable')
 const Auth = require('../lib/authstar')
 const { User } = require('../models/user')
 const { Feedback } = require('../models/feedback')
@@ -98,9 +99,27 @@ app.get('/feedback', Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-app.put('/feedback', jsonParser, Auth.middlewares.jwt, (req, res) => {
-  // TODO: Validate feedback
-  res.status(503).json({ message: 'Not Implemented' })
+app.put('/feedback', jsonParser, Auth.middlewares.jwt, async (req, res) => {
+  try {
+    const errors = Validable.merge(
+      Validable.requirelist(req.body, ['npaper', 'score']),
+      Validable.whitelist(req.body, ['npaper', 'score']),
+      Feedback.validateObject(req.body, true)
+    )
+    if (errors) {
+      log.warn(`User ${req.user.id} performed bad feedback update request\n%o`, req.body)
+      return res.status(400).json({ errors })
+    }
+
+    const fb = await Feedback.retrieve(req.user.id, req.body.npaper)
+    fb.score += req.body.score
+    if (fb.exists) await fb.update('score')
+    else await fb.save()
+    res.sendStatus(200)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
 })
 
 app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
@@ -114,7 +133,6 @@ app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
 })
 
 app.get('/news', Auth.middlewares.jwt, (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
 })
 
 app.post('/news', jsonParser, Auth.middlewares.jwt, (req, res) => {

@@ -254,8 +254,8 @@ describe('Exposed API', function() {
             .send({ npaper: npaper.id, score: -1 })
           expect(res).to.have.status(200)
           const fbs = await conn.get('/feedback').set('Authorization', token)
-          expect(fbs[0].npaper).to.equal(npaper.id)
-          expect(fbs[0].score).to.equal(-1)
+          expect(fbs.body[0].npaper).to.equal(npaper.id)
+          expect(fbs.body[0].score).to.equal(-1)
         } catch (err) {
           throw err
         }
@@ -276,11 +276,27 @@ describe('Exposed API', function() {
             .send({ npaper: npaper.id, score: 1 })
           expect(res).to.have.status(200)
           const fbs = await conn.get('/feedback').set('Authorization', token)
-          expect(fbs[0].npaper).to.equal(npaper.id)
-          expect(fbs[0].score).to.equal(2)
+          expect(fbs.body[0].npaper).to.equal(npaper.id)
+          expect(fbs.body[0].score).to.equal(2)
         } catch (err) {
           throw err
         }
+      })
+
+      it('should return 400 with invalid properties', async () => {
+        const res = await conn
+          .put('/feedback')
+          .set('Authorization', token)
+          .send({ id: 123, npaper: npaper.id, score: 1 })
+        expect(res).to.have.status(400)
+      })
+
+      it('should return 400 with malformed fields', async () => {
+        const res = await conn
+          .put('/feedback')
+          .set('Authorization', token)
+          .send({ npaper: npaper.id, score: 'abc' })
+        expect(res).to.have.status(400)
       })
     })
 

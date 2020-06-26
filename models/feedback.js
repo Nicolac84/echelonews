@@ -41,7 +41,7 @@ class VolatileFeedback extends Validable.Class {
       presence: true,
     },
     score: {
-      numericality: { greaterThanOrEqualTo: 0, strict: true },
+      numericality: { strict: true },
       presence: true,
     }
   }
@@ -55,6 +55,7 @@ class Feedback extends Perseest.Mixin(VolatileFeedback) {
   /** Create a new persistent article */
   constructor(opt = {}) {
     super(opt)
+    this.id = opt.id
     this.exists = opt.exists || false
   }
 
@@ -62,7 +63,31 @@ class Feedback extends Perseest.Mixin(VolatileFeedback) {
   static db = new Perseest.Config('Feedback', 'id', [
     ['id', { serial: true, id: true }], 'account', 'npaper', 'score'
   ])
+
+  /** Retrieve a feedback by user/newspaper tuple
+   * @param {number} account - User ID
+   * @param {number} npaper - Newspaper ID
+   * @returns {Promise<Feedback>} The requested feedback, with a score of 0 if
+   *   it does not exist
+   */
+  static retrieve(account, npaper) {
+    return Feedback.db.queries.run('retrieve', {
+      conf: Feedback.db,
+      account,
+      npaper
+    }).then(fb => fb || new Feedback({ account, npaper }))
+  }
 }
+
+// Retrieve a feedback by (account,npaper)
+Feedback.db.queries.create({
+  name: 'retrieve',
+  type: 'singular',
+  generate: ({ conf, account, npaper }) => ({
+    text: `SELECT * FROM ${conf.table} WHERE account = $1 AND npaper = $2`,
+    values: [account, npaper]
+  })
+})
 
 Feedback.db.row2Entity = row => new Feedback(Object.assign(row, { exists: true }))
 
