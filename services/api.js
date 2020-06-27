@@ -21,24 +21,9 @@ app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
 app.set('view engine','ejs')
 app.use(express.static('views'))
 
-
 app.get('/', (req, res) => {
-    res.render('index')
-//  res.status(503).json({ message: 'Not Implemented' }) 
+  res.status(503).json({ message: 'Not Implemented' }) 
 })
-
-app.get('/login', (req, res) => {
-    res.render('login')
-
-
-})
-
-app.get('/register', (req, res) => {
-    res.render('register')
-
-
-})
-
 
 app.post('/login', jsonParser, Auth.middlewares.login)
 
