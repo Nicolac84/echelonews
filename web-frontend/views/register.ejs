@@ -83,9 +83,9 @@
  Signup
   </div>
   <div class="card-body">
-<form action="register" method="post">
+<form action="register" method="post" onsubmit="return testpass(this)" >
   <div class="form-group">
-     <label for="email">Email <span style="color: red !important; display: inline; float: none;">*</span>  
+     <label for="email">Email: <span style="color: red !important; display: inline; float: none;">*</span>  
     <input type="email" name="email">
     </label>
 <label for="country">Country</label><span style="color: red !important; display: inline; float: none;">*</span>      
@@ -337,10 +337,12 @@
                 <option value="Zimbabwe">Zimbabwe</option>
             </select>
   </div>
-    <label for="password">Password</label><span style="color: red !important; display: inline; float: none;">*</span>  
-    <input type="password" name="password">
-    <label for="password">Verify Password</label><span style="color: red !important; display: inline; float: none;">*</span>  
-    <input type="password" name="password">
+
+ Password:<span style="color: red !important; display: inline; float: none;">*</span>  <br />
+<input type="password" name="password"  /><br />
+  Verify Password:<span style="color: red !important; display: inline; float: none;">*</span>  <br />
+<input type="password" name="password_2"  /><br />
+
   </div>
   </div>
 </div>
@@ -387,11 +389,34 @@
      
   
     
-
+<script language="Javascript" type="text/javascript">
+<!-- 
+function testpass(modulo){
+  // Verifico che il campo password sia valorizzato in caso contrario
+  // avverto dell'errore tramite un Alert
+  if (modulo.password.value == "" || modulo.email.value ==""){
+    alert("Errore: manca mail o  password!")
+    modulo.password.focus()
+    return false
+  }
+  // Verifico che le due password siano uguali, in caso contrario avverto
+  // dell'errore con un Alert
+  if (modulo.password.value != modulo.password_2.value) {
+    alert("La password inserita non coincide con la prima!")
+    modulo.password.focus()
+    modulo.password.select()
+    return false
+  }
+  return true
+}
+-->
+</script>
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
 </body>
 </html>
+
+
 
