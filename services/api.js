@@ -17,9 +17,11 @@ const { Feedback } = require('../models/feedback')
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 const app = express()
 app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
-
+app.set('view engine','ejs')
+app.use(express.static('views'))
 app.get('/', (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
+    res.render('index')
+//  res.status(503).json({ message: 'Not Implemented' }) 
 })
 
 app.post('/login', jsonParser, Auth.middlewares.login)
