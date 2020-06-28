@@ -83,9 +83,12 @@
  Signup
   </div>
   <div class="card-body">
-<form action="register" method="post" onsubmit="return testpass(this)" >
+<form action="/register" method="POST" onsubmit="return testpass(this)" >
   <div class="form-group">
-     <label for="email">Email: <span style="color: red !important; display: inline; float: none;">*</span>  
+    <label for="name">Name: <span style="color: red !important; display: inline; float: none;">*</span>  
+    <input type="text" name="name">
+    </label>
+  <label for="email">Email: <span style="color: red !important; display: inline; float: none;">*</span>  
     <input type="email" name="email">
     </label>
 <label for="country">Country</label><span style="color: red !important; display: inline; float: none;">*</span>      
@@ -339,9 +342,9 @@
   </div>
 
  Password:<span style="color: red !important; display: inline; float: none;">*</span>  <br />
-<input type="password" name="password"  /><br />
+<input type="password" name="pass"  /><br />
   Verify Password:<span style="color: red !important; display: inline; float: none;">*</span>  <br />
-<input type="password" name="password_2"  /><br />
+<input type="password" name=""  /><br />
 
   </div>
   </div>

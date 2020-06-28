@@ -6,7 +6,7 @@ const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
 
 API_URL = process.env.API_URL
-
+prova = 'http://localhost:8081' 
 const app = express()
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
@@ -38,6 +38,28 @@ app.post('/login', formParser, async (req, res) => {
     throw err
   }
 })
+
+app.get('/register', (req, res) => {
+  res.render('register')
+})
+
+app.post('/register', formParser, async (req, res) => {
+  try {
+    const apiRes = await fetch(`${prova}/register`, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: req.body.name,
+        email: req.body.email,
+        pass: req.body.pass
+      })
+    })
+
+  } catch (err) {
+    throw err
+  }
+})
+
 
 /*
 app.get('/news', (req, res) => {
