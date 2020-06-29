@@ -27,6 +27,8 @@ app.get('/', (req, res) => {
 
 app.post('/login', jsonParser, Auth.middlewares.login)
 
+app.post('/register', jsonParser, Auth.middlewares.register)
+
 app.get('/profile', Auth.middlewares.jwt, async (req, res) => {
   try {
     const user = await fetchUser(req.user.id)

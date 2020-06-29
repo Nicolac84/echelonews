@@ -27,6 +27,24 @@ paths:
           $ref: "#/components/responses/MalformedRequest"
         '401':
           $ref: '#/components/responses/Unauthorized'
+  /register:
+    post:
+      summary: Register a user, logging it in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterData"
+      responses:
+        '200':
+          description: A signed JSON Web Token to be used in subsequent calls
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: "#/components/responses/Forbidden"
   /news:
     get:
       summary: Fetch news according to known user preferences
@@ -186,10 +204,22 @@ components:
         message:
           type: string
           description: Error description message
+    RegisterData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: User name
+        email:
+          type: string
+          description: User email
+        pass:
+          type: string
+          description: User password
     LoginData:
       type: object
       properties:
-        user:
+        name:
           type: string
           description: User name
         pass:

@@ -54,7 +54,6 @@ app.post('/register', formParser, async (req, res) => {
         pass: req.body.pass
       })
     })
-
   } catch (err) {
     throw err
   }
