@@ -14,3 +14,7 @@ h1 {
   }
 
 .big-padding{padding: 6 px 0;}
+
+ .checked {
+  color: orange;
+}
