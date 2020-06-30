@@ -96,8 +96,8 @@
   
   <div class="form-row">
     <div class="col-sm">
-      <label for="validationServer02">Parole chiavi</label>
-      <input type="text" class="form-control is-invalid" id="validationServer02" value="Otto" required>
+      <label for="validationServer02">Data</label>
+      <input type="date" class="form-control is-valid" id="validationServer02" value="" required>
       <div class="valid-feedback">
         
       </div>
@@ -106,7 +106,7 @@
 </div>
   <div class="form-row">
     
-    <div class="col-sm">
+    <div class="col">
       <label for="validationServer04">Paesi</label>
       <select class="custom-select is-valid" id="validationServer04" required>
         <option selected disabled value="">Choose...</option>
@@ -387,35 +387,14 @@
  
 
 </div>
-<div class="col-sm">
- <div class="card-header">
-    NEWS&nbsp; <span class="fa fa-star checked"></span>
-<span class="fa fa-star checked"></span>
-<span class="fa fa-star checked"></span>
-<span class="fa fa-star checked"></span>
-<span class="fa fa-star"></span>
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-outline-info" href="1">Vota</a>
+<div class="col-8">
 
-  </div>
+  <iframe src="iframenews.ejs" height="500" width="100%"></iframe> 
 </div>
 
-    <div class="col-sm">
- <div class="card-header">
-    NEWS &nbsp; <span class="fa fa-star checked"></span>
-<span class="fa fa-star checked"></span>
-<span class="fa fa-star checked"></span>
-<span class="fa fa-star"></span>
-<span class="fa fa-star"></span>
 
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-outline-info" href="1">Vota</a>
+
+
 
 
   </div>
@@ -441,9 +420,10 @@
     NEWS
   </div>
   <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-outline-info" href="1">More</a>
+  <div class="header" id="myHeader">
+  <h2>My Header</h2>
+
+</div> 
 
   </div>
 </div>
@@ -469,6 +449,29 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
+<script>
+function myFunction() {
+  // Declare variables
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById('myInput');
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("myUL");
+  li = ul.getElementsByTagName('li');
+
+  // Loop through all list items, and hide those who don't match the search query
+  for (i = 0; i < li.length; i++) {
+    a = li[i].getElementsByTagName("a")[0];
+    txtValue = a.textContent || a.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+</script>
+
+
 </body>
 </html>
 

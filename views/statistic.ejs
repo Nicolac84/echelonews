@@ -6,8 +6,8 @@
     <title>Document</title>
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="stile.css">
-
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
     <div class='fixed-top'>
@@ -42,8 +42,9 @@
               <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"></a>
             </li>
           </ul>
-  <a  class="btn btn-outline-primary" href="/register">Signup</a> &nbsp &nbsp
-       <a  class="btn btn-outline-primary" href="/login">Login</a>
+
+       <a  class="btn btn-outline-primary" href="/login">LogOut</a>
+   
    
         </div>
       </nav>
@@ -70,7 +71,7 @@
     
     <div class="row">
 
-    <div class="col-sm">
+    <div class="col-4">
  <div class="col-sm">
 <div class="card" style="width: 18rem;">
   <img src="worldnews.jpg" class="card-img-top" alt="...">
@@ -95,8 +96,8 @@
   
   <div class="form-row">
     <div class="col-sm">
-      <label for="validationServer02">Parole chiavi</label>
-      <input type="text" class="form-control is-invalid" id="validationServer02" value="Otto" required>
+      <label for="validationServer02">Data</label>
+      <input type="date" class="form-control is-valid" id="validationServer02" value="Otto" required>
       <div class="valid-feedback">
         
       </div>
@@ -386,25 +387,29 @@
  
 
 </div>
-<div class="col-sm">
- <div class="card-header">
-    NEWS
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-outline-info" href="1">More</a>
-  </div>
-</div>
 
-    <div class="col-sm">
- <div class="card-header">
-    NEWS
-  </div>
-  <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-outline-info" href="1">More</a>
+
+    <div class="col-8">
+
+    <div class="container-fluid">
+
+<h2>News Analytic</h2>
+
+<div id="piechart"></div>
+
+
+<div class="icon-bar">
+  <a class="active" href="#"><i class="fa fa-home"></i></a>
+  <a href="#"><i class="fa fa-search"></i></a>
+  <a href="#"><i class="fa fa-envelope"></i></a>
+  <a href="#"><i class="fa fa-globe"></i></a>
+  <a href="#"><i class="fa fa-trash"></i></a>
+</div>
+</div> 
+</div> 
+
+
+
   </div>
 </div>
 
@@ -423,21 +428,34 @@
     <div class="container">
      <p class="lead big-padding">
        <div class="shadow-lg p-3 mb-5 bg-white Width auto">
-<div class="card">
-  <div class="card-header">
-    NEWS
+
+
+ 
+ 
+<div class="card-header">
+    NEWS &nbsp; <span class="fa fa-star checked"></span>
+<span class="fa fa-star checked"></span>
+<span class="fa fa-star checked"></span>
+<span class="fa fa-star checked"></span>
+<span class="fa fa-star checked"></span>
+
   </div>
   <div class="card-body">
-    <h5 class="card-title">Special title treatment</h5>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-outline-info" href="1">More</a>
+      <iframe src="iframenews.ejs" height="250" width="100%"></iframe> 
+
+
+
+
+ </div>
+
+</div> 
+
   </div>
 </div>
 
 
        </div>
     </div>
-
 
 
 
@@ -455,6 +473,55 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
+<script>
+function myFunction() {
+  // Declare variables
+  var input, filter, ul, li, a, i, txtValue;
+  input = document.getElementById('myInput');
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("myUL");
+  li = ul.getElementsByTagName('li');
+
+  // Loop through all list items, and hide those who don't match the search query
+  for (i = 0; i < li.length; i++) {
+    a = li[i].getElementsByTagName("a")[0];
+    txtValue = a.textContent || a.innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
+}
+</script>
+ <script type="text/javascript">
+// Load google charts
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawChart);
+
+// Draw the chart and set the chart values
+function drawChart() {
+  var data = google.visualization.arrayToDataTable([
+  ['Task', 'Hours per Day'],
+  ['Work', 8],
+  ['Friends', 2],
+  ['Eat', 2],
+  ['TV', 2],
+  ['Gym', 2],
+  ['Cronaca', 2],
+  ['Sleep', 8]
+]);
+
+  // Optional; add a title and set the width and height of the chart
+  var options = {'title':'', 'width':650, 'height':400};
+
+  // Display the chart inside the <div> element with id="piechart"
+  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+  chart.draw(data, options);
+}
+</script> 
+
 </body>
 </html>
 
