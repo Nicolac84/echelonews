@@ -6,7 +6,9 @@
     <title>Document</title>
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="stile.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 
 </head>
 <body>
@@ -217,7 +219,7 @@
                 <option value="Ireland">Ireland</option>
                 <option value="Isle of Man">Isle of Man</option>
                 <option value="Israel">Israel</option>
-                <option value="Italy">Italy</option>
+                <option value="Italy">🇮🇹 Italy</option>
                 <option value="Jamaica">Jamaica</option>
                 <option value="Japan">Japan</option>
                 <option value="Jersey">Jersey</option>
@@ -389,49 +391,135 @@
 </div>
 <div class="col-8">
 
-  <iframe src="iframenews.ejs" height="500" width="100%"></iframe> 
+    <div class="container">
+
+
+
+ <div style="width:100% ;height: 400px; overflow-x:  scroll; overflow-y:  scroll;border:1px solid black;">
+
+ <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for News..">
+
+<table id="myTable">
+  <tr class="header">
+    <th style="width:40%;">Name</th>
+    <th style="width:30%;">Country</th>
+    <th style="width:30%;">Menu</th>
+  </tr>
+  <tr>
+    <td>Alfreds FutterkisteAlfreds Futterkiste</td>
+    <td>🇩🇪 Germany</td>
+
+  <td>  <span class="fa fa-star checked"></span>
+        <span class="fa fa-star "></span>
+        <span class="fa fa-star "></span>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span> </td>
+
+  </tr>
+  <tr>
+    <td>Berglunds snabbkop</td>
+    <td>🇸🇪 Sweden </td>
+<td>  <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star "></span> </td>
+  </tr>
+
+  <tr>
+    <td>Island Trading</td>
+    <td>🇬🇧 UK</td>
+<td>  <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star"></span>
+        <span class="fa fa-star"></span> </td>  
+</tr>
+  <tr>
+    <td>Situazione corona virus</td>
+    <td>🇮🇹 Italy</td>
+<td>  <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span> </td>  
+</tr>
+
+  <tr>
+    <td>Situazione corona virus</td>
+    <td>🇮🇹 Italy</td>
+<td>  <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span> </td>  
+</tr>
+  <tr>
+    <td>Situazione corona virus</td>
+    <td>🇮🇹 Italy</td>
+<td>  <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span> </td>  
+</tr>
+
+  <tr>
+    <td>Situazione corona virus</td>
+    <td>🇮🇹 Italy</td>
+<td>  <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span> </td>  
+</tr>
+
+  <tr>
+    <td>Situazione corona virus</td>
+    <td>🇮🇹 Italy</td>
+<td>  <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span> </td>  
+</tr>
+
+  <tr>
+    <td>Situazione corona virus</td>
+    <td>🇮🇹 Italy</td>
+<td>  <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span>
+        <span class="fa fa-star checked"></span> </td>  
+</tr>
+</table> 
+
+
+
+
+</div>
+
 </div>
 
 
 
+<br><br>
 
+    <div class="container">
+<div class="btn-group btn-group-lg">
 
-
-  </div>
-</div>
-
-
-
-
-</div>
+  <button type="button" class="btn btn-primary">Lista </button>
+  <button type="button" class="btn btn-primary"  >Analisi</button>
+  <button type="button" class="btn btn-primary">Vota</button>
     </div>
 
-
+</div>
+</div>
   </div>
     </div>
 
  
-
-    <div class="container">
-     <p class="lead big-padding">
-       <div class="shadow-lg p-3 mb-5 bg-white Width auto">
-<div class="card">
-  <div class="card-header">
-    NEWS
-  </div>
-  <div class="card-body">
-  <div class="header" id="myHeader">
-  <h2>My Header</h2>
-
-</div> 
-
-  </div>
-</div>
-
-
-       </div>
-    </div>
-
 
 
 
@@ -452,20 +540,22 @@
 <script>
 function myFunction() {
   // Declare variables
-  var input, filter, ul, li, a, i, txtValue;
-  input = document.getElementById('myInput');
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
   filter = input.value.toUpperCase();
-  ul = document.getElementById("myUL");
-  li = ul.getElementsByTagName('li');
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
 
-  // Loop through all list items, and hide those who don't match the search query
-  for (i = 0; i < li.length; i++) {
-    a = li[i].getElementsByTagName("a")[0];
-    txtValue = a.textContent || a.innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      li[i].style.display = "";
-    } else {
-      li[i].style.display = "none";
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
     }
   }
 }
