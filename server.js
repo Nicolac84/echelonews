@@ -4,6 +4,8 @@ const parser = require('body-parser')
 const formParser = parser.urlencoded({ extended: false })
 const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
+const passport =require('passport')
+
 
 API_URL = process.env.API_URL
 prova = 'http://localhost:8081' 
@@ -16,6 +18,8 @@ app.use(express.static('views'))
 app.get('/', (req, res) => {
   res.render('index')
 })
+
+
 
 app.get('/login', (req, res) => {
   res.render('login')
@@ -32,7 +36,7 @@ app.post('/login', formParser, async (req, res) => {
         pass: req.body.pass
       })
     })
-    if (apiRes.ok) res.redirect('/')
+    if (apiRes.ok) res.redirect('/profile')
     else res.status(apiRes.status).send('Erroraccio')
   } catch (err) {
     throw err
@@ -60,8 +64,10 @@ app.post('/register', formParser, async (req, res) => {
 })
 
 
+app.get('/news',chekAuthenticated , (req, res) => {
+  
 /*
-app.get('/news', (req, res) => {
+
   try {
     const apiRes = await fetch(`${API_URL}/news`)
     const news = await apiRes.json()
@@ -70,6 +76,28 @@ app.get('/news', (req, res) => {
   }
 })
 */
+
+
+res.render('news')
+})
+app.get('/statistic',chekAuthenticated ,(req, res) => {
+  res.render('statistic')
+})
+
+app.get('/profile',chekAuthenticated ,(req, res) => {
+  res.render('profile')
+})
+
+function chekAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+  return next()
+  }
+
+res.redirect('/login')
+}
+
+
+
 
 // Perform the required setup operations and launch the server
 app.launch = function({ port = 8080 } = {}) {
