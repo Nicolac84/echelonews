@@ -27,6 +27,8 @@ class UserFactory {
     }
   }
 
+  static entities = { existing: [], nonExisting: [] }
+
   static bad = {
     id: -140,
     name: 'a',
@@ -39,18 +41,14 @@ class UserFactory {
   static async setupTestDB(opt) {
     try {
       // Mock users
-      const existing = await this.create({
-        name: 'idoalreadyexist',
-        email: 'existing@ema.il',
-      })
-      const existing2 = await this.create({
-        name: 'idoalreadyexist2',
-        email: 'existing2@ema.il',
-      })
-      const nonExisting = await this.create({
-        name: 'idonotexist',
-        email: 'nonexisting@ema.il',
-      })
+      this.entities.existing = await Promise.all(
+        mocks.map(u => UserFactory.create(u)))
+      this.entities.nonExisting = [
+        await this.create({
+          name: 'idonotexist',
+          email: 'nonexisting@ema.il',
+        }),
+      ]
 
       // Setup the database for user testing
       User.db.setup(opt)
@@ -59,14 +57,17 @@ class UserFactory {
         .catch(() => {})
       await User.db.pool.query(fs.readFileSync('sql/account.sql').toString())
 
-      await existing.save()
-      await existing2.save()
+      // Save the existing entities, save and delete the non-existing ones
+      for (const e of this.entities.existing) await e.save()
+      for (const e of this.entities.nonExisting) {
+        await e.save()
+        await e.delete()
+      }
 
-      // Make sure that none of nonExisting ID columns will actually exist
-      await nonExisting.save()
-      await nonExisting.delete()
-
-      return [existing, nonExisting, existing2]
+      return {
+        present: this.entities.present,
+        absent: this.entities.absent
+      }
     } catch (err) {
       console.log(err)
       throw err
@@ -77,5 +78,26 @@ class UserFactory {
     await User.db.cleanup()
   }
 }
+
+const mocks = [
+  {
+    name: 'existingUser1',
+    email: 'user1@ema.il',
+    countries: ['Italy'],
+    topics: ['Politics'],
+  },
+  {
+    name: 'existingUser2',
+    email: 'user2@ema.il',
+    countries: ['Russia'],
+    topics: ['Politics','Sport'],
+  },
+  {
+    name: 'existingUser3',
+    email: 'user3@ema.il',
+    countries: ['USA'],
+    topics: ['Sport'],
+  },
+]
 
 module.exports = { UserFactory }

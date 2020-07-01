@@ -16,8 +16,11 @@ describe('Exposed API', function() {
   before(async () => {
     // Setup the database
     try {
-      ;[user,absentUser] = await UserFactory.setupTestDB(process.env.POSTGRES_URI)
-      ;[npaper] = await NewspaperFactory.setupTestDB(process.env.POSTGRES_URI)
+      await UserFactory.setupTestDB(process.env.POSTGRES_URI)
+      await NewspaperFactory.setupTestDB(process.env.POSTGRES_URI)
+      user = UserFactory.entities.existing[0]
+      absentUser = UserFactory.entities.nonExisting[0]
+      npaper = NewspaperFactory.entities.existing[0]
       await UserFactory.cleanupTestDB() // We don't need the user db directly
       await NewspaperFactory.cleanupTestDB() // Same thing for newspapers
       Feedback.db.setup(process.env.POSTGRES_URI)

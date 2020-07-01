@@ -22,9 +22,10 @@ describe('User Handler API', function () {
       topics: 'def',
     })
     try {
-      ;[presentUser, absentUser, presentUser2] = await UserFactory.setupTestDB(
-        process.env.POSTGRES_URI
-      )
+      await UserFactory.setupTestDB(process.env.POSTGRES_URI)
+      presentUser = UserFactory.entities.existing[0]
+      presentUser2 = UserFactory.entities.existing[1]
+      absentUser = UserFactory.entities.nonExisting[0]
     } catch (err) {
       console.error(err)
       process.exit(1)

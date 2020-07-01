@@ -58,7 +58,6 @@ class NewsMultiplexer {
         }
       })
     } catch (err) {
-      log.error(err)
       throw err
     }
   }
@@ -83,27 +82,6 @@ class NewsMultiplexer {
       else return 0
     })
   }
-}
-
-// Multiplex articles at database level by a single topic and country
-// TODO: Adjust
-Article.db.queries.create({
-  name: 'multiplex',
-  type: 'multiple',
-  generate: ({ user, topic, country }) => ({
-    text: 'SELECT * FROM multiplex($1,$2,$3)',
-    values: [user, topic, country]
-  })
-})
-
-// More elegant solution than running a query with Article.queries.run
-Article.multiplex = function({ uid, topic, country } = {}) {
-  return Article.db.queries.run('multiplex', {
-    conf: Article.db,
-    user: uid,
-    topic,
-    country
-  })
 }
 
 /** News Multiplexer client */

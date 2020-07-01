@@ -73,6 +73,22 @@ class Article extends Perseest.Mixin(VolatileArticle) {
     this.exists = opt.exists || false
   }
 
+  /** Multiplex articles, with a single country
+   * @param {object} opt - Parameters
+   * @param {number} opt.uid - User ID
+   * @param {string} opt.topic - Topic for multiplexed articles
+   * @param {string} opt.country - Single country for multiplexed articles
+   * @returns {Promise<Array<Article>>} An array of articles, sorted by score
+   */
+  static multiplex({ uid, topic, country } = {}) {
+    return this.db.queries.run('multiplex', {
+      conf: Article.db,
+      user: uid,
+      topic,
+      country
+    })
+  }
+
   /** Database configuration for perseest */
   static db = new Perseest.Config('Article', 'id', [
     ['id', { serial: true, id: true }],
@@ -96,5 +112,26 @@ Validable.validate.extend(Validable.validate.validators.datetime, {
 modHelpers.setIDAfterSaving(Article, 'id')
 modHelpers.tm2DateAfterFetch(Article, 'created')
 modHelpers.validateBeforeQuery(Article)
+
+// Multiplex articles at database level by a single topic and country
+Article.db.queries.create({
+  name: 'multiplex',
+  type: 'multiple',
+  generate: ({ user, topic, country }) => {
+  return ({
+    text: 'SELECT * FROM multiplex($1::INTEGER,$2::TEXT,$3::TEXT)',
+    values: [user, topic, country]
+  })
+  }
+})
+
+// Add feedback score to multiplexed articles
+Article.db.addHook('after', 'multiplex', params => {
+  params.ret = params.ret.map((e,idx) => {
+    const art = params.conf.row2Entity(e)
+    art.score = params.res.rows[idx].score
+    return art
+  })
+})
 
 module.exports = { VolatileArticle, Article }

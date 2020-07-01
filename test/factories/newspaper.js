@@ -10,15 +10,15 @@ class NewspaperFactory {
     return new Newspaper(Object.assign(this.uniqueParams(), opt))
   }
 
-  static uniqueNewspaperCounter = 0
   static uniqueParams() {
-    const id = this.uniqueNewspaperCounter++
     return {
       sourceType: 'rss',
       country: 'Italy',
       info: {},
     }
   }
+
+  static entities = { existing: [], nonExisting: [] }
 
   static bad = {
     sourceType: 12345678,
@@ -27,27 +27,30 @@ class NewspaperFactory {
   }
 
   static async setupTestDB(opt) {
-    const existing = this.create(),
-      existing2 = this.create(),
-      nonExisting = this.create()
     try {
+      this.entities.existing = mocks.map(u => NewspaperFactory.create(u))
+      this.entities.nonExisting = [ this.create() ]
+
       // Setup the database for newspaper testing
       Newspaper.db.setup(opt)
       await Newspaper.db.pool
         .query(`DROP TABLE ${Newspaper.db.table} CASCADE`)
-        .catch(console.error) // Ignore errors, table could be inexistent
+        .catch(() => {}) // Ignore errors, table could be inexistent
       await Newspaper.db.pool.query(
         fs.readFileSync('sql/newspaper.sql').toString()
       )
 
-      await existing.save()
-      await existing2.save()
+      // Save the existing entities, save and delete the non-existing ones
+      for (const e of this.entities.existing) await e.save()
+      for (const e of this.entities.nonExisting) {
+        await e.save()
+        await e.delete()
+      }
 
-      // Make sure that none of nonExisting ID columns will actually exist
-      await nonExisting.save()
-      await nonExisting.delete()
-
-      return [existing, nonExisting, existing2]
+      return {
+        present: this.entities.present,
+        absent: this.entities.absent
+      }
     } catch (err) {
       throw err
     }
@@ -57,5 +60,12 @@ class NewspaperFactory {
     Newspaper.db.cleanup()
   }
 }
+
+const mocks = [
+  { sourceType: 'rss', country: 'Italy', info: {} },
+  { sourceType: 'rss', country: 'Russia', info: {} },
+  { sourceType: 'rss', country: 'USA', info: {} },
+  { sourceType: 'rss', country: 'China', info: {} },
+]
 
 module.exports = { NewspaperFactory }

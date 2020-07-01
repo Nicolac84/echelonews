@@ -19,14 +19,14 @@ const absNasaUrl = 'http://www.nasa.gov'
 const relNasaUrl = '/rss/dyn/breaking_news.rss'
 
 describe('RSS News Fetcher', () => {
+  // Setup
   let nasa, articles
   before(async () => {
-    // Setup database
     nasa = newNasa()
     try {
-      const nps = await NewspaperFactory.setupTestDB(process.env.POSTGRES_URI)
-      articles = await ArticleFactory
-        .setupTestDB([nps[0], nps[2]], process.env.POSTGRES_URI)
+      await NewspaperFactory.setupTestDB(process.env.POSTGRES_URI)
+      await ArticleFactory.setupTestDB(process.env.POSTGRES_URI)
+      articles = ArticleFactory.entities.existing
     } catch (err) {
       console.error(err)
       throw err
