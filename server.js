@@ -4,7 +4,20 @@ const parser = require('body-parser')
 const formParser = parser.urlencoded({ extended: false })
 const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
-const passport =require('passport')
+const passport = require('passport')
+
+const passportSetup = require('./passport-setup')
+
+const router = require('express').Router();
+
+router.get('/google', passport.authenticate('google',{
+scope: ['profile']
+
+}))
+
+
+
+
 
 
 API_URL = process.env.API_URL
@@ -12,13 +25,13 @@ prova = 'http://localhost:8081'
 const app = express()
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
+
 app.set('view engine', 'ejs')
 app.use(express.static('views'))
 
 app.get('/', (req, res) => {
   res.render('index')
 })
-
 
 
 app.get('/login', (req, res) => {
@@ -42,6 +55,15 @@ app.post('/login', formParser, async (req, res) => {
     throw err
   }
 })
+
+
+
+app.get('/google', passport.authenticate('google',{
+scope: ['profile']
+
+
+}))
+
 
 app.get('/register', (req, res) => {
   res.render('register')
@@ -80,16 +102,18 @@ app.get('/news',chekAuthenticated , (req, res) => {
 
 res.render('news')
 })
+
+
 app.get('/statistic',chekAuthenticated ,(req, res) => {
   res.render('statistic')
 })
 
-app.get('/profile',chekAuthenticated ,(req, res) => {
+app.get('/profile', chekAuthenticated ,(req, res) => {
   res.render('profile')
 })
 
 function chekAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated() ) {
   return next()
   }
 
