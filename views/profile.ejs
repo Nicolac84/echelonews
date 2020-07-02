@@ -395,7 +395,7 @@
 
 
 <div class="card-header">
-    NEWS &nbsp; 
+    NEWS &nbsp; <%= usr.info %>
 
   </div>
   <div class="card-body">
@@ -409,13 +409,29 @@
 
 <br> 30/06/2020  15.25
 <div class="card-header"> 
-<p>Umberto Calcagno, vicepresidente dell'Associazione Italiana Calciatori, ha ribadito a TgCom che l'orario pomeridiano in estate continua a non convincere: “L’orario delle 16,30 per le partite estive è sbagliato. Siamo contrari. Sulla questione stipendi non è semplice trovare una soluzione condivisa.”.
-</p>
-<br>
-<button type="button" class="btn btn-danger">Rimuovi</button>
-<button type="button" class="btn btn-success">Aggiungi a lista preferiti</button>
+
+<%  usr.news.forEach(function(item){  %>
+
+
+
+
+<div class="card">  
+<button class="btn2"><i class="fa fa-close"></i> </button>
+  <div class="card-body">
+    <h4 class="card-title"><%= usr.info %></h4>
+    <p class="card-text"> <%= item %> </p>
+   <button class="btn2"><i class="fa fa-close"></i> </button>
   </div>
 
+</div>
+
+
+ <br>
+
+
+
+<% }) %>
+ </div>
  </div>
  </div>
 

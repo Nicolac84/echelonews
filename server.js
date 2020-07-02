@@ -86,7 +86,7 @@ app.post('/register', formParser, async (req, res) => {
 })
 
 
-app.get('/news',chekAuthenticated , (req, res) => {
+app.get('/news', (req, res) => {
   
 /*
 
@@ -98,18 +98,24 @@ app.get('/news',chekAuthenticated , (req, res) => {
   }
 })
 */
+let newsi=   {data: '30/06/2020 15.25'  , rank:'10' ,titolo: 'Situazione Coronavirus', paese: '🇮🇹  Italia'}
+ 
 
-
-res.render('news')
+res.render('news', { newsi: newsi})
 })
 
 
-app.get('/statistic',chekAuthenticated ,(req, res) => {
+app.get('/statistic',(req, res) => {
   res.render('statistic')
 })
 
-app.get('/profile', chekAuthenticated ,(req, res) => {
-  res.render('profile')
+app.get('/profile' ,(req, res) => {
+
+
+let usr = {info: 'TITOLO...' ,news:['provatestblabla1','provatestblabla2','provatestblabla3','provatestblabla4']}
+
+
+  res.render('profile', { usr: usr})
 })
 
 function chekAuthenticated(req, res, next) {
