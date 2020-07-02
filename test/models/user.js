@@ -20,9 +20,9 @@ describe('User', function () {
   let nonExisting
   before(async () => {
     try {
-      ;[existing, nonExisting] = await UserFactory.setupTestDB(
-        process.env.POSTGRES_URI
-      )
+      await UserFactory.setupTestDB(process.env.POSTGRES_URI)
+      existing = UserFactory.entities.existing[0]
+      nonExisting = UserFactory.entities.nonExisting[0]
     } catch (err) {
       console.error(err)
       process.exit(1)

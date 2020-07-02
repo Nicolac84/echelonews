@@ -73,6 +73,32 @@ class Article extends Perseest.Mixin(VolatileArticle) {
     this.exists = opt.exists || false
   }
 
+
+  /** Multiplex articles, with a single country
+   * @param {object} opt - Constructor parameters
+   * @param {number} opt.uid - Reference user ID
+   * @param {string} opt.topic - Topic to multiplex
+   * @param {Array<string>} opt.countries - Countries to multiplex
+   * @returns {Array<Article>} An ordered collection of articles
+   */
+  static async multiplex({ uid, topic, countries } = {}) {
+    let allNews = []
+    for (const country of countries) {
+      const news = await this.db.queries.run('multiplex', {
+        conf: Article.db,
+        user: uid,
+        topic,
+        country
+      })
+      allNews = allNews.concat(news)
+    }
+    return allNews.sort((a,b) => {
+      if (a.score > b.score) return 1
+      else if (a.score < b.score) return -1
+      else return 0
+    })
+  }
+
   /** Database configuration for perseest */
   static db = new Perseest.Config('Article', 'id', [
     ['id', { serial: true, id: true }],
@@ -96,5 +122,26 @@ Validable.validate.extend(Validable.validate.validators.datetime, {
 modHelpers.setIDAfterSaving(Article, 'id')
 modHelpers.tm2DateAfterFetch(Article, 'created')
 modHelpers.validateBeforeQuery(Article)
+
+// Multiplex articles at database level by a single topic and country
+Article.db.queries.create({
+  name: 'multiplex',
+  type: 'multiple',
+  generate: ({ user, topic, country }) => {
+  return ({
+    text: 'SELECT * FROM multiplex($1::INTEGER,$2::TEXT,$3::TEXT)',
+    values: [user, topic, country]
+  })
+  }
+})
+
+// Add feedback score to multiplexed articles
+Article.db.addHook('after', 'multiplex', params => {
+  params.ret = params.ret.map((e,idx) => {
+    const art = params.conf.row2Entity(e)
+    art.score = params.res.rows[idx].score
+    return art
+  })
+})
 
 module.exports = { VolatileArticle, Article }
