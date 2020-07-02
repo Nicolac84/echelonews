@@ -40,7 +40,7 @@ describe('Article', function() {
         const topic = articles[0].topics[0]
         const country = npapers.find(np => np.id === articles[0].source).country
         const muxed = await Article.multiplex({
-          uid: uid.present, topic, country
+          uid: uid.present, topic, countries: [country]
         })
         expect(muxed).to.be.an('array')
         expect(muxed[0].constructor.name).to.equal('Article')
@@ -60,7 +60,7 @@ describe('Article', function() {
         const topic = articles[0].topics[0]
         const country = npapers.find(np => np.id === articles[0].source).country
         const muxed = await Article.multiplex({
-          uid: uid.absent, topic, country
+          uid: uid.absent, topic, countries: [country]
         })
         expect(muxed).to.be.an('array')
         expect(muxed[0].constructor.name).to.equal('Article')
@@ -79,7 +79,7 @@ describe('Article', function() {
       try {
         const country = npapers.find(np => np.id === articles[0].source).country
         const muxed = await Article.multiplex({
-          uid: uid.present, topic: 'nonexisting', country
+          uid: uid.present, topic: 'nonexisting', countries: [country]
         })
         expect(muxed).to.be.an('array')
         expect(muxed).to.be.empty
@@ -92,7 +92,7 @@ describe('Article', function() {
       try {
         const topic = articles[0].topics[0]
         const muxed = await Article.multiplex({
-          uid: uid.absent, topic, country: 'nonexisting'
+          uid: uid.absent, topic, countries: ['nonexisting']
         })
         expect(muxed).to.be.an('array')
         expect(muxed).to.be.empty

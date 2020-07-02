@@ -50,9 +50,7 @@ class NewsMultiplexer {
             correlationId: msg.properties.correlationId
           }))
           channel.ack(msg)
-        } catch (err) {
-          // Error - NACK the message
-          log.error(err)
+        } catch (err) {  // Error - NACK the message
           channel.nack(msg)
           throw err
         }
@@ -60,27 +58,6 @@ class NewsMultiplexer {
     } catch (err) {
       throw err
     }
-  }
-
-  /** Fetch news for a user
-   * @param {object} opt - Constructor parameters
-   * @param {number} opt.uid - Reference user ID
-   * @param {string} opt.topic - Topic to multiplex
-   * @param {Array<string>} opt.countries - Countries to multiplex
-   * @returns {Array<Article>} An ordered collection of articles
-   */
-  static async multiplex({ uid, topic, countries } = {}) {
-    log.info(`Multiplexing for user ${uid} - ${topic} ${countries.join(',')}`)
-    let allNews = []
-    for (const c of countries) {
-      const news = await Article.multiplex({ uid, topic, country: c })
-      allNews = allNews.concat(news)
-    }
-    return allNews.sort((a,b) => {
-      if (a.score > b.score) return 1
-      else if (a.score < b.score) return -1
-      else return 0
-    })
   }
 }
 

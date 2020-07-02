@@ -73,19 +73,29 @@ class Article extends Perseest.Mixin(VolatileArticle) {
     this.exists = opt.exists || false
   }
 
+
   /** Multiplex articles, with a single country
-   * @param {object} opt - Parameters
-   * @param {number} opt.uid - User ID
-   * @param {string} opt.topic - Topic for multiplexed articles
-   * @param {string} opt.country - Single country for multiplexed articles
-   * @returns {Promise<Array<Article>>} An array of articles, sorted by score
+   * @param {object} opt - Constructor parameters
+   * @param {number} opt.uid - Reference user ID
+   * @param {string} opt.topic - Topic to multiplex
+   * @param {Array<string>} opt.countries - Countries to multiplex
+   * @returns {Array<Article>} An ordered collection of articles
    */
-  static multiplex({ uid, topic, country } = {}) {
-    return this.db.queries.run('multiplex', {
-      conf: Article.db,
-      user: uid,
-      topic,
-      country
+  static async multiplex({ uid, topic, countries } = {}) {
+    let allNews = []
+    for (const country of countries) {
+      const news = await this.db.queries.run('multiplex', {
+        conf: Article.db,
+        user: uid,
+        topic,
+        country
+      })
+      allNews = allNews.concat(news)
+    }
+    return allNews.sort((a,b) => {
+      if (a.score > b.score) return 1
+      else if (a.score < b.score) return -1
+      else return 0
     })
   }
 
