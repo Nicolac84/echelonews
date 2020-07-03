@@ -12,14 +12,15 @@ const pinoExpress = require('express-pino-logger')
 const Validable = require('validable')
 const Auth = require('../lib/authstar')
 const { User } = require('../models/user')
+const { Article } = require('../models/article')
 const { Feedback } = require('../models/feedback')
+const { NewsMultiplexerClient, DEFAULT_RPC_QUEUE } =
+  require('./news-multiplexer')
 
-const log = pino({ level: process.env.LOG_LEVEL || 'info' })
+// Setup app and logger
 const app = express()
+const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
-
-app.set('view engine','ejs')
-app.use(express.static('views'))
 
 app.get('/', (req, res) => {
   res.status(503).json({ message: 'Not Implemented' }) 
@@ -137,31 +138,88 @@ app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-app.get('/news', Auth.middlewares.jwt, (req, res) => {
+app.get('/news', Auth.middlewares.jwt, async (req, res) => {
+  try {
+    const user = await fetchUser(req.user.id)
+    const muxed = await app.muxer.multiplex({
+      uid: user.id,
+      countries: user.countries,
+      topic: user.topics[0]
+    })
+  res.status(200).json(muxed)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
 })
 
-app.post('/news', Auth.middlewares.jwt, jsonParser, (req, res) => {
-  res.status(503).json({ message: 'Not Implemented' })
+app.post('/news', Auth.middlewares.jwt, jsonParser, async (req, res) => {
+  try {
+    const errors = Validable.merge(
+      Validable.requirelist(req.body, ['topic', 'countries']),
+      Validable.whitelist(req.body, ['topic', 'countries']),
+      Article.validate('topics', [req.body.topic]),
+      User.validate('countries', req.body.countries)
+    )
+    if (errors) {
+      log.warn(`User ${req.user.id} performed bad news fetch request\n%o`, req.body)
+      return res.status(400).json({ errors })
+    }
+    const muxed = await app.muxer.multiplex({
+      uid: req.user.id,
+      topic: req.body.topic,
+      countries: req.body.countries
+    })
+    res.status(200).json(muxed)
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
 })
 
 // Perform the application setup, programmatically
-app.setup = function({ logger, userHandlerUrl, jwtSecret } = {}) {
-  Auth.setup({
-    log: logger || log,
-    jwtSecret: jwtSecret || process.env.JWT_SECRET,
-    userHandlerUrl: userHandlerUrl || process.env.USER_HANDLER_URL,
-  })
+app.setup = async function({
+  logger,
+  userHandlerUrl,
+  jwtSecret,
+  amqpBroker,
+  muxerQueueName,
+  postgresUri,
+} = {}) {
+  try {
+    Feedback.db.setup(postgresUri)
+    Auth.setup({
+      log: logger || log,
+      jwtSecret: jwtSecret || process.env.JWT_SECRET,
+      userHandlerUrl: userHandlerUrl || process.env.USER_HANDLER_URL,
+    })
+    app.muxer = new NewsMultiplexerClient({
+      broker: amqpBroker,
+      queueName: muxerQueueName
+    })
+    await app.muxer.setup()
+  } catch (err) {
+    throw err
+  }
 }
 
 // Perform the required setup operations and launch the server
 app.launch = function({ port = 8080, userHandlerUrl, jwtSecret} = {}) {
-  Feedback.db.setup(process.env.POSTGRES_URI)
-  app.setup({ userHandlerUrl, jwtSecret })
+  app.setup({
+    userHandlerUrl,
+    jwtSecret,
+    postgresUri: process.env.POSTGRES_URI,
+    amqpBroker: process.env.AMQP_BROKER,
+    muxerQueueName: process.env.RPC_QUEUE_NAME || DEFAULT_RPC_QUEUE,
+  })
   app.listen(port, () => log.info(`Server listening on port ${port}`))
 }
 
 // If this is the main module, launch the API server
 if (require.main === module) {
+  for (const v of ['POSTGRES_URI', 'AMQP_BROKER', 'JWT_SECRET', 'USER_HANDLER_URL']) {
+    if (!process.env[v]) throw new Error(`You must define environment variable ${v}`)
+  }
   log.info('Launching EcheloNews RESTful API in standalone mode')
   app.launch({ port: process.env.PORT })
 }

@@ -11,6 +11,8 @@ const { Article } = require('../models/article')
 
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 
+const DEFAULT_RPC_QUEUE = 'echelonews-multiplexer-rpc'
+
 class NewsMultiplexer {
   /** Construct a news multiplexer
    * @param {object} opt - Constructor parameters
@@ -50,7 +52,7 @@ class NewsMultiplexer {
             correlationId: msg.properties.correlationId
           })
           this.channel.ack(msg)
-          log.info()
+          log.info(`Completed RPC call ${correlationId}`)
         } catch (err) {  // Error - NACK the message
           this.channel.nack(msg)
           throw err
@@ -181,13 +183,13 @@ if (require.main === module) {
   const muxer = new NewsMultiplexer({
     broker,
     prefetch: process.env.AMQP_PREFETCH,
-    queueName: process.env.AMQP_QUEUE_NAME || 'echelonews-multiplexer-rpc'
+    queueName: process.env.AMQP_QUEUE_NAME || DEFAULT_RPC_QUEUE
   })
 
   // Setup graceful close on SIGINT
   process.once('SIGINT', () => {
-    muxer.close().then(() => {
-      log.info('Multiplexer server gracefully closed')
+    muxer.conn.close().then(() => {
+      log.debug('Multiplexer server gracefully closed')
       process.exit(0)
     }).catch(log.error)
   })
@@ -199,4 +201,4 @@ if (require.main === module) {
   })
 }
 
-module.exports = { NewsMultiplexer, NewsMultiplexerClient }
+module.exports = { NewsMultiplexer, NewsMultiplexerClient, DEFAULT_RPC_QUEUE }
