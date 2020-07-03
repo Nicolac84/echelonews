@@ -13,6 +13,7 @@ const Validable = require('validable')
 const Perseest = require('perseest')
 const bcrypt = require('bcrypt')
 const modHelpers = require('./helpers/perseest')
+Object.assign(Validable.validate.validators, require('../lib/validators'))
 
 /** User entity, with no support for persistence */
 class VolatileUser extends Validable.Class {
@@ -114,7 +115,7 @@ class VolatileUser extends Validable.Class {
     },
     exists: { type: 'boolean' },
     topics: { stringArray: true },
-    countries: { stringArray: true },
+    countries: { countryCodeArray: true },
   }
 
   /** @constant {number} - BCrypt hash cost */
@@ -160,15 +161,5 @@ Validable.validate.extend(Validable.validate.validators.datetime, {
   parse: value => new Date(value).valueOf(),
   format: value => new Date(value),
 })
-
-// Validate non-blank string array
-Validable.validate.validators.stringArray = (value, options) => {
-  if (!options) return null
-  if (!Validable.validate.isArray(value)) return 'is not an array'
-  for (const x of value)
-    if (!x || !Validable.validate.isString(x))
-      return 'contain invalid elements'
-  return null
-}
 
 module.exports = { User, VolatileUser }

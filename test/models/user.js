@@ -85,12 +85,12 @@ describe('User', function () {
       })
 
       specify('some element is not a string', () => {
-        user.countries = ['Italy', 123, 'Russia']
+        user.countries = ['IT', 123, 'RU']
         expect(user.validate()).to.have.property('countries')
       })
 
       specify('some element is blank', () => {
-        user.countries = ['Italy', '', 'Russia']
+        user.countries = ['IT', '', 'RU']
         expect(user.validate()).to.have.property('countries')
       })
     })

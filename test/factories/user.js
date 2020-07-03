@@ -83,19 +83,19 @@ const mocks = [
   {
     name: 'existingUser1',
     email: 'user1@ema.il',
-    countries: ['Italy'],
+    countries: ['IT'],
     topics: ['Politics'],
   },
   {
     name: 'existingUser2',
     email: 'user2@ema.il',
-    countries: ['Russia'],
+    countries: ['RU'],
     topics: ['Politics','Sport'],
   },
   {
     name: 'existingUser3',
     email: 'user3@ema.il',
-    countries: ['USA'],
+    countries: ['US'],
     topics: ['Sport'],
   },
 ]

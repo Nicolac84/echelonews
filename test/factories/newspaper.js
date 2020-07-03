@@ -13,7 +13,7 @@ class NewspaperFactory {
   static uniqueParams() {
     return {
       sourceType: 'rss',
-      country: 'Italy',
+      country: 'IT',
       info: {},
     }
   }
@@ -62,10 +62,10 @@ class NewspaperFactory {
 }
 
 const mocks = [
-  { sourceType: 'rss', country: 'Italy', info: {} },
-  { sourceType: 'rss', country: 'Russia', info: {} },
-  { sourceType: 'rss', country: 'USA', info: {} },
-  { sourceType: 'rss', country: 'China', info: {} },
+  { sourceType: 'rss', country: 'IT', info: {} },
+  { sourceType: 'rss', country: 'RU', info: {} },
+  { sourceType: 'rss', country: 'US', info: {} },
+  { sourceType: 'rss', country: 'CN', info: {} },
 ]
 
 module.exports = { NewspaperFactory }

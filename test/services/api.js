@@ -149,7 +149,7 @@ describe('Exposed API', function() {
           const res = await conn
             .post('/countries')
             .set('Authorization', token)
-            .send(['Italy', 'Russia', 'USA'])
+            .send(['IT', 'RU', 'US'])
           expect(res).to.have.status(200)
         } catch (err) {
           throw err
@@ -170,7 +170,7 @@ describe('Exposed API', function() {
 
       it('should return 400 with inconsistent countries', async () => {
         try {
-          for (const body of [['USA', 123, 'Japan'], 'abc', null, { a: 1 }]) {
+          for (const body of [['US', 123, 'CN'], 'abc', null, { a: 1 }]) {
             const res = await conn
               .post('/countries')
               .set('Authorization', token)

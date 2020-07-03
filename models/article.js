@@ -11,6 +11,7 @@
 const Validable = require('validable')
 const Perseest = require('perseest')
 const modHelpers = require('./helpers/perseest')
+Object.assign(Validable.validate.validators, require('../lib/validators'))
 
 /** Article, with no persistence support */
 class VolatileArticle extends Validable.Class {
@@ -57,7 +58,7 @@ class VolatileArticle extends Validable.Class {
       presence: { allowEmpty: false },
     },
     created: { datetime: true },
-    topics: { type: 'array' },
+    topics: { stringArray: true },
     exists: { type: 'boolean' },
   }
 }

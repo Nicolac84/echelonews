@@ -101,7 +101,7 @@ describe('User Handler API', function () {
           it('should be successful and consistent parameters', async () => {
             try {
               const res = await performUpdateRequest(presentUser[id], {
-                countries: ['Italy', 'USA', 'Russia', 'China'],
+                countries: ['IT', 'US', 'RU', 'CN'],
               })
               expect(res).to.have.status(200)
               // TODO: Test if presentUser changed?
@@ -136,7 +136,7 @@ describe('User Handler API', function () {
           it(`should return 404 with inexistent ${id}`, async () => {
             try {
               const res = await performUpdateRequest(absentUser[id], {
-                countries: ['Italy'],
+                countries: ['IT'],
               })
               expect(res).to.have.status(404)
             } catch (err) {

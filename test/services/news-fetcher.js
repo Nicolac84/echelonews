@@ -175,7 +175,7 @@ describe('RSS News Fetcher', () => {
 function newNasa() {
   return NewspaperFactory.create({
     sourceType: 'rss',
-    country: 'USA',
+    country: 'US',
     info: {
       lastFetched: new Date(1),
       origin: 'http://www.nasa.gov/rss/dyn/breaking_news.rss'

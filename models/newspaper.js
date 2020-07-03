@@ -11,6 +11,8 @@
 const Validable = require('validable')
 const Perseest = require('perseest')
 const modHelpers = require('./helpers/perseest')
+const { countries } = require('countries-list')
+Object.assign(Validable.validate.validators, require('../lib/validators'))
 
 /** Newspaper, with no persistence support */
 class VolatileNewspaper extends Validable.Class {
@@ -29,6 +31,13 @@ class VolatileNewspaper extends Validable.Class {
     this.info = opt.info
   }
 
+  /** Get the language of the newspaper origin country
+   * @returns {string} The language code for the newspaper
+   */
+  language() {
+    return countries[this.country].languages[0]
+  }
+
   /** @constant {object} - Constraints on Newspaper instance properties */
   static constraints = {
     id: {
@@ -38,10 +47,7 @@ class VolatileNewspaper extends Validable.Class {
       type: 'string',
       presence: { allowEmpty: false },
     },
-    country: {
-      type: 'string',
-      presence: { allowEmpty: false },
-    },
+    country: { countryCode: true },
     info: { type: 'object' },
     exists: { type: 'boolean' },
   }
