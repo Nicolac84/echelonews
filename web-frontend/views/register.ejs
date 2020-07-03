@@ -1,98 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="bootstrap.min.css">
-    <link rel="stylesheet" href="stile.css">
-
-
+  <meta name="generator" content="HTML Tidy for HTML5 for Linux version 5.7.16">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="style/bootstrap.min.css">
+  <link rel="stylesheet" href="style/stile.css">
 </head>
-<body >
-    <div class='fixed-top'>
+<body>
+  <div class='fixed-top'>
     <div class="container">
-        
-     
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-   <a class="navbar-brand"  <a class="nav-link" href="/">Home </a></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand"></a><a class="nav-link" href="/">Home</a>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
-           
             <li class="nav-item">
               <a class="nav-link" href="#">Varie</a>
             </li>
-           
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                News
-              </a>
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">News</a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="#">News1</a>
-                <a class="dropdown-item" href="#">News2</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">News3</a>
+                <a class="dropdown-item" href="#">News1</a> <a class="dropdown-item" href="#">News2</a>
+                <div class="dropdown-divider"></div><a class="dropdown-item" href="#">News3</a>
               </div>
             </li>
             <li class="nav-item">
               <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"></a>
             </li>
-          </ul>
-  <a  class="btn btn-outline-primary" href="/register">Signup</a> &nbsp &nbsp
-       <a  class="btn btn-outline-primary" href="/login">Login</a>
-   
+          </ul><a class="btn btn-outline-primary" href="/register">Signup</a> &nbsp; &nbsp; <a class="btn btn-outline-primary" href="/login">Login</a>
         </div>
       </nav>
     </div>
-    </div>
-
-    <div class="container">
-        <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
-              <div class="carousel-item active">
-                  <img src="ECHELONEWS.png" class="d-block w-100" alt="...">
-              </div>
-             
-           
-          </div>
-    </div>
-
-   <div class="container">
-     <p class="lead big-padding">
-       <div class="shadow-lg p-3 mb-5 bg-white Width auto">
-
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-    
-    </div>
-    <div class="col-sm">
-          <p class="lead big-padding">
-       <div class="shadow-lg p-3 mb-5 bg-white "style="">
-<div class="card"style="width: 100%;">
-  
-
-<div class="card" style="width: 18rem;">
-  <img src="login.jpg" class="card-img-top" alt="...">
-  <div class="card-body">
-   <div class="card-header" >
- Signup
   </div>
-  <div class="card-body">
-<form action="/register" method="POST" onsubmit="return testpass(this)" >
-  <div class="form-group">
-    <label for="name">Name: <span style="color: red !important; display: inline; float: none;">*</span>  
-    <input type="text" name="name">
-    </label>
-  <label for="email">Email: <span style="color: red !important; display: inline; float: none;">*</span>  
-    <input type="email" name="email">
-    </label>
-<label for="country">Country</label><span style="color: red !important; display: inline; float: none;">*</span>      
-        
+  <div class="container">
+    <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active"><img src="img/ECHELONEWS.png" class="d-block w-100" alt="..."></div>
+      </div>
+    </div>
+    <div class="container">
+      <p class="lead big-padding"></p>
+      <div class="shadow-lg p-3 mb-5 bg-white Width auto">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm"></div>
+            <div class="col-sm">
+              <p class="lead big-padding"></p>
+              <div class="shadow-lg p-3 mb-5 bg-white" style="">
+                <div class="card" style="width: 100%;">
+                  <div class="card" style="width: 18rem;">
+                    <img src="img/login.jpg" class="card-img-top" alt="...">
+                    <div class="card-body">
+                      <div class="card-header">
+                        Signup
+                      </div>
+                      <div class="card-body">
+                        <form action="/register" method="post">
+                          <div class="form-group">
+                            <label for="name">Name: 
+                              <span style="color: red !important; display: inline; float: none;">*</span> <input type="text" name="name"></label> <label for="email">Email: <span style="color: red !important; display: inline; float: none;">*</span> <input type="email" name="email"></label> <label for="country">Country</label><span style="color: red !important; display: inline; float: none;">*</span>
             <select id="country" name="country" class="form-control">
                 <option value="Afghanistan">Afghanistan</option>
                 <option value="Åland Islands">Åland Islands</option>
@@ -339,87 +306,31 @@
                 <option value="Zambia">Zambia</option>
                 <option value="Zimbabwe">Zimbabwe</option>
             </select>
-  </div>
 
- Password:<span style="color: red !important; display: inline; float: none;">*</span>  <br />
-<input type="password" name="pass"  /><br />
-  Verify Password:<span style="color: red !important; display: inline; float: none;">*</span>  <br />
-<input type="password" name=""  /><br />
-
-  </div>
-  </div>
-</div>
-
-
- 
-  
-    
-  
-  <button type="submit" class="btn btn-primary"> Signup</button> <br>
-<center>
-
-<center>
-  <a href="#" >Login</a>
-</center>
-
-  <a href="#" >Forgotten password </a>
-</center>
-
-
-
- <button type="submit" class="btn btn-primary">Accedi con Facebook </button>
-</form>
-
-
-  </div>
-
-       </div>
+                            Password:<span style="color: red !important; display: inline; float: none;">*</span><br>
+                            <input type="password" name="pass"><br>
+                            <button type="submit" class="btn btn-primary">Signup</button><br>
+                          </div>
+                          <center>
+                            <a href="#">Login</a>
+                          </center><a href="#">Forgotten password</a> <button type="submit" class="btn btn-primary">Accedi con Facebook</button>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm"></div>
+          </div>
+        </div>
+      </div>
+      <center>
+        <p>©copyright2020 EchelonNEWS. All Rights Reserved</p>
+      </center>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
+      <script src="js/bootstrap.bundle.min.js"></script>
     </div>
-    <div class="col-sm">
-    
-    </div>
-
   </div>
-
-  
- 
-</div>
-</div>
-
-    <center>
-  <p> ©copyright2020 EchelonNEWS. All Rights Reserved </p>
-</center>
-     
-  
-    
-<script language="Javascript" type="text/javascript">
-<!-- 
-function testpass(modulo){
-  // Verifico che il campo password sia valorizzato in caso contrario
-  // avverto dell'errore tramite un Alert
-  if (modulo.password.value == "" || modulo.email.value ==""){
-    alert("Errore: manca mail o  password!")
-    modulo.password.focus()
-    return false
-  }
-  // Verifico che le due password siano uguali, in caso contrario avverto
-  // dell'errore con un Alert
-  if (modulo.password.value != modulo.password_2.value) {
-    alert("La password inserita non coincide con la prima!")
-    modulo.password.focus()
-    modulo.password.select()
-    return false
-  }
-  return true
-}
-
-</script>
-
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="bootstrap.min.js"></script>
 </body>
 </html>
-
-
-

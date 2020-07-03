@@ -1,114 +1,139 @@
-if (process.env.NODE_ENV !== 'production'){
-   require('dotenv').config()
-}
+const express = require('express')
+const fetch = require('node-fetch')
+const parser = require('body-parser')
+const formParser = parser.urlencoded({ extended: false })
+const pino = require('pino')
+const pinoExpress = require('express-pino-logger')
+const passport = require('passport')
 
-const express =require('express')
-const app = express()
-const bodyParser = require('body-parser')
-const bcrypt = require ('bcrypt')
-const passport =require('passport')
-const flash = require('express-flash')
-const session = require('express-session')
+const passportSetup = require('./passport-setup')
 
-const initializePassport = require('./passport-conf')
-initializePassport(
- passport,
- email => users.find (user => user.email === email ),
- id => users.find(user => user.id === id )
-)
+const router = require('express').Router();
 
-// database da inserire !
-const user =[]
-app.use(express.json())
-
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
-
-app.use(express.urlencoded({extended: false}))
-
-app.set('view engine', 'ejs')
-app.use(express.static('views'))
-
-
-
-app.use(flash())
-
-app.use(session({ 
-secret: process.env.SESSION_SECRET,
-resave: false,
-saveUnitialized: false
+router.get('/google', passport.authenticate('google',{
+scope: ['profile']
 
 }))
 
+API_URL = process.env.API_URL
+prova = 'http://localhost:8081' 
+const app = express()
+const log = pino({ level: process.env.LOG_LEVEL || 'info' })
+app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
 
-app.get('/',chekAuthenticated ,(req, res)=> {
+app.set('view engine', 'ejs')
+app.use(express.static('assets'))
 
-
+app.get('/', (req, res) => {
+  res.render('index')
 })
 
-app.post('/users', async (req, res) => {
-  try { const salt = await bcrypt.genSalt()
-      const hashedPassword = await bcrypt.hash(req.body.password, salt)
-      console.log(salt)
-      console.log(hashedPassword) 
-      const user = { name: req.body.name, password: hashedPassword }
-      users.push(user)
-      res.status(201).send()
-  }   catch {
-      res.status(500).send()
+
+app.get('/login', (req, res) => {
+  res.render('login')
+})
+
+app.post('/login', formParser, async (req, res) => {
+  try {
+    const apiRes = await fetch(`${API_URL}/login`, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: req.body.name,
+        email: req.body.email,
+        pass: req.body.pass
+      })
+    })
+    if (apiRes.ok) res.redirect('/profile')
+    else res.status(apiRes.status).send('Erroraccio')
+  } catch (err) {
+    throw err
   }
 })
 
 
-app.get('/login',checkNotAuthenticated,(req, res) => {
-  res.render('login.ejs')
-})
 
-app.post('/login',checkNotAuthenticated,passport.authenticate('local',{
-    successRedirect: '/',
-    failureRedirect:  '/login',
-    failureFlash: true
+app.get('/google', passport.authenticate('google',{
+scope: ['profile']
+
+
 }))
+
+
+app.get('/register', (req, res) => {
+  res.render('register')
+})
+
+app.post('/register', formParser, async (req, res) => {
+  try {
+    const apiRes = await fetch(`${prova}/register`, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: req.body.name,
+        email: req.body.email,
+        pass: req.body.pass
+      })
+    })
+  } catch (err) {
+    throw err
+  }
+})
+
+
+app.get('/news', (req, res) => {
+  
+/*
+
+  try {
+    const apiRes = await fetch(`${API_URL}/news`)
+    const news = await apiRes.json()
+  } catch (err) {
+    throw err
+  }
+})
+*/
+let newsi=   {data: '30/06/2020 15.25'  , rank:'10' ,titolo: 'Situazione Coronavirus', paese: '🇮🇹  Italia'}
  
- 
-app.get('/register', checkNotAuthenticated, (req,res) => {
-   res.render('register.ejs')
+
+res.render('news', { newsi: newsi})
 })
 
-app.post('/register',checkNotAuthenticated, async (req, res)=>{
-try {
-   const hashedPassword = await bcrypt.hash(req.body.password, 10)
-   user.push({
-      id: Date.now().toString(),
-      name: req.body.name, 
-      email: req.body.email,
-      password: hashedPassword
-})
-   res.redirect('/login')
-   }catch {
-   res.redirec('/register')
-}
+
+app.get('/statistic',(req, res) => {
+  res.render('statistic')
 })
 
-app.delete('/logout',(req, res)=>{
-   req.logOut()
-   req.redirect('/login')
+app.get('/profile' ,(req, res) => {
 
+
+let usr = {info: 'TITOLO...' ,news:['provatestblabla1','provatestblabla2','provatestblabla3','provatestblabla4']}
+
+
+  res.render('profile', { usr: usr})
 })
 
 function chekAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated() ) {
   return next()
   }
 
 res.redirect('/login')
 }
 
-function checkNotAuthenticated(req, res, next){
-   if (req.isAuthenticated()){
-       return res.redirect('/')
-   }
-    next()
+
+
+
+// Perform the required setup operations and launch the server
+app.launch = function({ port = 8080 } = {}) {
+  if (!API_URL) log.warn('API_URL was not given - The API is unreachable')
+  app.listen(port, () => log.info(`Server listening on port ${port}`))
 }
 
-app.listen(3000)
+// If this is the main module, launch the web frontend
+if (require.main === module) {
+  log.info('Launching EcheloNews Web Frontend in standalone mode')
+  app.launch({ port: process.env.PORT })
+}
+
+module.exports = app
