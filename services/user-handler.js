@@ -8,6 +8,7 @@ const express = require('express')
 const jsonParser = require('body-parser').json()
 const Validable = require('validable')
 const { User } = require('../models/user')
+const { OAuthUser } = require('../models/oauth-user')
 const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
 
@@ -15,6 +16,10 @@ const pinoExpress = require('express-pino-logger')
 const UPDATE_ALLOWED = new Set(User.db.columns.keys())
 ;['id', 'hash', 'created'].forEach(x => UPDATE_ALLOWED.delete(x))
 UPDATE_ALLOWED.add('pass')
+
+// Same thing for OAuth users
+const OAUTH_UPDATE_ALLOWED = new Set(OAuthUser.db.columns.keys())
+;['id', 'created'].forEach(x => OAUTH_UPDATE_ALLOWED.delete(x))
 
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 const app = express()
@@ -54,7 +59,7 @@ for (const id of ['id', 'name', 'email']) {
     try {
       const user = await User.fetch(id, idval)
       if (!user) {
-        log.info(`Tried to fetch inexistent user of ${id} ${idval}`)
+        log.warn(`Tried to fetch inexistent user of ${id} ${idval}`)
         res.status(404).send()
       } else {
         log.info(`Successfully fetched user of ${id} ${idval}`)
@@ -108,7 +113,7 @@ for (const id of ['id', 'name', 'email']) {
   app.delete(`/users/by${id}/:${id}`, async (req, res) => {
     const idval = decodeURIComponent(req.params[id])
     if (!idval || User.validate(id, idval)) {
-      log.warn(`Tried to update user with invalid ${id} ${idval}`)
+      log.warn(`Tried to delete user with invalid ${id} ${idval}`)
       res.status(400).json({ message: `Invalid ${id} ${idval}` })
       return
     }
@@ -123,6 +128,81 @@ for (const id of ['id', 'name', 'email']) {
     }
   })
 }
+
+// Fetch an OAuth user by arbitrary field
+app.get(`/oauth/:id`, async (req, res) => {
+  const idval = decodeURIComponent(req.params.id)
+  if (!idval || OAuthUser.validate('id', idval)) {
+    log.info(`Tried to fetch OAuth user with invalid id ${idval}`)
+    res.status(400).json({ message: `Invalid id ${idval}` })
+    return
+  }
+
+  try {
+    const user = await OAuthUser.fetch('id', idval)
+    if (!user) {
+      log.warn(`Tried to fetch inexistent OAuth user of id ${idval}`)
+      res.status(404).send()
+    } else {
+      log.info(`Successfully fetched OAuth user of id ${idval}`)
+      res.status(200).json(user.export())
+    }
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal database error. Sorry' })
+  }
+})
+
+// Update an OAuth user by arbitrary field
+// TODO: Avoid performing 2 queries
+app.put(`/oauth/:id`, jsonParser, async (req, res) => {
+  const idval = decodeURIComponent(req.params.id)
+  if (!idval || OAuthUser.validate('id', idval)) {
+    log.warn(`Tried to update OAuth user with invalid id ${idval}`)
+    return res.status(400).json({ message: `Invalid id ${idval}` })
+  }
+
+  const errors = Validable.whitelist(req.body, OAUTH_UPDATE_ALLOWED)
+  if (errors) {
+    log.warn('Validation error while updating OAuth user\n%o', errors)
+    return res.status(400).json(errors)
+  }
+
+  // Attempt to update the OAuth user
+  try {
+    const user = await OAuthUser.fetch('id', idval)
+    if (!user) {
+      log.warn(`Tried to update inexistent OAuth user of id ${idval}`)
+      res.status(404).send()
+    } else {
+      Object.assign(user, req.body)
+      await user.update()
+      log.info(`Successfully updated OAuth user of id ${idval}`)
+      res.status(200).send()
+    }
+  } catch (err) {
+    handleTransactionError(err, res)
+  }
+})
+
+// Delete an OAuth user by arbitrary field
+app.delete(`/oauth/:id`, async (req, res) => {
+  const idval = decodeURIComponent(req.params.id)
+  if (!idval || OAuthUser.validate('id', idval)) {
+    log.warn(`Tried to delete OAuth user with invalid id ${idval}`)
+    res.status(400).json({ message: `Invalid id ${idval}` })
+    return
+  }
+
+  try {
+    const deleted = await OAuthUser.delete('id', idval)
+    log.info(`OAuth user of id ${idval} ${deleted ? '' : 'not '} deleted`)
+    res.status(deleted ? 200 : 404).send()
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal database error. Sorry' })
+  }
+})
 
 // Authenticate with login/password credentials
 // TODO: Make possible to authenticate also with email or id
@@ -177,6 +257,29 @@ app.post('/register', jsonParser, async (req, res) => {
   }
 })
 
+// Register a new OAuth user
+app.post('/register/oauth', jsonParser, async (req, res) => {
+  const errors = Validable.merge(
+    Validable.whitelist(req.body, OAuthUser.db.columns.keys()),
+    Validable.blacklist(req.body, ['created']),
+    Validable.requirelist(req.body, ['id', 'name'])
+  )
+  if (errors) {
+    log.warn('Cannot register OAuth user with invalid parameters\n%o', errors)
+    return res.status(400).json(errors)
+  }
+
+  // Attempt to register the user
+  try {
+    const user = new OAuthUser(req.body)
+    await user.save()
+    log.info(`Successfully registered OAuth user ${user.id} (${user.name})`)
+    res.status(201).json(user.export())
+  } catch (err) {
+    handleTransactionError(err, res)
+  }
+})
+
 // Handle a database or validation error
 function handleTransactionError(err, res) {
   if (err.constructor.name === Validable.Error.name) {
@@ -200,6 +303,7 @@ function handleTransactionError(err, res) {
 app.launch = function({ postgresUri, port = 8080 } = {}) {
   log.info('Setting up database')
   User.db.setup(postgresUri)
+  OAuthUser.db.setup(postgresUri)
   return app.listen(port, () => log.info(`Server listening on port ${port}`))
 }
 

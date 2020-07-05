@@ -220,6 +220,74 @@ paths:
         '404':
           $ref: "#/components/responses/NotFound"
 
+  /oauth/{id}:
+    get:
+      summary: Get a OAuth user by univocal ID
+      tags:
+        - Fetching
+      parameters:
+        - name: id
+          in: path
+          description: OAuth user univocal ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: An OAuth user entity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    put:
+      summary: Update an OAuth user by univocal ID
+      tags:
+        - Updating
+      parameters:
+        - name: id
+          in: path
+          description: OAuth user univocal ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+        '404':
+          $ref: "#/components/responses/NotFound"
+    delete:
+      summary: Delete an OAuth user by univocal ID
+      tags:
+        - Deleting
+      parameters:
+        - name: id
+          in: path
+          description: OAuth user univocal ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
+        '404':
+          $ref: "#/components/responses/NotFound"
+
   /auth:
     post:
       summary: Authenticate a user with login/password credentials
@@ -244,6 +312,26 @@ paths:
   /register:
     post:
       summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '201':
+          description: A sharing-safe representation of the created user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
+        '403':
+          $ref: "#/components/responses/Forbidden"
+  /register/oauth:
+    post:
+      summary: Register a new OAuth user (with Google as the provider)
       requestBody:
         required: true
         content:

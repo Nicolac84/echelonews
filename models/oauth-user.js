@@ -84,13 +84,9 @@ class OAuthUser extends Perseest.Mixin(VolatileOAuthUser) {
   }
 
   /** Database configuration for perseest */
-  static db = new Perseest.Config('OAuthAccount', 'id', {
-    id: { id: true, serial: true },
-    name: { id: true },
-    countries: null,
-    topics: null,
-    created: null,
-  })
+  static db = new Perseest.Config('OAuthAccount', 'id', [
+    'id', 'name', 'countries', 'topics', 'created'
+  ])
 }
 
 OAuthUser.db.row2Entity = row => new OAuthUser(Object.assign(row, { exists: true }))
@@ -100,7 +96,6 @@ OAuthUser.db.ids = function* () {
   for (const [c, a] of OAuthUser.db.columns) if (a && a.id) yield c
 }
 
-modHelpers.setIDAfterSaving(OAuthUser, 'id')
 modHelpers.tm2DateAfterFetch(OAuthUser, 'created')
 modHelpers.validateBeforeQuery(OAuthUser)
 
