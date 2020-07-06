@@ -14,6 +14,7 @@ const Auth = require('../lib/authstar')
 const { User } = require('../models/user')
 const { Article } = require('../models/article')
 const { Feedback } = require('../models/feedback')
+const { OAuthFeedback } = require('../models/oauth-feedback')
 const { NewsMultiplexerClient, DEFAULT_RPC_QUEUE } =
   require('./news-multiplexer')
 
@@ -32,7 +33,7 @@ app.post('/register', jsonParser, Auth.middlewares.register)
 
 app.get('/profile', Auth.middlewares.jwt, async (req, res) => {
   try {
-    const user = await fetchUser(req.user.id)
+    const user = await fetchUser(req.user.id, req.user.oauth)
     res.status(200).json(user)
   } catch (err) {
     log.error(err)
@@ -42,7 +43,7 @@ app.get('/profile', Auth.middlewares.jwt, async (req, res) => {
 
 app.get('/countries', Auth.middlewares.jwt, async (req, res) => {
   try {
-    const user = await fetchUser(req.user.id)
+    const user = await fetchUser(req.user.id, req.user.oauth)
     res.status(200).json(user.countries)
   } catch (err) {
     log.error(err)
@@ -68,7 +69,7 @@ app.post('/countries', Auth.middlewares.jwt, jsonParser, async (req, res) => {
 
 app.get('/topics', Auth.middlewares.jwt, async (req, res) => {
   try {
-    const user = await fetchUser(req.user.id)
+    const user = await fetchUser(req.user.id, req.user.oauth)
     res.status(200).json(user.topics)
   } catch (err) {
     log.error(err)
@@ -94,7 +95,8 @@ app.post('/topics', Auth.middlewares.jwt, jsonParser, async (req, res) => {
 
 app.get('/feedback', Auth.middlewares.jwt, async (req, res) => {
   try {
-    const fbs = await Feedback.fetchMany({ account: req.user.id })
+    const FB = req.user.oauth ? OAuthFeedback : Feedback
+    const fbs = await FB.fetchMany({ account: req.user.id })
     res.status(200).json(fbs.map(f => ({
       npaper: f.npaper,
       score: f.score
@@ -117,7 +119,8 @@ app.put('/feedback', Auth.middlewares.jwt, jsonParser, async (req, res) => {
       return res.status(400).json({ errors })
     }
 
-    const fb = await Feedback.retrieve(req.user.id, req.body.npaper)
+    const FB = req.user.oauth ? OAuthFeedback : Feedback
+    const fb = await FB.retrieve(req.user.id, req.body.npaper)
     fb.score += req.body.score
     if (fb.exists) await fb.update('score')
     else await fb.save()
@@ -130,7 +133,8 @@ app.put('/feedback', Auth.middlewares.jwt, jsonParser, async (req, res) => {
 
 app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
   try {
-    await Feedback.deleteMany({ account: req.user.id })
+    const FB = req.user.oauth ? OAuthFeedback : Feedback
+    await FB.deleteMany({ account: req.user.id })
     res.sendStatus(200)
   } catch (err) {
     log.error(err)
@@ -138,9 +142,11 @@ app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
+// TODO: OAuth
 app.get('/news', Auth.middlewares.jwt, async (req, res) => {
   try {
-    const user = await fetchUser(req.user.id)
+    const user = await fetchUser(req.user.id, req.user.oauth)
+    console.log('USER: ', user)
     const muxed = await app.muxer.multiplex({
       uid: user.id,
       countries: user.countries,
@@ -188,6 +194,7 @@ app.setup = async function({
 } = {}) {
   try {
     Feedback.db.setup(postgresUri)
+    OAuthFeedback.db.setup(postgresUri)
     Auth.setup({
       log: logger || log,
       jwtSecret: jwtSecret || process.env.JWT_SECRET,
@@ -204,15 +211,19 @@ app.setup = async function({
 }
 
 // Perform the required setup operations and launch the server
-app.launch = function({ port = 8080, userHandlerUrl, jwtSecret} = {}) {
-  app.setup({
-    userHandlerUrl,
-    jwtSecret,
-    postgresUri: process.env.POSTGRES_URI,
-    amqpBroker: process.env.AMQP_BROKER,
-    muxerQueueName: process.env.RPC_QUEUE_NAME || DEFAULT_RPC_QUEUE,
-  })
-  app.listen(port, () => log.info(`Server listening on port ${port}`))
+app.launch = async function({ port = 8080, userHandlerUrl, jwtSecret} = {}) {
+  try {
+    await app.setup({
+      userHandlerUrl,
+      jwtSecret,
+      postgresUri: process.env.POSTGRES_URI,
+      amqpBroker: process.env.AMQP_BROKER,
+      muxerQueueName: process.env.RPC_QUEUE_NAME || DEFAULT_RPC_QUEUE,
+    })
+    app.listen(port, () => log.info(`Server listening on port ${port}`))
+  } catch (err) {
+    throw err
+  }
 }
 
 // If this is the main module, launch the API server
@@ -225,11 +236,13 @@ if (require.main === module) {
 }
 
 // Fetch a user calling the user handler
-async function fetchUser(id) {
+async function fetchUser(id, oauth) {
   try {
     if (!Number.isInteger(id))
       return new TypeError('User ID is not an integer')
-    const res = await fetch(Auth.userHandlerUrl + `/users/byid/${id}`)
+    const url = Auth.userHandlerUrl + (oauth ? '/oauth' : '/users/byid') + `/${id}`
+    console.log('URL: ', url)
+    const res = await fetch(url)
     if (!res.ok)
       return new Error(`User handler returned status ${res.status}`)
     return await res.json()
@@ -239,11 +252,13 @@ async function fetchUser(id) {
 }
 
 // Update a user calling the user handler
-async function updateUser(id, body) {
+async function updateUser(id, body, oauth) {
   try {
     if (!Number.isInteger(id))
       return new TypeError('User ID is not an integer')
-    const res = await fetch(Auth.userHandlerUrl + `/users/byid/${id}`, {
+    const url = Auth.userHandlerUrl + (oauth ? '/oauth' : '/users/byid') + `/${id}`
+    console.log('URL: ', url)
+    const res = await fetch(url, {
       method: 'put',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
