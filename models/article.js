@@ -80,12 +80,14 @@ class Article extends Perseest.Mixin(VolatileArticle) {
    * @param {number} opt.uid - Reference user ID
    * @param {string} opt.topic - Topic to multiplex
    * @param {Array<string>} opt.countries - Countries to multiplex
+   * @param {boolean} opt.oauth - Multiplex for OAuth users?
    * @returns {Array<Article>} An ordered collection of articles
    */
-  static async multiplex({ uid, topic, countries } = {}) {
+  static async multiplex({ uid, topic, countries, oauth } = {}) {
+    const queryName = oauth ? 'multiplexOAuth' : 'multiplex'
     let allNews = []
     for (const country of countries) {
-      const news = await this.db.queries.run('multiplex', {
+      const news = await this.db.queries.run(queryName, {
         conf: Article.db,
         user: uid,
         topic,
@@ -94,8 +96,8 @@ class Article extends Perseest.Mixin(VolatileArticle) {
       allNews = allNews.concat(news)
     }
     return allNews.sort((a,b) => {
-      if (a.score > b.score) return 1
-      else if (a.score < b.score) return -1
+      if (a.score < b.score) return 1
+      else if (a.score > b.score) return -1
       else return 0
     })
   }
@@ -138,6 +140,27 @@ Article.db.queries.create({
 
 // Add feedback score to multiplexed articles
 Article.db.addHook('after', 'multiplex', params => {
+  params.ret = params.ret.map((e,idx) => {
+    const art = params.conf.row2Entity(e)
+    art.score = params.res.rows[idx].score
+    return art
+  })
+})
+
+// Same thing for OAuth users
+Article.db.queries.create({
+  name: 'multiplexOAuth',
+  type: 'multiple',
+  generate: ({ user, topic, country }) => {
+  return ({
+    text: 'SELECT * FROM multiplex_oauth($1::INTEGER,$2::TEXT,$3::TEXT)',
+    values: [user, topic, country]
+  })
+  }
+})
+
+// Add feedback score to multiplexed articles
+Article.db.addHook('after', 'multiplexOAuth', params => {
   params.ret = params.ret.map((e,idx) => {
     const art = params.conf.row2Entity(e)
     art.score = params.res.rows[idx].score

@@ -124,9 +124,10 @@ class NewsMultiplexerClient extends EventEmitter {
    * @param {number} opt.uid - Related user id
    * @param {string} opt.topic - Topic to multiplex
    * @param {Array<string>} opt.countries - Countries to multiplex
+   * @param {boolean} opt.oauth - Multiplex for OAuth users?
    * @returns {Array<Article>} A collection of articles, sorted by score
    */
-  async multiplex({ uid, topic, countries } = {}) {
+  async multiplex({ uid, topic, countries, oauth } = {}) {
     try {
       const articles = await new Promise(function(resolve) {
 
@@ -139,7 +140,7 @@ class NewsMultiplexerClient extends EventEmitter {
 
         // Effectively perform the the RPC
         this.channel.sendToQueue(this.queueName, Buffer.from(JSON.stringify({
-          uid, topic, countries
+          uid, topic, countries, oauth
         })), { 
           correlationId,
           replyTo: this.responseQueue.queue,

@@ -142,7 +142,6 @@ app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
   }
 })
 
-// TODO: OAuth
 app.get('/news', Auth.middlewares.jwt, async (req, res) => {
   try {
     const user = await fetchUser(req.user.id, req.user.oauth)
@@ -150,7 +149,8 @@ app.get('/news', Auth.middlewares.jwt, async (req, res) => {
     const muxed = await app.muxer.multiplex({
       uid: user.id,
       countries: user.countries,
-      topic: user.topics[0]
+      topic: user.topics[0],
+      oauth: !!(req.user.oauth)
     })
   res.status(200).json(muxed)
   } catch (err) {
@@ -174,7 +174,8 @@ app.post('/news', Auth.middlewares.jwt, jsonParser, async (req, res) => {
     const muxed = await app.muxer.multiplex({
       uid: req.user.id,
       topic: req.body.topic,
-      countries: req.body.countries
+      countries: req.body.countries,
+      oauth: !!(req.user.oauth)
     })
     res.status(200).json(muxed)
   } catch (err) {
