@@ -220,6 +220,30 @@ paths:
         '404':
           $ref: "#/components/responses/NotFound"
 
+  /oauth:
+    post:
+      summary: Retrieve or register a new OAuth user (with Google as the provider)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        '200':
+          description: Fetched an existent user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '201':
+          description: Created a new user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
   /oauth/{id}:
     get:
       summary: Get a OAuth user by univocal ID
@@ -312,26 +336,6 @@ paths:
   /register:
     post:
       summary: Register a new user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-      responses:
-        '201':
-          description: A sharing-safe representation of the created user
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        '400':
-          $ref: "#/components/responses/MalformedRequest"
-        '403':
-          $ref: "#/components/responses/Forbidden"
-  /register/oauth:
-    post:
-      summary: Register a new OAuth user (with Google as the provider)
       requestBody:
         required: true
         content:

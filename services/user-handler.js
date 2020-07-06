@@ -28,12 +28,15 @@ app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
 // Get metadata for the current user handler server instance
 app.get('/', async (req, res) => {
   log.info('Requested user handler status')
-  let users
+  let users, oauths
   try {
-    const pgRes = await User.db.pool.query('SELECT COUNT(*) AS n FROM Account')
-    users = pgRes.rows[0].n
+    const res1 = await User.db.pool.query('SELECT COUNT(*) AS n FROM Account')
+    users = res1.rows[0].n
+    const res2 = await OAuthUser.db.pool.query('SELECT COUNT(*) AS n FROM Account')
+    oauths = res2.rows[0].n
   } catch (err) {
     users = null
+    oauths = null
   }
   res.status(200).json({
     message: 'EcheloNews User Handler server',
@@ -41,6 +44,7 @@ app.get('/', async (req, res) => {
     platform: process.platform,
     databaseStatus: users === null ? 'Unavailable' : 'Available',
     users: users,
+    oauthUsers: oauths,
   })
 })
 
@@ -128,6 +132,33 @@ for (const id of ['id', 'name', 'email']) {
     }
   })
 }
+
+
+// Retrieve a new OAuth user
+app.post('/oauth', jsonParser, async (req, res) => {
+  const errors = Validable.merge(
+    Validable.whitelist(req.body, OAuthUser.db.columns.keys()),
+    Validable.blacklist(req.body, ['created']),
+    Validable.requirelist(req.body, ['id', 'name'])
+  )
+  if (errors) {
+    log.warn('Cannot retrieve OAuth user with invalid parameters\n%o', errors)
+    return res.status(400).json(errors)
+  }
+
+  // Attempt to fetch an OAuth user, registering if not present
+  try {
+    const fetched = await OAuthUser.fetch('id', req.body.id)
+    if (fetched) return res.status(200).json(fetched.export())
+    // Not found, register a new user
+    const user = new OAuthUser(req.body)
+    await user.save()
+    log.info(`Successfully registered OAuth user ${user.id} (${user.name})`)
+    return res.status(201).json(user.export())
+  } catch (err) {
+    handleTransactionError(err, res)
+  }
+})
 
 // Fetch an OAuth user by arbitrary field
 app.get(`/oauth/:id`, async (req, res) => {
@@ -251,29 +282,6 @@ app.post('/register', jsonParser, async (req, res) => {
     const user = await User.create(req.body)
     await user.save()
     log.info(`Successfully registered user '${user.name}' of id ${user.id}`)
-    res.status(201).json(user.export())
-  } catch (err) {
-    handleTransactionError(err, res)
-  }
-})
-
-// Register a new OAuth user
-app.post('/register/oauth', jsonParser, async (req, res) => {
-  const errors = Validable.merge(
-    Validable.whitelist(req.body, OAuthUser.db.columns.keys()),
-    Validable.blacklist(req.body, ['created']),
-    Validable.requirelist(req.body, ['id', 'name'])
-  )
-  if (errors) {
-    log.warn('Cannot register OAuth user with invalid parameters\n%o', errors)
-    return res.status(400).json(errors)
-  }
-
-  // Attempt to register the user
-  try {
-    const user = new OAuthUser(req.body)
-    await user.save()
-    log.info(`Successfully registered OAuth user ${user.id} (${user.name})`)
     res.status(201).json(user.export())
   } catch (err) {
     handleTransactionError(err, res)
