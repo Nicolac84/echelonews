@@ -57,6 +57,11 @@ class UserFactory {
         .catch(() => {})
       await User.db.pool.query(fs.readFileSync('sql/account.sql').toString())
 
+      await User.db.pool
+        .query(`DROP TABLE Feedback CASCADE`)
+        .catch(() => {})
+      await User.db.pool.query(fs.readFileSync('sql/feedback.sql').toString())
+
       // Save the existing entities, save and delete the non-existing ones
       for (const e of this.entities.existing) await e.save()
       for (const e of this.entities.nonExisting) {

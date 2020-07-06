@@ -27,6 +27,7 @@ class VolatileOAuthUser extends Validable.Class {
     super()
     this.id = opt.id
     this.name = opt.name
+    this.lang = 'en'
     this.topics = opt.topics || []
     this.countries = opt.countries || []
     this.created = opt.created || new Date()
@@ -47,6 +48,7 @@ class VolatileOAuthUser extends Validable.Class {
     return {
       id: this.id,
       name: this.name,
+      lang: this.lang,
       topics: this.topics,
       created: this.created,
       countries: this.countries,
@@ -62,6 +64,9 @@ class VolatileOAuthUser extends Validable.Class {
     name: {
       type: 'string',
       presence: { allowEmpty: false },
+    },
+    lang: {
+      languageCode: true
     },
     created: {
       datetime: true,
@@ -85,7 +90,7 @@ class OAuthUser extends Perseest.Mixin(VolatileOAuthUser) {
 
   /** Database configuration for perseest */
   static db = new Perseest.Config('OAuthAccount', 'id', [
-    'id', 'name', 'countries', 'topics', 'created'
+    'id', 'name', 'lang', 'countries', 'topics', 'created'
   ])
 }
 

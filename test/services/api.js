@@ -2,6 +2,7 @@
 // Main exposed API
 'use strict'
 require('dotenv').config({ path: '.env.test' })
+const fs = require('fs')
 const chai = require('chai')
 const expect = chai.expect
 const { UserFactory } = require('../factories/user')
@@ -36,6 +37,7 @@ describe('Exposed API', function() {
     app.setup({
       userHandlerUrl: 'http://localhost:8081',
       jwtSecret: 'none',
+      postgresUri: process.env.POSTGRES_URI,
     })
     // Open a persistent connection before testing
     conn = chai.request(app).keepOpen()
@@ -235,92 +237,99 @@ describe('Exposed API', function() {
       })
     })
 
-    describe('GET /feedback', () => {
-      it('should return all the feedbacks registered by a user', async () => {
-        try {
-          const res = await conn.get('/feedback').set('Authorization', token)
-          expect(res).to.have.status(200)
-          expect(res.body).to.be.an('array')
-        } catch (err) {
-          throw err
-        }
+    describe('/feedback', function() {
+      before(async () => {
+        await Feedback.db.pool.query(fs.readFileSync('./sql/feedback.sql').toString())
+          .catch(() => {})
       })
-    })
 
-    describe('PUT /feedback', () => {
-      it('should create a new feedback if none is related to the newspaper', async () => {
-        try {
-          await Feedback.deleteMany({ account: user.id })
+      describe('GET', () => {
+        it('should return all the feedbacks registered by a user', async () => {
+          try {
+            const res = await conn.get('/feedback').set('Authorization', token)
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('array')
+          } catch (err) {
+            throw err
+          }
+        })
+      })
+
+      describe('PUT', () => {
+        it('should create a new feedback if none is related to the newspaper', async () => {
+          try {
+            await Feedback.deleteMany({ account: user.id })
+            const res = await conn
+              .put('/feedback')
+              .set('Authorization', token)
+              .send({ npaper: npaper.id, score: -1 })
+            expect(res).to.have.status(200)
+            const fbs = await conn.get('/feedback').set('Authorization', token)
+            expect(fbs.body[0].npaper).to.equal(npaper.id)
+            expect(fbs.body[0].score).to.equal(-1)
+          } catch (err) {
+            throw err
+          }
+        })
+
+        it('should update a feedback if one related to the newspaper already exists', async () => {
+          try {
+            await Feedback.deleteMany({ account: user.id })
+            const fb = new Feedback({
+              account: user.id,
+              npaper: npaper.id,
+              score: 1
+            })
+            await fb.save()
+            const res = await conn
+              .put('/feedback')
+              .set('Authorization', token)
+              .send({ npaper: npaper.id, score: 1 })
+            expect(res).to.have.status(200)
+            const fbs = await conn.get('/feedback').set('Authorization', token)
+            expect(fbs.body[0].npaper).to.equal(npaper.id)
+            expect(fbs.body[0].score).to.equal(2)
+          } catch (err) {
+            throw err
+          }
+        })
+
+        it('should return 400 with invalid properties', async () => {
           const res = await conn
             .put('/feedback')
             .set('Authorization', token)
-            .send({ npaper: npaper.id, score: -1 })
-          expect(res).to.have.status(200)
-          const fbs = await conn.get('/feedback').set('Authorization', token)
-          expect(fbs.body[0].npaper).to.equal(npaper.id)
-          expect(fbs.body[0].score).to.equal(-1)
-        } catch (err) {
-          throw err
-        }
-      })
+            .send({ id: 123, npaper: npaper.id, score: 1 })
+          expect(res).to.have.status(400)
+        })
 
-      it('should update a feedback if one related to the newspaper already exists', async () => {
-        try {
-          await Feedback.deleteMany({ account: user.id })
-          const fb = new Feedback({
-            account: user.id,
-            npaper: npaper.id,
-            score: 1
-          })
-          await fb.save()
+        it('should return 400 with malformed fields', async () => {
           const res = await conn
             .put('/feedback')
             .set('Authorization', token)
-            .send({ npaper: npaper.id, score: 1 })
-          expect(res).to.have.status(200)
-          const fbs = await conn.get('/feedback').set('Authorization', token)
-          expect(fbs.body[0].npaper).to.equal(npaper.id)
-          expect(fbs.body[0].score).to.equal(2)
-        } catch (err) {
-          throw err
-        }
+            .send({ npaper: npaper.id, score: 'abc' })
+          expect(res).to.have.status(400)
+        })
       })
 
-      it('should return 400 with invalid properties', async () => {
-        const res = await conn
-          .put('/feedback')
-          .set('Authorization', token)
-          .send({ id: 123, npaper: npaper.id, score: 1 })
-        expect(res).to.have.status(400)
-      })
-
-      it('should return 400 with malformed fields', async () => {
-        const res = await conn
-          .put('/feedback')
-          .set('Authorization', token)
-          .send({ npaper: npaper.id, score: 'abc' })
-        expect(res).to.have.status(400)
-      })
-    })
-
-    describe('DELETE /feedback', () => {
-      it('should delete all the feedbacks related to the user', async () => {
-        try {
-          const fb = new Feedback({
-            account: user.id,
-            npaper: npaper.id,
-            score: 1
-          })
-          await fb.save()
-          const res = await conn.delete('/feedback').set('Authorization', token)
-          expect(res).to.have.status(200)
-          const fbs = await conn.get('/feedback').set('Authorization', token)
-          expect(fbs).to.have.status(200)
-          expect(fbs.body).to.be.an('array')
-          expect(fbs.body.length).to.equal(0)
-        } catch (err) {
-          throw err
-        }
+      describe('DELETE', () => {
+        it('should delete all the feedbacks related to the user', async () => {
+          try {
+            const fb = new Feedback({
+              account: user.id,
+              npaper: npaper.id,
+              score: 1
+            })
+            await fb.save()
+            const res = await conn.delete('/feedback').set('Authorization', token)
+            expect(res).to.have.status(200)
+            const fbs = await conn.get('/feedback').set('Authorization', token)
+            expect(fbs).to.have.status(200)
+            expect(fbs.body).to.be.an('array')
+            expect(fbs.body.length).to.equal(0)
+          } catch (err) {
+            throw err
+          }
+        })
       })
     })
 

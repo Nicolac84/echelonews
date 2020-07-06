@@ -145,7 +145,6 @@ app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
 app.get('/news', Auth.middlewares.jwt, async (req, res) => {
   try {
     const user = await fetchUser(req.user.id, req.user.oauth)
-    console.log('USER: ', user)
     const muxed = await app.muxer.multiplex({
       uid: user.id,
       countries: user.countries,
@@ -242,7 +241,6 @@ async function fetchUser(id, oauth) {
     if (!Number.isInteger(id))
       return new TypeError('User ID is not an integer')
     const url = Auth.userHandlerUrl + (oauth ? '/oauth' : '/users/byid') + `/${id}`
-    console.log('URL: ', url)
     const res = await fetch(url)
     if (!res.ok)
       return new Error(`User handler returned status ${res.status}`)
@@ -258,7 +256,6 @@ async function updateUser(id, body, oauth) {
     if (!Number.isInteger(id))
       return new TypeError('User ID is not an integer')
     const url = Auth.userHandlerUrl + (oauth ? '/oauth' : '/users/byid') + `/${id}`
-    console.log('URL: ', url)
     const res = await fetch(url, {
       method: 'put',
       headers: { 'Content-Type': 'application/json' },
