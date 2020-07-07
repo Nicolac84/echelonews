@@ -22,6 +22,16 @@ p {
   margin: 0 4px;
 }
 
+/* Content stylesheets */
+#main-content .card {
+  width: 20rem;
+  height: 24rem;
+}
+
+#main-content .card img {
+  height: 10rem;
+}
+
 #myInput {
   background-image: url('/assets/searchicon.png'); /* Add a search icon to input TODO */
   background-position: 10px 12px; /* Position the search icon */
