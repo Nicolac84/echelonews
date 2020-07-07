@@ -12,6 +12,7 @@ const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
 const OAuth = require('./oauth')
 
+// Environment variables
 const API_URL = process.env.API_URL
 const OAUTH_BRIDGE_URL = process.env.OAUTH_BRIDGE_URL
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
@@ -20,6 +21,7 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
 const formDecoder = Parser.urlencoded({ extended: false })
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 
+// Express application
 const app = express()
 app.set('view engine', 'ejs')
 app.use(express.static('assets'))
@@ -29,7 +31,9 @@ app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
 
 // Homepage
 app.get('/', (req, res) => {
-  res.render('index')
+  res.render('index', {
+    title: 'Homepage'
+  })
 })
 
 // Login page
