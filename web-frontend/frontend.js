@@ -38,7 +38,9 @@ app.get('/', (req, res) => {
 
 // Login page
 app.get('/login', (req, res) => {
-  res.status(503).send('Not Implemented')
+  res.render('login', {
+    title: 'Login'
+  })
 })
 
 // OAuth login

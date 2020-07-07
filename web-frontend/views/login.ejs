@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head', { title }) %>
+<body>
+  <%- include('partials/navbar', { user: null }) %>
+  <div class="container" id="main-content">
+    <%- include('partials/banner') %>
+    <div class="container center">
+      <div class="shadow-lg p-3 mb-5 bg-white Width auto">
+        <div class="card">
+          <div class="card-header">
+            Login
+          </div>
+          <div class="card-body">
+            <form action="/login" method="post">
+              <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" name="name" value="Username" required></label>
+                <label for="pass">Password</label>
+                <input type="password" name="pass" value="Password" required>
+              </div><button type="submit" class="btn btn-primary">Login</button><br>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

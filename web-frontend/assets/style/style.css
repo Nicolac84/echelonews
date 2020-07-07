@@ -13,8 +13,9 @@ p {
   font-size: 20px;
 }
 
-.big-padding {
-  padding: 6px 0;
+.center {
+  margin: auto;
+  text-align: center;
 }
 
 /* Navbar stylesheets */
