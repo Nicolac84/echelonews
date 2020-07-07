@@ -195,6 +195,29 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+  /newspaper/{id}:
+    get:
+      summary: Get a newspaper by id
+      parameters:
+        - name: id
+          in: path
+          description: User univocal ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The requested newspaper
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Newspaper"
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
+        '401':
+          $ref: "#/components/responses/Unauthorized"
+        '404':
+          $ref: "#/components/responses/NotFound"
 
 components:
   schemas:
@@ -275,6 +298,18 @@ components:
       type: array
       items:
         type: string
+    Newspaper:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Newspaper ID
+        country:
+          type: string
+          description: Newspaper country
+        info:
+          type: object
+          description: Newspaper additional informations
   responses:
     FetchedNews:
       description: An array containing the requested news

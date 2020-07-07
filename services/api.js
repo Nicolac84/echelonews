@@ -15,6 +15,7 @@ const { User } = require('../models/user')
 const { Article } = require('../models/article')
 const { Feedback } = require('../models/feedback')
 const { OAuthFeedback } = require('../models/oauth-feedback')
+const { Newspaper } = require('../models/newspaper')
 const { NewsMultiplexerClient, DEFAULT_RPC_QUEUE } =
   require('./news-multiplexer')
 
@@ -184,6 +185,28 @@ app.post('/news', Auth.middlewares.jwt, jsonParser, async (req, res) => {
   }
 })
 
+app.get('/newspaper/:id', (req, res) => {
+  try {
+    if (Newspaper.validate('id', req.params.id)) {
+      log.warn('Attempted to fetch newspaper with invalid ID')
+      return res.status(400).json({ id: ['Newspaper ID is not valid'] })
+    }
+    const np = await Newspaper.fetch('id', req.params.id)
+    if (!np) {
+      log.warn('Attempted to fetch inexistent newspaper')
+      return res.status(404).send()
+    }
+    res.status(200).json({
+      id: np.id,
+      country: np.country,
+      info: np.info
+    })
+  } catch (err) {
+    log.error(err)
+    res.status(500).json({ message: 'Internal server error. Sorry' })
+  }
+})
+
 // Perform the application setup, programmatically
 app.setup = async function({
   logger,
@@ -196,6 +219,7 @@ app.setup = async function({
   try {
     Feedback.db.setup(postgresUri)
     OAuthFeedback.db.setup(postgresUri)
+    Newspaper.db.setup(postgresUri)
     Auth.setup({
       log: logger || log,
       jwtSecret: jwtSecret || process.env.JWT_SECRET,
