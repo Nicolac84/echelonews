@@ -3,15 +3,15 @@
  * Copyright (c) 2020 Nicola Colao, Paolo Lucchesi, Dejan Nuzzi
  * All rights reserved
  */
-'use strict'
-const { Newspaper } = require('../models/newspaper')
-const { Article } = require('../models/article')
-const fetch = require('node-fetch')
-const Parser = require('rss-parser')
-const pino = require('pino')
+"use strict";
+const { Newspaper } = require("../models/newspaper");
+const { Article } = require("../models/article");
+const fetch = require("node-fetch");
+const Parser = require("rss-parser");
+const pino = require("pino");
 
-const parser = new Parser()
-const log = pino({ level: process.env.LOG_LEVEL || 'info' })
+const parser = new Parser();
+const log = pino({ level: process.env.LOG_LEVEL || "info" });
 
 /** RSS feed fetcher */
 class RssFetcher {
@@ -19,60 +19,72 @@ class RssFetcher {
    * @param {number} opt.interval - The fetching interval
    * @param {string} opt.organizerUrl - URL of the news organizer
    */
-  constructor({ interval=30000, organizerUrl=null } = {}) {
-    this.organizerUrl = organizerUrl
-    this.interval = interval
-    this.initialized = false
-    this.npapers = null
+  constructor({ interval = 30000, organizerUrl = null } = {}) {
+    this.organizerUrl = organizerUrl;
+    this.interval = interval;
+    this.initialized = false;
+    this.npapers = null;
   }
 
   /** Initialize the database and fetch all the RSS sources
    * @returns {Promise<RssFetcher>} this RssFetcher instance as a promise
    */
   setup() {
-    Newspaper.db.setup(process.env.POSTGRES_URI)
-    return Newspaper.fetchMany({ sourceType: 'rss' })
-      .then(function(npapers) {
-        this.npapers = npapers.map(np => {
-          np.info.lastFetched = new Date(np.info.lastFetched || 0)
-          return np
-        })
-        log.info(`Setup completed with ${npapers.length} newspaper(s)`)
-        return this
-      }.bind(this))
+    Newspaper.db.setup(process.env.POSTGRES_URI);
+    return Newspaper.fetchMany({ sourceType: "rss" }).then(
+      function (npapers) {
+        this.npapers = npapers.map((np) => {
+          np.info.lastFetched = new Date(np.info.lastFetched || 0);
+          return np;
+        });
+        log.info(`Setup completed with ${npapers.length} newspaper(s)`);
+        return this;
+      }.bind(this)
+    );
   }
 
   /** Cleanup the news fetcher, closing the pool for ALL the fetcher instances
    * @returns {undefined}
    */
-  static async cleanup() { await Newspaper.db.cleanup() }
+  static async cleanup() {
+    await Newspaper.db.cleanup();
+  }
 
   /** Execute the fetcher task, i.e. fetch an RSS feed, process it and store
    * the related articles (if any)
    * @returns {undefined}
    */
   async task() {
-    log.info('Fetcher task started')
+    log.info("Fetcher task started");
     for (const np of this.npapers) {
       try {
-        const news = await RssFetcher.process(np, await RssFetcher.download(np))
+        const news = await RssFetcher.process(
+          np,
+          await RssFetcher.download(np)
+        );
         if (news && (await this.store(news)) > 0) {
-          log.info(`Updating newspaper ${np.id} lastFetched field`)
-          np.info.lastFetched = new Date()
-          await np.update('info')
+          log.info(`Updating newspaper ${np.id} lastFetched field`);
+          np.info.lastFetched = new Date();
+          await np.update("info");
         }
       } catch (err) {
-        log.error(err)
+        log.error(err);
       }
     }
-    log.info(`Task completed - Sleeping for ${this.interval} seconds`)
-    await sleep(this.interval).catch(log.error)// TODO: Time difference
+    log.info(`Task completed - Sleeping for ${this.interval} seconds`);
+    await sleep(this.interval).catch(log.error); // TODO: Time difference
   }
 
   /** Execute the fetcher task in loop */
   async run() {
-    log.info('Fetcher activity started')
-    while (1) { try { await this.task() } catch (err) { log.error(err) } }
+    log.info("Fetcher activity started");
+    while (1) {
+      try {
+        await this.task();
+      } catch (err) {
+        log.error(err);
+      }
+    }
   }
 
   /** Download an RSS feed - This function is separated to ease testing
@@ -82,30 +94,27 @@ class RssFetcher {
    */
   static async download(source) {
     try {
-      if (!source || !source.info || !source.info.origin)
-        throw new TypeError('Invalid source newspaper')
-      log.info(`Downloading RSS for newspaper ${source.id}`)
+      if (!source || !source.info || !source.info.origin) {
+        throw new TypeError("Invalid source newspaper");
+      }
+      log.info(`Downloading RSS for newspaper ${source.id}`);
 
-      const lastFetched = source.info.lastFetched || new Date(0)
-      log.info(`lastFetched is '${lastFetched}' for newspaper ${source.id}`)
+      const lastFetched = source.info.lastFetched || new Date(0);
+      log.info(`lastFetched is '${lastFetched}' for newspaper ${source.id}`);
       const res = await fetch(source.info.origin, {
-        method: 'get',
-        headers: { 'If-Modified-Since': lastFetched.toUTCString() }
-      })
+        method: "get",
+        headers: { "If-Modified-Since": lastFetched.toUTCString() },
+      });
 
       if (res.status === 304) {
-        log.info(`RSS for newspaper ${source.id} was not recent`)
-        return null
-      }
-
-      else if (res.ok) {
-        log.info(`Incoming RSS for newspaper ${source.id}`)
-        return res.text()
-      }
-
-      else throw new Error(`Fetching URL returned status code ${res.status}`)
+        log.info(`RSS for newspaper ${source.id} was not recent`);
+        return null;
+      } else if (res.ok) {
+        log.info(`Incoming RSS for newspaper ${source.id}`);
+        return res.text();
+      } else throw new Error(`Fetching URL returned status code ${res.status}`);
     } catch (err) {
-      throw err
+      throw err;
     }
   }
 
@@ -117,28 +126,30 @@ class RssFetcher {
    */
   static async process(source, rss) {
     try {
-      log.debug(source)
-      log.debug(rss)
-      if (!rss) return null
-      log.info(`Processing RSS for newspaper ${source.id}`)
+      log.debug(source);
+      log.debug(rss);
+      if (!rss) return null;
+      log.info(`Processing RSS for newspaper ${source.id}`);
 
-      const news = await parser.parseString(rss)
-      if (!news.items) return null
+      const news = await parser.parseString(rss);
+      if (!news.items) return null;
 
-      let ret = news.items
-        .filter(e => new Date(e.isoDate) > source.info.lastFetched)
-        .map(item => ({
+      const ret = news.items
+        .filter((e) => new Date(e.isoDate) > source.info.lastFetched)
+        .map((item) => ({
           source: source.id,
           title: item.title,
           preview: item.content,
           origin: item.link,
-          topics: item.categories ? item.categories.map(e => e._ ? e._.split('/') : []).flat() : [],
-          created: new Date(item.isoDate)
-        }))
-      log.info(`Processed ${ret.length} articles`)
-      return ret
+          topics: item.categories
+            ? item.categories.map((e) => (e._ ? e._.split("/") : [])).flat()
+            : [],
+          created: new Date(item.isoDate),
+        }));
+      log.info(`Processed ${ret.length} articles`);
+      return ret;
     } catch (err) {
-      throw err
+      throw err;
     }
   }
 
@@ -147,45 +158,47 @@ class RssFetcher {
    * @returns {number} The number of successfully stored articles
    */
   async store(articles) {
-    if (!articles) return 0
-    log.info(`Storing ${articles.length} articles`)
+    if (!articles) return 0;
+    log.info(`Storing ${articles.length} articles`);
     let n = 0;
     for (const art of articles) {
       try {
         const res = await fetch(`${this.organizerUrl}/store`, {
-          method: 'post',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(art)
-        })
-        log.info(`Stored new article\n${art.title}`)
-        if (res.ok) ++n
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(art),
+        });
+        log.info(`Stored new article\n${art.title}`);
+        if (res.ok) ++n;
       } catch (err) {
-        log.error(err)
+        log.error(err);
       }
     }
-    return n
+    return n;
   }
 }
 
 // Sleep (with promises)
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
 
 // If this is the main module, launch the news fetcher
 if (require.main === module) {
-  (async function() {
+  (async function () {
     try {
       const fetcher = new RssFetcher({
         interval: process.env.INTERVAL,
-        organizerUrl: process.env.ORGANIZER_URL
-      })
-      log.debug(`Organizer URL: ${fetcher.organizerUrl}`)
-      log.debug(`Interval: ${fetcher.interval}`)
-      await fetcher.setup()
-      await fetcher.run()
+        organizerUrl: process.env.ORGANIZER_URL,
+      });
+      log.debug(`Organizer URL: ${fetcher.organizerUrl}`);
+      log.debug(`Interval: ${fetcher.interval}`);
+      await fetcher.setup();
+      await fetcher.run();
     } catch (err) {
-      throw err
+      throw err;
     }
   })();
 }
 
-module.exports = { RssFetcher }
+module.exports = { RssFetcher };

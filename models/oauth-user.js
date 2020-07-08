@@ -10,7 +10,7 @@
 'use strict'
 const Validable = require('validable')
 const Perseest = require('perseest')
-const modHelpers = require('./helpers/perseest')
+const modHelpers = require('../lib/models-helpers')
 Object.assign(Validable.validate.validators, require('../lib/validators'))
 
 /** OAuth user entity, with no support for persistence */

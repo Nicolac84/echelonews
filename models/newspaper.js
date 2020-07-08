@@ -10,7 +10,7 @@
 'use strict'
 const Validable = require('validable')
 const Perseest = require('perseest')
-const modHelpers = require('./helpers/perseest')
+const modHelpers = require('../lib/models-helpers')
 const { countries } = require('countries-list')
 Object.assign(Validable.validate.validators, require('../lib/validators'))
 

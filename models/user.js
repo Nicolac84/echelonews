@@ -12,7 +12,7 @@
 const Validable = require('validable')
 const Perseest = require('perseest')
 const bcrypt = require('bcrypt')
-const modHelpers = require('./helpers/perseest')
+const modHelpers = require('../lib/models-helpers')
 Object.assign(Validable.validate.validators, require('../lib/validators'))
 
 /** User entity, with no support for persistence */

@@ -10,7 +10,7 @@
 'use strict'
 const Validable = require('validable')
 const Perseest = require('perseest')
-const modHelpers = require('./helpers/perseest')
+const modHelpers = require('../lib/models-helpers')
 
 /** User feedback, with no persistence support */
 class VolatileFeedback extends Validable.Class {
