@@ -122,7 +122,7 @@ service.
 The following variables are common to any microservice:
 
 **Variable** | **Description** | **Mandatory** | **Example**
-:-:|---|---
+:-:|---|:-:|---
 `POSTGRES_URI` | URI to the postgres database | no | `postgres://user:pass@so.me.db/testdb`
 `LOG_LEVEL` | Minimum Pino log level | no | `trace`
 `PORT` | Port to which servers and APIs can be exposed (only valid for RESTful services) | no | `8081`
@@ -130,7 +130,7 @@ The following variables are common to any microservice:
 #### Exposed RESTful API
 
 **Variable** | **Description** | **Mandatory** | **Example**
-:-:|---|---
+:-:|---|:-:|---
 `JWT_SECRET` | Secret key to sign Json Web Tokens | yes | `verylongandrandomstring...`
 `AMQP_BROKER` | URL to the infrastructure AMQP broker | yes | `amqp://localhost`
 `USER_HANDLER_URL` | URL to the user handler instance | yes | `http://localhost:8082`
@@ -139,14 +139,14 @@ The following variables are common to any microservice:
 #### OAuth Bridge
 
 **Variable** | **Description** | **Mandatory** | **Example**
-:-:|---|---
+:-:|---|:-:|---
 `JWT_SECRET` | Secret key to sign Json Web Tokens | yes | `verylongandrandomstring...`
 `USER_HANDLER_URL` | URL to the user handler instance | yes | `http://localhost:8082`
 
 #### News Multiplexer
 
 **Variable** | **Description** | **Mandatory** | **Example**
-:-:|---|---
+:-:|---|:-:|---
 `AMQP_BROKER` | URL to the infrastructure AMQP broker | yes | `amqp://localhost`
 `AMQP_QUEUE_NAME` | Queue name to perform RPCs to the news multiplexer | no | `mux-rpc-queue`
 `AMQP_PREFETCH` | Prefetch value for the AMQP consumer | no | `1`
@@ -159,14 +159,14 @@ The following variables are common to any microservice:
 #### News Fetcher
 
 **Variable** | **Description** | **Mandatory** | **Example**
-:-:|---|---
+:-:|---|:-:|---
 `ORGANIZER_URL` | URL to the news organizer instance | yes | `http://localhost:8084`
 `INTERVAL` | News fetching interval, in milliseconds | no | `300000`
 
 #### Web Frontend
 
 **Variable** | **Description** | **Mandatory** | **Example**
-:-:|---|---
+:-:|---|:-:|---
 `API_URL` | URL to the main exposed API instance | no | `http://localhost:8081`
 `OAUTH_BRIDGE_URL` | URL to the OAuth bridge instance | no | `http://localhost:8083`
 `GOOGLE_CLIENT_ID` | Google Cloud client ID | no |`1234abcde.apps.googleusercontent.com`

@@ -25,6 +25,7 @@ links:
 * [Exposed API]({{ site.url }}/openapi/external)
 * [Internal User Handler]({{ site.url }}/openapi/users)
 * [News Organizer]({{ site.url }}/openapi/organizer)
+* [OAuth Bridge]({{ site.url }}/openapi/oauth-bridge)
 
 ### Libraries and Programming APIs
 
