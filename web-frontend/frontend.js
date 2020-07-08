@@ -114,6 +114,15 @@ app.get('/oauth', OAuth.directPath)
 // OAuth login callback
 app.get('/oauth/callback', OAuth.callbackPath)
 
+// Logout
+app.get('/logout', (req, res) => {
+  res.cookie('jwt', '', {
+    expires: new Date(0),
+    overwrite: true
+  })
+  res.redirect('/')
+})
+
 // Show user profile
 app.get('/profile', (req, res) => {
   req.log.info('Requested profile page')
