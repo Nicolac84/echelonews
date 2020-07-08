@@ -40,6 +40,34 @@ app.get('/login', (req, res) => {
   res.render('login')
 })
 
+// Login request
+app.post('/login', async (req, res) => {
+  req.log.info('Login request')
+  try {
+    const apiRes = await fetch(`${API_URL}/login`, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.query)
+    })
+    const body = await apiRes.json()
+    req.log.debug(`Received response from API with status code ${apiRes.status}\n%o`, body)
+    switch (apiRes.status) {
+      case 200:
+        res.cookie('jwt', `Bearer ${body.token}`, { maxAge: 3600000 })
+        return res.redirect('/') // TODO: Redirect to profile
+      case 400:
+        return res.status(400).redirect('/login') // TODO: Flash
+      case 401:
+        return res.status(400).redirect('/login') // TODO: Flash (with some other message)
+      default:
+        return res.status(500).send('Internal server error. Sorry')
+    }
+  } catch (err) {
+    req.log.error(err)
+    return res.status(500).send('Internal server error. Sorry')
+  }
+})
+
 // Signup page
 app.get('/register', (req, res) => {
   req.log.info('Requested registration page')
