@@ -67,6 +67,7 @@ class OAuthMiddlewares {
       const token = await tokenRes.text()
 
       // Set token as 'jwt' cookie
+      // TODO: Determine the cookie max age according to the jwt expiration
       res.cookie('jwt', `Bearer ${token}`, { httpOnly: true, maxAge: 3600000 })
       res.redirect('/') // TODO: Redirect to profile
     } catch (err) {

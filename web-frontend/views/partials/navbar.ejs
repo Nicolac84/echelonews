@@ -1,0 +1,20 @@
+<div class="fixed-top" id="main-navbar">
+  <div class="container">
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <a class="navbar-brand"></a><a class="nav-link" href="/">Home</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/news">News</a>
+          </li>
+        </ul>
+        <% if (user) { %>
+          <a class="btn btn-outline-primary" href="/profile">Profile</a>
+        <% } else { %>
+          <a class="btn btn-outline-primary" href="/register">Signup</a>
+          <a class="btn btn-outline-primary" href="/login">Login</a>
+        <% } %>
+      </div>
+    </nav>
+  </div>
+</div>

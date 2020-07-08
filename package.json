@@ -11,7 +11,8 @@
     "test": "npx mocha test/models test/services --exit",
     "coverage": "npx nyc npm test",
     "lint": "npx standard --fix services/**/*.js models/**/*.js; npx standard --env mocha --fix test/*.js test/**/*.js; npx prettier --write services/**/*.js test/**/*.js models/**/*.js",
-    "start": "node services/$SERVICE | npx pino-pretty -c -t \"yyyy-mm-dd HH:MM:ss\" -i pid,hostname"
+    "start": "node services/$SERVICE | npx pino-pretty -c -t \"yyyy-mm-dd HH:MM:ss\" -i pid,hostname",
+    "frontend": "cd web-frontend && node frontend.js | pino-pretty"
   },
   "repository": {
     "type": "git",
