@@ -13,13 +13,16 @@ p {
   font-size: 20px;
 }
 
-.center-text {
-  text-align: center;
-}
+.center-text { text-align: center; }
 
 /* Navbar stylesheets */
 #main-navbar .btn {
   margin: 0 4px;
+}
+
+/* Banner stylesheets */
+#main-content .banner {
+  border-radius: 8px 8px 0px 0px;
 }
 
 /* Content stylesheets */
@@ -30,88 +33,4 @@ p {
 
 #main-content .card img {
   height: 10rem;
-}
-
-/* Form stylesheets */
-/*
-#main-content form label {
-  display: block;
-  color: black;
-  background-color: #7582F0;
-  margin: 2px auto;
-  padding: 6px;
-}
-*/
-
-
-/* TODO: Remove? */
-
-#myInput {
-  background-image: url('/assets/searchicon.png'); /* Add a search icon to input TODO */
-  background-position: 10px 12px; /* Position the search icon */
-  background-repeat: no-repeat; /* Do not repeat the icon image */
-  width: 100%; /* Full-width */
-  font-size: 16px; /* Increase font-size */
-  padding: 12px 20px 12px 40px; /* Add some padding */
-  border: 1px solid #ddd; /* Add a grey border */
-  margin-bottom: 12px; /* Add some space below the input */
-}
-
-/* inizio menu sotto analitycs */
-.icon-bar {
-  width: 100%; /* Full-width */
-  background-color: #555; /* Dark-grey background */
-  overflow: auto; /* Overflow due to float */
-}
-
-.icon-bar a {
-  float: left; /* Float links side by side */
-  text-align: center; /* Center-align text */
-  width: 20%; /* Equal width (5 icons with 20% width each = 100%) */
-  padding: 12px 0; /* Some top and bottom padding */
-  transition: all 0.3s ease; /* Add transition for hover effects */
-  color: white; /* White text color */
-  font-size: 36px; /* Increased font size */
-}
-
-.icon-bar a:hover {
-  background-color: #000; /* Add a hover color */
-}
-
-.active {
-  background-color: #4CAF50; /* Add an active/current color */
-}
-
-/* tabella news*/
-#myInput {
-  background-image: url('lente.jpg'); /* Add a search icon to input */
-  background-position: 10px 12px; /* Position the search icon */
-  background-repeat: no-repeat; /* Do not repeat the icon image */
-  width: 100%; /* Full-width */
-  font-size: 16px; /* Increase font-size */
-  padding: 12px 20px 12px 40px; /* Add some padding */
-  border: 1px solid #ddd; /* Add a grey border */
-  margin-bottom: 12px; /* Add some space below the input */
-}
-
-#myTable {
-  border-collapse: collapse; /* Collapse borders */
-  width: 100%; /* Full-width */
-  border: 1px solid #ddd; /* Add a grey border */
-  font-size: 18px; /* Increase font-size */
-}
-
-#myTable th, #myTable td {
-  text-align: left; /* Left-align text */
-  padding: 12px; /* Add padding */
-}
-
-#myTable tr {
-  /* Add a bottom border to all table rows */
-  border-bottom: 1px solid #ddd;
-}
-
-#myTable tr.header, #myTable tr:hover {
-  /* Add a grey background color to the table header and on hover */
-  background-color: #f1f1f1;
 }
