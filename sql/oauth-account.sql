@@ -1,7 +1,7 @@
 -- echelonews - postgres table definitions
 -- OAuth user account, with Google as a provider
 CREATE TABLE OAuthAccount (
-  id SERIAL PRIMARY KEY,         -- User univocal ID, given by Google
+  id DECIMAL PRIMARY KEY,      -- User univocal ID, given by Google
   name VARCHAR NOT NULL,         -- User name, given by Google
   lang VARCHAR NOT NULL,         -- User native language
   countries VARCHAR[] NOT NULL,  -- Preferred countries

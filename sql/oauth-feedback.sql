@@ -2,7 +2,7 @@
 -- User feedback for OAuth accounts
 CREATE TABLE OAuthFeedback (
   id SERIAL PRIMARY KEY,     -- Feedback ID
-  account INTEGER NOT NULL,  -- Account which produced the feedback
+  account DECIMAL NOT NULL,  -- Account which produced the feedback
   npaper INTEGER NOT NULL,   -- Newspaper
   score SMALLINT NOT NULL,   -- Feedback score
 
