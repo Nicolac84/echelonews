@@ -8,6 +8,7 @@ digraph EcheloNews {
   web   [label="Web Frontend"];
   api   [label="RESTful API"];
   auth  [label="User Handler"];
+  oauth [label="OAuth Bridge"];
   mux   [label="News Multiplexer"];
   org   [label="News Organizer"];
   fetch [label="News Fetcher"];
@@ -29,6 +30,8 @@ digraph EcheloNews {
   web -> api;
   api -> auth;
   fetch -> org;
+  web -> oauth;
+  oauth -> auth;
 
   edge [color="#fbc02d"] # Internal AMQP services
   api -> mux;

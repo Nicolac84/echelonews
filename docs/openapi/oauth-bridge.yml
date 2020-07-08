@@ -1,0 +1,49 @@
+openapi: 3.0.0
+info:
+  title: echelonews-oauth-bridge
+  description: EcheloNews OAuth Bridge
+  version: 0.0.1
+
+paths:
+  /oauth:
+    post:
+      summary: Retrieve or register an OAuth user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OAuthUser"
+      responses:
+        '200':
+          description: Successfully created a new user
+        '201':
+          description: Successfully retrieved an existent user
+        '400':
+          $ref: "#/components/responses/MalformedRequest"
+
+components:
+  schemas:
+    OAuthUser:
+      type: object
+      description: "OAuth user data"
+      properties:
+        id:
+          type: integer
+          description: User id given by the OAuth provider
+        name:
+          type: string
+          description: User name given by the OAuth provider
+    ValidationError:
+      type: object
+      description: "Error in the form { field: [ error1, ... ], ... }"
+      example:
+        title: ['Title is too long', 'Title is not valid']
+        source: ['Source is not an existing newspaper ID']
+  responses:
+    MalformedRequest:
+      description: Malformed request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'

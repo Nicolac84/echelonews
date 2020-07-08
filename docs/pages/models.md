@@ -1,15 +1,9 @@
 ---
-title: Library documentation - Models
-permalink: '/jsdoc/models'
+title: JSDoc | Models
+permalink: /jsdoc/models
 ---
 
-## Modules
-
-<dl>
-<dt><a href="#module_perseest-helper">perseest-helper</a></dt>
-<dd><p>echelonews - Model helpers</p>
-</dd>
-</dl>
+# JSDoc documentation for models
 
 ## Classes
 
@@ -20,11 +14,29 @@ permalink: '/jsdoc/models'
 <dt><a href="#Article">Article</a> ⇐ <code><a href="#VolatileArticle">VolatileArticle</a></code></dt>
 <dd><p>Article with persistence capability via the perseest package</p>
 </dd>
+<dt><a href="#VolatileFeedback">VolatileFeedback</a></dt>
+<dd><p>User feedback, with no persistence support</p>
+</dd>
+<dt><a href="#Feedback">Feedback</a> ⇐ <code><a href="#VolatileFeedback">VolatileFeedback</a></code></dt>
+<dd><p>Feedback with persistence capability via the perseest package</p>
+</dd>
 <dt><a href="#VolatileNewspaper">VolatileNewspaper</a></dt>
 <dd><p>Newspaper, with no persistence support</p>
 </dd>
 <dt><a href="#Newspaper">Newspaper</a> ⇐ <code><a href="#VolatileNewspaper">VolatileNewspaper</a></code></dt>
 <dd><p>Newspaper with persistence capability via the perseest package</p>
+</dd>
+<dt><a href="#VolatileOAuthFeedback">VolatileOAuthFeedback</a></dt>
+<dd><p>User feedback, with no persistence support</p>
+</dd>
+<dt><a href="#OAuthFeedback">OAuthFeedback</a> ⇐ <code><a href="#VolatileOAuthFeedback">VolatileOAuthFeedback</a></code></dt>
+<dd><p>OAuthFeedback with persistence capability via the perseest package</p>
+</dd>
+<dt><a href="#VolatileOAuthUser">VolatileOAuthUser</a></dt>
+<dd><p>OAuth user entity, with no support for persistence</p>
+</dd>
+<dt><a href="#OAuthUser">OAuthUser</a> ⇐ <code><a href="#VolatileOAuthUser">VolatileOAuthUser</a></code></dt>
+<dd><p>OAuthUser with persistence capability via the perseest package</p>
 </dd>
 <dt><a href="#VolatileUser">VolatileUser</a></dt>
 <dd><p>User entity, with no support for persistence</p>
@@ -33,60 +45,6 @@ permalink: '/jsdoc/models'
 <dd><p>User with persistence capability via the perseest package</p>
 </dd>
 </dl>
-
-<a name="module_perseest-helper"></a>
-
-## perseest-helper
-echelonews - Model helpers
-
-**Requires**: <code>module:validable</code>, <code>module:perseest</code>  
-**License**: Copyright (c) 2020 Nicola Colao, Paolo Lucchesi, Dejan Nuzzi
-All rights reserved
-This software is licensed under the MIT license found in the file LICENSE
-in the root directory of this repository  
-
-* [perseest-helper](#module_perseest-helper)
-    * [~setIDAfterSaving(Schema, idColName)](#module_perseest-helper..setIDAfterSaving) ⇒ <code>undefined</code>
-    * [~tm2DateAfterFetch(Schema, Schema, tmColName)](#module_perseest-helper..tm2DateAfterFetch) ⇒ <code>undefined</code>
-    * [~validateBeforeQuery(Schema, idColName)](#module_perseest-helper..validateBeforeQuery) ⇒ <code>undefined</code>
-
-<a name="module_perseest-helper..setIDAfterSaving"></a>
-
-### perseest-helper~setIDAfterSaving(Schema, idColName) ⇒ <code>undefined</code>
-On save, make the database return the id of the saved entry and set it as
-the JS instance id
-
-**Kind**: inner method of [<code>perseest-helper</code>](#module_perseest-helper)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| Schema | <code>Class</code> | The schema extending Perseest.Class |
-| idColName | <code>string</code> | The name of the ID column |
-
-<a name="module_perseest-helper..tm2DateAfterFetch"></a>
-
-### perseest-helper~tm2DateAfterFetch(Schema, Schema, tmColName) ⇒ <code>undefined</code>
-After having fetched a user, convert a postgres timestamp in a JS Date
-
-**Kind**: inner method of [<code>perseest-helper</code>](#module_perseest-helper)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| Schema | <code>Class</code> |  |
-| Schema | <code>Class</code> | The schema extending Perseest.Class |
-| tmColName | <code>string</code> | The name of the timestamp column |
-
-<a name="module_perseest-helper..validateBeforeQuery"></a>
-
-### perseest-helper~validateBeforeQuery(Schema, idColName) ⇒ <code>undefined</code>
-Run validators before performing any default query
-
-**Kind**: inner method of [<code>perseest-helper</code>](#module_perseest-helper)  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| Schema | <code>Class</code> | The schema extending Perseest.Class |
-| idColName | <code>string</code> | The name of the ID column |
 
 <a name="VolatileArticle"></a>
 
@@ -132,8 +90,11 @@ Article with persistence capability via the perseest package
 
 * [Article](#Article) ⇐ [<code>VolatileArticle</code>](#VolatileArticle)
     * [new Article()](#new_Article_new)
-    * [.db](#Article+db)
-    * [.constraints](#VolatileArticle+constraints) : <code>object</code>
+    * _instance_
+        * [.db](#Article+db)
+        * [.constraints](#VolatileArticle+constraints) : <code>object</code>
+    * _static_
+        * [.multiplex(opt)](#Article.multiplex) ⇒ [<code>Array.&lt;Article&gt;</code>](#Article)
 
 <a name="new_Article_new"></a>
 
@@ -153,6 +114,100 @@ Constraints on Article instance properties
 
 **Kind**: instance constant of [<code>Article</code>](#Article)  
 **Overrides**: [<code>constraints</code>](#VolatileArticle+constraints)  
+<a name="Article.multiplex"></a>
+
+### Article.multiplex(opt) ⇒ [<code>Array.&lt;Article&gt;</code>](#Article)
+Multiplex articles, with a single country
+
+**Kind**: static method of [<code>Article</code>](#Article)  
+**Returns**: [<code>Array.&lt;Article&gt;</code>](#Article) - An ordered collection of articles  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| opt | <code>object</code> | Constructor parameters |
+| opt.uid | <code>number</code> | Reference user ID |
+| opt.topic | <code>string</code> | Topic to multiplex |
+| opt.countries | <code>Array.&lt;string&gt;</code> | Countries to multiplex |
+| opt.oauth | <code>boolean</code> | Multiplex for OAuth users? |
+
+<a name="VolatileFeedback"></a>
+
+## VolatileFeedback
+User feedback, with no persistence support
+
+**Kind**: global class  
+
+* [VolatileFeedback](#VolatileFeedback)
+    * [new VolatileFeedback(opt)](#new_VolatileFeedback_new)
+    * [.constraints](#VolatileFeedback+constraints) : <code>object</code>
+
+<a name="new_VolatileFeedback_new"></a>
+
+### new VolatileFeedback(opt)
+Create a new feedback
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| opt | <code>object</code> | Constructor parameters |
+| opt.account | <code>number</code> | Related user id |
+| opt.npaper | <code>number</code> | Related newspaper ID |
+| opt.score | <code>number</code> | Newspaper score |
+
+<a name="VolatileFeedback+constraints"></a>
+
+### volatileFeedback.constraints : <code>object</code>
+Constraints on Feedback instance properties
+
+**Kind**: instance constant of [<code>VolatileFeedback</code>](#VolatileFeedback)  
+<a name="Feedback"></a>
+
+## Feedback ⇐ [<code>VolatileFeedback</code>](#VolatileFeedback)
+Feedback with persistence capability via the perseest package
+
+**Kind**: global class  
+**Extends**: [<code>VolatileFeedback</code>](#VolatileFeedback)  
+
+* [Feedback](#Feedback) ⇐ [<code>VolatileFeedback</code>](#VolatileFeedback)
+    * [new Feedback()](#new_Feedback_new)
+    * _instance_
+        * [.db](#Feedback+db)
+        * [.constraints](#VolatileFeedback+constraints) : <code>object</code>
+    * _static_
+        * [.retrieve(account, npaper)](#Feedback.retrieve) ⇒ [<code>Promise.&lt;Feedback&gt;</code>](#Feedback)
+
+<a name="new_Feedback_new"></a>
+
+### new Feedback()
+Create a new persistent article
+
+<a name="Feedback+db"></a>
+
+### feedback.db
+Database configuration for perseest
+
+**Kind**: instance property of [<code>Feedback</code>](#Feedback)  
+<a name="VolatileFeedback+constraints"></a>
+
+### feedback.constraints : <code>object</code>
+Constraints on Feedback instance properties
+
+**Kind**: instance constant of [<code>Feedback</code>](#Feedback)  
+**Overrides**: [<code>constraints</code>](#VolatileFeedback+constraints)  
+<a name="Feedback.retrieve"></a>
+
+### Feedback.retrieve(account, npaper) ⇒ [<code>Promise.&lt;Feedback&gt;</code>](#Feedback)
+Retrieve a feedback by user/newspaper tuple
+
+**Kind**: static method of [<code>Feedback</code>](#Feedback)  
+**Returns**: [<code>Promise.&lt;Feedback&gt;</code>](#Feedback) - The requested feedback, with a score of 0 if
+  it does not exist  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| account | <code>number</code> | User ID |
+| npaper | <code>number</code> | Newspaper ID |
+
 <a name="VolatileNewspaper"></a>
 
 ## VolatileNewspaper
@@ -163,6 +218,7 @@ Newspaper, with no persistence support
 * [VolatileNewspaper](#VolatileNewspaper)
     * [new VolatileNewspaper(opt, sourceType, country, info)](#new_VolatileNewspaper_new)
     * [.constraints](#VolatileNewspaper+constraints) : <code>object</code>
+    * [.language()](#VolatileNewspaper+language) ⇒ <code>string</code>
 
 <a name="new_VolatileNewspaper_new"></a>
 
@@ -184,6 +240,13 @@ Instantiate a new Newspaper
 Constraints on Newspaper instance properties
 
 **Kind**: instance constant of [<code>VolatileNewspaper</code>](#VolatileNewspaper)  
+<a name="VolatileNewspaper+language"></a>
+
+### volatileNewspaper.language() ⇒ <code>string</code>
+Get the language of the newspaper origin country
+
+**Kind**: instance method of [<code>VolatileNewspaper</code>](#VolatileNewspaper)  
+**Returns**: <code>string</code> - The language code for the newspaper  
 <a name="Newspaper"></a>
 
 ## Newspaper ⇐ [<code>VolatileNewspaper</code>](#VolatileNewspaper)
@@ -193,8 +256,15 @@ Newspaper with persistence capability via the perseest package
 **Extends**: [<code>VolatileNewspaper</code>](#VolatileNewspaper)  
 
 * [Newspaper](#Newspaper) ⇐ [<code>VolatileNewspaper</code>](#VolatileNewspaper)
+    * [new Newspaper()](#new_Newspaper_new)
     * [.db](#Newspaper+db)
     * [.constraints](#VolatileNewspaper+constraints) : <code>object</code>
+    * [.language()](#VolatileNewspaper+language) ⇒ <code>string</code>
+
+<a name="new_Newspaper_new"></a>
+
+### new Newspaper()
+Create a new persistent newspaper
 
 <a name="Newspaper+db"></a>
 
@@ -208,6 +278,214 @@ Database configuration for perseest
 Constraints on Newspaper instance properties
 
 **Kind**: instance constant of [<code>Newspaper</code>](#Newspaper)  
+**Overrides**: [<code>constraints</code>](#VolatileNewspaper+constraints)  
+<a name="VolatileNewspaper+language"></a>
+
+### newspaper.language() ⇒ <code>string</code>
+Get the language of the newspaper origin country
+
+**Kind**: instance method of [<code>Newspaper</code>](#Newspaper)  
+**Overrides**: [<code>language</code>](#VolatileNewspaper+language)  
+**Returns**: <code>string</code> - The language code for the newspaper  
+<a name="VolatileOAuthFeedback"></a>
+
+## VolatileOAuthFeedback
+User feedback, with no persistence support
+
+**Kind**: global class  
+
+* [VolatileOAuthFeedback](#VolatileOAuthFeedback)
+    * [new VolatileOAuthFeedback(opt)](#new_VolatileOAuthFeedback_new)
+    * [.oauth](#VolatileOAuthFeedback+oauth) ⇒ <code>boolean</code>
+    * [.constraints](#VolatileOAuthFeedback+constraints) : <code>object</code>
+
+<a name="new_VolatileOAuthFeedback_new"></a>
+
+### new VolatileOAuthFeedback(opt)
+Create a new feedback
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| opt | <code>object</code> | Constructor parameters |
+| opt.account | <code>number</code> | Related OAuth user id |
+| opt.npaper | <code>number</code> | Related newspaper ID |
+| opt.score | <code>number</code> | Newspaper score |
+
+<a name="VolatileOAuthFeedback+oauth"></a>
+
+### volatileOAuthFeedback.oauth ⇒ <code>boolean</code>
+Does the feedback belong to an oauth user? (always true)
+
+**Kind**: instance property of [<code>VolatileOAuthFeedback</code>](#VolatileOAuthFeedback)  
+<a name="VolatileOAuthFeedback+constraints"></a>
+
+### volatileOAuthFeedback.constraints : <code>object</code>
+Constraints on OAuthFeedback instance properties
+
+**Kind**: instance constant of [<code>VolatileOAuthFeedback</code>](#VolatileOAuthFeedback)  
+<a name="OAuthFeedback"></a>
+
+## OAuthFeedback ⇐ [<code>VolatileOAuthFeedback</code>](#VolatileOAuthFeedback)
+OAuthFeedback with persistence capability via the perseest package
+
+**Kind**: global class  
+**Extends**: [<code>VolatileOAuthFeedback</code>](#VolatileOAuthFeedback)  
+
+* [OAuthFeedback](#OAuthFeedback) ⇐ [<code>VolatileOAuthFeedback</code>](#VolatileOAuthFeedback)
+    * [new OAuthFeedback()](#new_OAuthFeedback_new)
+    * _instance_
+        * [.db](#OAuthFeedback+db)
+        * [.oauth](#VolatileOAuthFeedback+oauth) ⇒ <code>boolean</code>
+        * [.constraints](#VolatileOAuthFeedback+constraints) : <code>object</code>
+    * _static_
+        * [.retrieve(account, npaper)](#OAuthFeedback.retrieve) ⇒ [<code>Promise.&lt;OAuthFeedback&gt;</code>](#OAuthFeedback)
+
+<a name="new_OAuthFeedback_new"></a>
+
+### new OAuthFeedback()
+Create a new persistent article
+
+<a name="OAuthFeedback+db"></a>
+
+### oAuthFeedback.db
+Database configuration for perseest
+
+**Kind**: instance property of [<code>OAuthFeedback</code>](#OAuthFeedback)  
+<a name="VolatileOAuthFeedback+oauth"></a>
+
+### oAuthFeedback.oauth ⇒ <code>boolean</code>
+Does the feedback belong to an oauth user? (always true)
+
+**Kind**: instance property of [<code>OAuthFeedback</code>](#OAuthFeedback)  
+**Overrides**: [<code>oauth</code>](#VolatileOAuthFeedback+oauth)  
+<a name="VolatileOAuthFeedback+constraints"></a>
+
+### oAuthFeedback.constraints : <code>object</code>
+Constraints on OAuthFeedback instance properties
+
+**Kind**: instance constant of [<code>OAuthFeedback</code>](#OAuthFeedback)  
+**Overrides**: [<code>constraints</code>](#VolatileOAuthFeedback+constraints)  
+<a name="OAuthFeedback.retrieve"></a>
+
+### OAuthFeedback.retrieve(account, npaper) ⇒ [<code>Promise.&lt;OAuthFeedback&gt;</code>](#OAuthFeedback)
+Retrieve a feedback by user/newspaper tuple
+
+**Kind**: static method of [<code>OAuthFeedback</code>](#OAuthFeedback)  
+**Returns**: [<code>Promise.&lt;OAuthFeedback&gt;</code>](#OAuthFeedback) - The requested feedback, with a score of 0 if
+  it does not exist  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| account | <code>number</code> | User ID |
+| npaper | <code>number</code> | Newspaper ID |
+
+<a name="VolatileOAuthUser"></a>
+
+## VolatileOAuthUser
+OAuth user entity, with no support for persistence
+
+**Kind**: global class  
+
+* [VolatileOAuthUser](#VolatileOAuthUser)
+    * [new VolatileOAuthUser(opt)](#new_VolatileOAuthUser_new)
+    * [.oauth](#VolatileOAuthUser+oauth) ⇒ <code>boolean</code>
+    * [.constraints](#VolatileOAuthUser+constraints) : <code>object</code>
+    * [.toString()](#VolatileOAuthUser+toString)
+    * [.export()](#VolatileOAuthUser+export) ⇒ <code>object</code>
+
+<a name="new_VolatileOAuthUser_new"></a>
+
+### new VolatileOAuthUser(opt)
+Instantiate a new OAuthUser
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| opt | <code>object</code> | Constructor parameters |
+| opt.id | <code>number</code> | User univocal ID, given by Google |
+| opt.name | <code>string</code> | User name, given by Google |
+| opt.created | <code>Date</code> | User creation timestamp |
+| opt.countries | <code>Array.&lt;String&gt;</code> | Countries in the user preferences |
+| opt.topics | <code>Array.&lt;String&gt;</code> | Countries in the user preferences |
+
+<a name="VolatileOAuthUser+oauth"></a>
+
+### volatileOAuthUser.oauth ⇒ <code>boolean</code>
+Is the user a OAuth user? (always returns true)
+
+**Kind**: instance property of [<code>VolatileOAuthUser</code>](#VolatileOAuthUser)  
+<a name="VolatileOAuthUser+constraints"></a>
+
+### volatileOAuthUser.constraints : <code>object</code>
+Constraints on OAuthUser instance properties
+
+**Kind**: instance constant of [<code>VolatileOAuthUser</code>](#VolatileOAuthUser)  
+<a name="VolatileOAuthUser+toString"></a>
+
+### volatileOAuthUser.toString()
+Return a string representation of the user
+
+**Kind**: instance method of [<code>VolatileOAuthUser</code>](#VolatileOAuthUser)  
+<a name="VolatileOAuthUser+export"></a>
+
+### volatileOAuthUser.export() ⇒ <code>object</code>
+**Kind**: instance method of [<code>VolatileOAuthUser</code>](#VolatileOAuthUser)  
+**Returns**: <code>object</code> - A sharing-safe representation of this user  
+<a name="OAuthUser"></a>
+
+## OAuthUser ⇐ [<code>VolatileOAuthUser</code>](#VolatileOAuthUser)
+OAuthUser with persistence capability via the perseest package
+
+**Kind**: global class  
+**Extends**: [<code>VolatileOAuthUser</code>](#VolatileOAuthUser)  
+
+* [OAuthUser](#OAuthUser) ⇐ [<code>VolatileOAuthUser</code>](#VolatileOAuthUser)
+    * [new OAuthUser()](#new_OAuthUser_new)
+    * [.db](#OAuthUser+db)
+    * [.oauth](#VolatileOAuthUser+oauth) ⇒ <code>boolean</code>
+    * [.constraints](#VolatileOAuthUser+constraints) : <code>object</code>
+    * [.toString()](#VolatileOAuthUser+toString)
+    * [.export()](#VolatileOAuthUser+export) ⇒ <code>object</code>
+
+<a name="new_OAuthUser_new"></a>
+
+### new OAuthUser()
+Create a new persistent user
+
+<a name="OAuthUser+db"></a>
+
+### oAuthUser.db
+Database configuration for perseest
+
+**Kind**: instance property of [<code>OAuthUser</code>](#OAuthUser)  
+<a name="VolatileOAuthUser+oauth"></a>
+
+### oAuthUser.oauth ⇒ <code>boolean</code>
+Is the user a OAuth user? (always returns true)
+
+**Kind**: instance property of [<code>OAuthUser</code>](#OAuthUser)  
+**Overrides**: [<code>oauth</code>](#VolatileOAuthUser+oauth)  
+<a name="VolatileOAuthUser+constraints"></a>
+
+### oAuthUser.constraints : <code>object</code>
+Constraints on OAuthUser instance properties
+
+**Kind**: instance constant of [<code>OAuthUser</code>](#OAuthUser)  
+**Overrides**: [<code>constraints</code>](#VolatileOAuthUser+constraints)  
+<a name="VolatileOAuthUser+toString"></a>
+
+### oAuthUser.toString()
+Return a string representation of the user
+
+**Kind**: instance method of [<code>OAuthUser</code>](#OAuthUser)  
+**Overrides**: [<code>toString</code>](#VolatileOAuthUser+toString)  
+<a name="VolatileOAuthUser+export"></a>
+
+### oAuthUser.export() ⇒ <code>object</code>
+**Kind**: instance method of [<code>OAuthUser</code>](#OAuthUser)  
+**Overrides**: [<code>export</code>](#VolatileOAuthUser+export)  
+**Returns**: <code>object</code> - A sharing-safe representation of this user  
 <a name="VolatileUser"></a>
 
 ## VolatileUser
@@ -242,7 +520,6 @@ Instantiate a new User
 | opt.pass | <code>string</code> | User plaintext password |
 | opt.hash | <code>string</code> | User hashed password |
 | opt.created | <code>Date</code> | User creation timestamp |
-| opt.googleId | <code>number</code> | Google account ID for the user |
 | opt.countries | <code>Array.&lt;String&gt;</code> | Countries in the user preferences |
 | opt.topics | <code>Array.&lt;String&gt;</code> | Countries in the user preferences |
 
@@ -317,6 +594,7 @@ User with persistence capability via the perseest package
 **Extends**: [<code>VolatileUser</code>](#VolatileUser)  
 
 * [User](#User) ⇐ [<code>VolatileUser</code>](#VolatileUser)
+    * [new User()](#new_User_new)
     * [.db](#User+db)
     * [.constraints](#VolatileUser+constraints) : <code>object</code>
     * [.BCRYPT_SALT_ROUNDS](#VolatileUser+BCRYPT_SALT_ROUNDS) : <code>number</code>
@@ -324,6 +602,11 @@ User with persistence capability via the perseest package
     * [.export()](#VolatileUser+export) ⇒ <code>object</code>
     * [.setPassword(pass)](#VolatileUser+setPassword) ⇒ <code>undefined</code>
     * [.authenticate(pass)](#VolatileUser+authenticate) ⇒ <code>Promise.&lt;boolean&gt;</code>
+
+<a name="new_User_new"></a>
+
+### new User()
+Create a new persistent user
 
 <a name="User+db"></a>
 
@@ -337,22 +620,26 @@ Database configuration for perseest
 Constraints on User instance properties
 
 **Kind**: instance constant of [<code>User</code>](#User)  
+**Overrides**: [<code>constraints</code>](#VolatileUser+constraints)  
 <a name="VolatileUser+BCRYPT_SALT_ROUNDS"></a>
 
 ### user.BCRYPT\_SALT\_ROUNDS : <code>number</code>
 BCrypt hash cost
 
 **Kind**: instance constant of [<code>User</code>](#User)  
+**Overrides**: [<code>BCRYPT\_SALT\_ROUNDS</code>](#VolatileUser+BCRYPT_SALT_ROUNDS)  
 <a name="VolatileUser+toString"></a>
 
 ### user.toString()
 Return a string representation of the user
 
 **Kind**: instance method of [<code>User</code>](#User)  
+**Overrides**: [<code>toString</code>](#VolatileUser+toString)  
 <a name="VolatileUser+export"></a>
 
 ### user.export() ⇒ <code>object</code>
 **Kind**: instance method of [<code>User</code>](#User)  
+**Overrides**: [<code>export</code>](#VolatileUser+export)  
 **Returns**: <code>object</code> - A sharing-safe representation of this user  
 <a name="VolatileUser+setPassword"></a>
 
@@ -360,6 +647,7 @@ Return a string representation of the user
 Set user password
 
 **Kind**: instance method of [<code>User</code>](#User)  
+**Overrides**: [<code>setPassword</code>](#VolatileUser+setPassword)  
 **Throws**:
 
 - Password must be valid
@@ -375,6 +663,7 @@ Set user password
 Authenticate a user with a password
 
 **Kind**: instance method of [<code>User</code>](#User)  
+**Overrides**: [<code>authenticate</code>](#VolatileUser+authenticate)  
 **Returns**: <code>Promise.&lt;boolean&gt;</code> - true if given password matches, false otherwise  
 
 | Param | Type | Description |
