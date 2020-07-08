@@ -31,35 +31,38 @@ app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
 // Homepage
 app.get('/', (req, res) => {
   req.log.info('Requested homepage')
-  res.render('index')
+  res.render('index', { user: !!(req.cookies.jwt) })
 })
 
 // Login page
 app.get('/login', (req, res) => {
   req.log.info('Requested login page')
-  res.render('login')
+  res.render('login', { user: !!(req.cookies.jwt) })
 })
 
 // Login request
-app.post('/login', async (req, res) => {
+app.post('/login', formDecoder, async (req, res) => {
   req.log.info('Login request')
   try {
     const apiRes = await fetch(`${API_URL}/login`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.query)
+      body: JSON.stringify(req.body)
     })
     const body = await apiRes.json()
-    req.log.debug(`Received response from API with status code ${apiRes.status}\n%o`, body)
     switch (apiRes.status) {
       case 200:
+        req.log.info('Successfully logged in')
         res.cookie('jwt', `Bearer ${body.token}`, { maxAge: 3600000 })
         return res.redirect('/') // TODO: Redirect to profile
       case 400:
+        req.log.warn('Malformed login request')
         return res.status(400).redirect('/login') // TODO: Flash
       case 401:
+        req.log.warn('Login incorrect')
         return res.status(400).redirect('/login') // TODO: Flash (with some other message)
       default:
+        req.log.error(`Unexpected API response status code ${apiRes.status}`)
         return res.status(500).send('Internal server error. Sorry')
     }
   } catch (err) {
@@ -71,7 +74,7 @@ app.post('/login', async (req, res) => {
 // Signup page
 app.get('/register', (req, res) => {
   req.log.info('Requested registration page')
-  res.render('register')
+  res.render('register', { user: !!(req.cookies.jwt) })
 })
 
 // OAuth login
