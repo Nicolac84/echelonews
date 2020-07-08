@@ -8,6 +8,7 @@ const EventEmitter = require('events')
 const amqp = require('amqplib')
 const pino = require('pino')
 const { Article } = require('../models/article')
+const { translateArticle } = require('../lib/translate')
 
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 
@@ -45,13 +46,24 @@ class NewsMultiplexer {
           const payload = JSON.parse(msg.content.toString())
           const correlationId = msg.properties.correlationId
           log.info(`Processing RPC call ${correlationId}`)
+
           // Multiplex news
           const muxed = await Article.multiplex(payload)
+
+          // Translate news
+          for (const art of muxed) {
+            await translateArticle(art, lang)
+              .catch(err => {
+                log.warn('Error while translating articles\n%o', err)
+              })
+          }
+
           // Send RPC response
           this.channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(muxed)), {
             correlationId: msg.properties.correlationId
           })
           this.channel.ack(msg)
+
           log.info(`Completed RPC call ${correlationId}`)
         } catch (err) {  // Error - NACK the message
           this.channel.nack(msg)
@@ -146,7 +158,6 @@ class NewsMultiplexerClient extends EventEmitter {
           replyTo: this.responseQueue.queue,
         })
       }.bind(this))
-      // TODO: Translate articles
       return articles
     } catch (err) {
       throw err

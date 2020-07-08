@@ -185,7 +185,7 @@ app.post('/news', Auth.middlewares.jwt, jsonParser, async (req, res) => {
   }
 })
 
-app.get('/newspaper/:id', (req, res) => {
+app.get('/newspaper/:id', async (req, res) => {
   try {
     if (Newspaper.validate('id', req.params.id)) {
       log.warn('Attempted to fetch newspaper with invalid ID')
