@@ -136,13 +136,13 @@ class NewsMultiplexerClient extends EventEmitter {
    * @param {number} opt.uid - Related user id
    * @param {string} opt.topic - Topic to multiplex
    * @param {Array<string>} opt.countries - Countries to multiplex
+   * @param {string} opt.lang - Langauge inwhich to translate articles
    * @param {boolean} opt.oauth - Multiplex for OAuth users?
    * @returns {Array<Article>} A collection of articles, sorted by score
    */
-  async multiplex({ uid, topic, countries, oauth } = {}) {
+  async multiplex({ uid, topic, countries, lang, oauth } = {}) {
     try {
       const articles = await new Promise(function(resolve) {
-
         // Iterate over the correlation ID
         const correlationId = (this.nextCorrelationId++).toString()
         log.info(`Performing multiplex RPC call ${correlationId}`)
@@ -152,7 +152,7 @@ class NewsMultiplexerClient extends EventEmitter {
 
         // Effectively perform the the RPC
         this.channel.sendToQueue(this.queueName, Buffer.from(JSON.stringify({
-          uid, topic, countries, oauth
+          uid, topic, countries, lang, oauth
         })), { 
           correlationId,
           replyTo: this.responseQueue.queue,

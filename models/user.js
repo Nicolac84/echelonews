@@ -34,6 +34,7 @@ class VolatileUser extends Validable.Class {
     this.name = opt.name
     this.pass = opt.pass
     this.hash = opt.hash
+    this.lang = 'en'
     this.email = opt.email
     this.topics = opt.topics || []
     this.countries = opt.countries || []
@@ -60,6 +61,7 @@ class VolatileUser extends Validable.Class {
     return {
       id: this.id,
       name: this.name,
+      lang: this.lang,
       email: this.email,
       topics: this.topics,
       created: this.created,
@@ -96,6 +98,9 @@ class VolatileUser extends Validable.Class {
       length: { minimum: 6, maximum: 24 },
       presence: { allowEmpty: false },
       format: { pattern: /[a-z0-9\-_]+/i },
+    },
+    lang: {
+      languageCode: true
     },
     email: {
       type: 'string',
@@ -139,6 +144,7 @@ class User extends Perseest.Mixin(VolatileUser) {
     name: { id: true },
     email: { id: true },
     hash: null,
+    lang: null,
     countries: null,
     topics: null,
     created: null,

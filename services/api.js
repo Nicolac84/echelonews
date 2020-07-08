@@ -146,12 +146,14 @@ app.delete('/feedback', Auth.middlewares.jwt, async (req, res) => {
 app.get('/news', Auth.middlewares.jwt, async (req, res) => {
   try {
     const user = await fetchUser(req.user.id, req.user.oauth)
-    console.log('USER: ', user)
+    if (!user.topics.length || !user.countries.length)
+      return res.status(200).json([])
     const muxed = await app.muxer.multiplex({
       uid: user.id,
       countries: user.countries,
       topic: user.topics[0],
-      oauth: !!(req.user.oauth)
+      oauth: !!(req.user.oauth),
+      lang: user.lang,
     })
   res.status(200).json(muxed)
   } catch (err) {
@@ -164,9 +166,10 @@ app.post('/news', Auth.middlewares.jwt, jsonParser, async (req, res) => {
   try {
     const errors = Validable.merge(
       Validable.requirelist(req.body, ['topic', 'countries']),
-      Validable.whitelist(req.body, ['topic', 'countries']),
+      Validable.whitelist(req.body, ['topic', 'countries', 'lang']),
       Article.validate('topics', [req.body.topic]),
-      User.validate('countries', req.body.countries)
+      User.validate('countries', req.body.countries),
+      req.body.lang && User.validate('lang', req.body.lang)
     )
     if (errors) {
       log.warn(`User ${req.user.id} performed bad news fetch request\n%o`, req.body)
@@ -176,7 +179,8 @@ app.post('/news', Auth.middlewares.jwt, jsonParser, async (req, res) => {
       uid: req.user.id,
       topic: req.body.topic,
       countries: req.body.countries,
-      oauth: !!(req.user.oauth)
+      oauth: !!(req.user.oauth),
+      lang: req.body.lang || 'en',
     })
     res.status(200).json(muxed)
   } catch (err) {
@@ -266,7 +270,6 @@ async function fetchUser(id, oauth) {
     if (!Number.isInteger(id))
       return new TypeError('User ID is not an integer')
     const url = Auth.userHandlerUrl + (oauth ? '/oauth' : '/users/byid') + `/${id}`
-    console.log('URL: ', url)
     const res = await fetch(url)
     if (!res.ok)
       return new Error(`User handler returned status ${res.status}`)
@@ -282,7 +285,6 @@ async function updateUser(id, body, oauth) {
     if (!Number.isInteger(id))
       return new TypeError('User ID is not an integer')
     const url = Auth.userHandlerUrl + (oauth ? '/oauth' : '/users/byid') + `/${id}`
-    console.log('URL: ', url)
     const res = await fetch(url, {
       method: 'put',
       headers: { 'Content-Type': 'application/json' },
