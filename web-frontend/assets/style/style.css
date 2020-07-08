@@ -1,5 +1,5 @@
 /* Generic stylesheets */
-body{
+body {
   padding-top: 72px;
 }
 
@@ -13,8 +13,7 @@ p {
   font-size: 20px;
 }
 
-.center {
-  margin: auto;
+.center-text {
   text-align: center;
 }
 
@@ -32,6 +31,20 @@ p {
 #main-content .card img {
   height: 10rem;
 }
+
+/* Form stylesheets */
+/*
+#main-content form label {
+  display: block;
+  color: black;
+  background-color: #7582F0;
+  margin: 2px auto;
+  padding: 6px;
+}
+*/
+
+
+/* TODO: Remove? */
 
 #myInput {
   background-image: url('/assets/searchicon.png'); /* Add a search icon to input TODO */

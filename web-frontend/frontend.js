@@ -28,19 +28,22 @@ app.use(express.static('assets'))
 app.use(cookieParser())
 app.use(pinoExpress({ logger: log, useLevel: 'trace' }))
 
-
 // Homepage
 app.get('/', (req, res) => {
-  res.render('index', {
-    title: 'Homepage'
-  })
+  req.log.info('Requested homepage')
+  res.render('index')
 })
 
 // Login page
 app.get('/login', (req, res) => {
-  res.render('login', {
-    title: 'Login'
-  })
+  req.log.info('Requested login page')
+  res.render('login')
+})
+
+// Signup page
+app.get('/register', (req, res) => {
+  req.log.info('Requested registration page')
+  res.render('register')
 })
 
 // OAuth login
@@ -49,31 +52,41 @@ app.get('/oauth', OAuth.directPath)
 // OAuth login callback
 app.get('/oauth/callback', OAuth.callbackPath)
 
-// Signup page
-app.get('/register', (req, res) => {
-  res.status(503).send('Not Implemented')
-})
-
-// Multiplexed news, according to user settings
-app.get('/news', (req, res) => {
-  res.status(503).send('Not Implemented')
-})
-
-// Multiplexed news, according to a custom multiplex request
-app.post('/news', formDecoder, (req, res) => {
-  res.status(503).send('Not Implemented')
-})
-
 // Show user profile
 app.get('/profile', (req, res) => {
+  req.log.info('Requested profile page')
   res.status(503).send('Not Implemented')
 })
 
 // Update user profile
 app.put('/profile', formDecoder, (req, res) => {
+  req.log.info('Attempting to update profile')
   res.status(503).send('Not Implemented')
 })
 
+// Multiplexed news, according to user settings
+app.get('/news', (req, res) => {
+  req.log.info('Requested news page')
+  res.status(503).send('Not Implemented')
+})
+
+// Multiplexed news, according to a custom multiplex request
+app.post('/news', formDecoder, (req, res) => {
+  req.log.info('Attempting to fetch news with custom multiplexer parameters')
+  res.status(503).send('Not Implemented')
+})
+
+// Authentication middleware
+// Turns the 'jwt' cookie into a Json Web Token, or redirects if the cookie is not present
+function tokenMiddleware(req, res, next) {
+  if (!req.cookies || !req.cookies.jwt) {
+    req.log.warn('Attempted to access protected route without a jwt cookie')
+    return res.redirect('/login')
+  }
+  console.log(req.cookies.jwt)
+  req.jwt = req.cookies.jwt
+  next()
+}
 
 // Perform the required setup operations and launch the server
 app.launch = function({ port = 8080 } = {}) {
