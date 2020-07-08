@@ -52,7 +52,7 @@ class NewsMultiplexer {
 
           // Translate news
           for (const art of muxed) {
-            await translateArticle(art, lang)
+            await translateArticle(art, payload.lang)
               .catch(err => {
                 log.warn('Error while translating articles\n%o', err)
               })
@@ -66,7 +66,7 @@ class NewsMultiplexer {
 
           log.info(`Completed RPC call ${correlationId}`)
         } catch (err) {  // Error - NACK the message
-          this.channel.nack(msg)
+          this.channel.ack(msg)
           throw err
         }
       }.bind(this))
