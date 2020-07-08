@@ -77,6 +77,37 @@ app.get('/register', (req, res) => {
   res.render('register', { user: !!(req.cookies.jwt) })
 })
 
+// Signup request
+app.post('/register', formDecoder, async (req, res) => {
+  req.log.info('Signup request')
+  try {
+    const apiRes = await fetch(`${API_URL}/register`, {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    })
+    const body = await apiRes.json()
+    switch (apiRes.status) {
+      case 200:
+        req.log.info('Successfully signed up')
+        res.cookie('jwt', `Bearer ${body.token}`, { maxAge: 3600000 })
+        return res.redirect('/') // TODO: Redirect to profile
+      case 400:
+        req.log.warn('Malformed signup request')
+        return res.status(400).redirect('/register') // TODO: Flash
+      case 403:
+        req.log.info('Signup forbidden')
+        return res.status(403).redirect('/register') // TODO: Flash (with some other message)
+      default:
+        req.log.error(`Unexpected API response status code ${apiRes.status}`)
+        return res.status(500).send('Internal server error. Sorry')
+    }
+  } catch (err) {
+    req.log.error(err)
+    return res.status(500).send('Internal server error. Sorry')
+  }
+})
+
 // OAuth login
 app.get('/oauth', OAuth.directPath)
 
