@@ -116,17 +116,33 @@ app.get('/oauth/callback', OAuth.callbackPath)
 
 // Logout
 app.get('/logout', (req, res) => {
-  res.cookie('jwt', '', {
-    expires: new Date(0),
-    overwrite: true
-  })
+  disposeSession(res)
   res.redirect('/')
 })
 
 // Show user profile
-app.get('/profile', (req, res) => {
+app.get('/profile', tokenMiddleware, async (req, res) => {
   req.log.info('Requested profile page')
-  res.status(503).send('Not Implemented')
+  try {
+    const apiRes = await fetch(`${API_URL}/profile`, {
+      method: 'get',
+      headers: { 'Authorization': req.cookies.jwt }
+    })
+    const body = await apiRes.json()
+    switch(apiRes.status) {
+      case 200:
+        return res.render('profile', { profile: body })
+      case 401:
+        disposeSession(res)
+        return res.redirect('login') // TODO: Flash 'You are not authenticated'
+      default:
+        req.log.error(`Unexpected API response status code ${apiRes.status}`)
+        return res.status(500).send('Internal server error. Sorry')
+    }
+  } catch (err) {
+    req.log.error(err)
+    return res.status(500).send('Internal server error. Sorry')
+  }
 })
 
 // Update user profile
@@ -155,8 +171,15 @@ function tokenMiddleware(req, res, next) {
     return res.redirect('/login')
   }
   console.log(req.cookies.jwt)
-  req.jwt = req.cookies.jwt
   next()
+}
+
+// Dispose a JWT session cookie
+function disposeSession(res) {
+  res.cookie('jwt', '', {
+    expires: new Date(0),
+    overwrite: true
+  })
 }
 
 // Perform the required setup operations and launch the server
