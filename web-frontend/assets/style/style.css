@@ -34,3 +34,10 @@ p {
 #main-content .card img {
   height: 10rem;
 }
+
+/* Google OAuth button */
+.google-button {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
