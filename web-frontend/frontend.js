@@ -10,7 +10,13 @@ const fetch = require('node-fetch')
 const Parser = require('body-parser')
 const pino = require('pino')
 const pinoExpress = require('express-pino-logger')
+const { countries, languages } = require('countries-list')
 const OAuth = require('./oauth')
+
+// Sort languages in a handy array
+const sortedLangs = Object.entries(languages)
+  .map(([code, props]) => Object.assign({ code }, props))
+  .sort((a, b) => a.name.localeCompare(b.name))
 
 // Environment variables
 const API_URL = process.env.API_URL
@@ -18,6 +24,7 @@ const OAUTH_BRIDGE_URL = process.env.OAUTH_BRIDGE_URL
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
 
+// Express middlewares
 const formDecoder = Parser.urlencoded({ extended: false })
 const log = pino({ level: process.env.LOG_LEVEL || 'info' })
 
@@ -63,11 +70,11 @@ app.post('/login', formDecoder, async (req, res) => {
         return res.status(400).redirect('/login') // TODO: Flash (with some other message)
       default:
         req.log.error(`Unexpected API response status code ${apiRes.status}`)
-        return res.status(500).send('Internal server error. Sorry')
+        return res.render('5xx', { user: !!(req.cookies.jwt) })
     }
   } catch (err) {
     req.log.error(err)
-    return res.status(500).send('Internal server error. Sorry')
+    return res.render('5xx', { user: !!(req.cookies.jwt) })
   }
 })
 
@@ -100,11 +107,11 @@ app.post('/register', formDecoder, async (req, res) => {
         return res.status(403).redirect('/register') // TODO: Flash (with some other message)
       default:
         req.log.error(`Unexpected API response status code ${apiRes.status}`)
-        return res.status(500).send('Internal server error. Sorry')
+        return res.render('5xx', { user: !!(req.cookies.jwt) })
     }
   } catch (err) {
     req.log.error(err)
-    return res.status(500).send('Internal server error. Sorry')
+    return res.render('5xx', { user: !!(req.cookies.jwt) })
   }
 })
 
@@ -131,17 +138,23 @@ app.get('/profile', tokenMiddleware, async (req, res) => {
     const body = await apiRes.json()
     switch(apiRes.status) {
       case 200:
-        return res.render('profile', { profile: body })
+        req.log.debug('Got user profile\n%o', body)
+        return res.render('profile', {
+          user: true,
+          profile: body,
+          langs: sortedLangs,
+          countries
+        })
       case 401:
         disposeSession(res)
         return res.redirect('login') // TODO: Flash 'You are not authenticated'
       default:
         req.log.error(`Unexpected API response status code ${apiRes.status}`)
-        return res.status(500).send('Internal server error. Sorry')
+        return res.render('5xx', { user: !!(req.cookies.jwt) })
     }
   } catch (err) {
     req.log.error(err)
-    return res.status(500).send('Internal server error. Sorry')
+    return res.render('5xx', { user: !!(req.cookies.jwt) })
   }
 })
 
@@ -161,6 +174,12 @@ app.get('/news', (req, res) => {
 app.post('/news', formDecoder, (req, res) => {
   req.log.info('Attempting to fetch news with custom multiplexer parameters')
   res.status(503).send('Not Implemented')
+})
+
+// Page not found -- THIS MUST BE THE LAST ROUTE!!!
+app.get('*', (req, res) => {
+  req.log.warn('Attempted to GET inexistent route')
+  res.render('404', { user: !!(req.cookies.jwt) })
 })
 
 // Authentication middleware
