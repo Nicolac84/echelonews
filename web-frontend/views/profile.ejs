@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head', { title: profile.name }) %>
+<body>
+  <%- include('partials/navbar', { user }) %>
+  <div class="container" id="main-content">
+    <%- include('partials/banner') %>
+    <div class="container">
+      <div class="shadow-lg p-3 mb-5 bg-white">
+        <div class="row center-text align-items-center justify-content-center">
+          <form class="full-size-form" action="/profile" method="put">
+            <h1>Profile | <%= profile.name %></h1>
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" name="name" class="form-control" placeholder="Username" value="<%= profile.name %>" required>
+            </div>
+            <div class="form-group">
+              <label for="email">E-Mail</label>
+              <input type="email" name="email" class="form-control" placeholder="E-Mail" value="<%= profile.email %>" required>
+            </div>
+            <div class="form-group">
+              <label for="lang">Native language</label><br/>
+              <select name="lang">
+                <% for (const l of langs) { %>
+                  <option value="<%= l.code %>"<%= (profile.lang === l.code) && 'selected' %>>
+                    <%= l.native %>
+                  </option>
+                <% } %>
+              </select>
+            </div>
+
+            <label for="countries">Countries</label><br/>
+            <div class="form-group">
+              <ul class="list-group list-group-flush" id="countries-list">
+                <% for (const c of profile.countries) { %>
+                  <li class="list-group-item">
+                    <%= countries[c].name %> (<%= countries[c].native %>)
+                  </li>
+                <% } %>
+              </ul>
+            </div>
+
+            <label for="topics">Topics</label><br/>
+            <div class="form-group">
+              <ul class="list-group list-group-flush" id="topics-list">
+                <% for (const t of profile.topics) { %>
+                  <li class="list-group-item"><%= t %></li>
+                <% } %>
+              </ul>
+            </div>
+
+            <div class="form-group">
+              <label for="pass">Change Password</label>
+              <input type="password" name="pass" class="form-control" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
