@@ -18,6 +18,11 @@ const sortedLangs = Object.entries(languages)
   .map(([code, props]) => Object.assign({ code }, props))
   .sort((a, b) => a.name.localeCompare(b.name))
 
+// Sort countries in a handy array
+const sortedCountries = Object.entries(countries)
+  .map(([code, props]) => Object.assign({ code }, props))
+  .sort((a, b) => a.name.localeCompare(b.name))
+
 // Environment variables
 const API_URL = process.env.API_URL
 const OAUTH_BRIDGE_URL = process.env.OAUTH_BRIDGE_URL
@@ -143,7 +148,8 @@ app.get('/profile', tokenMiddleware, async (req, res) => {
           user: true,
           profile: body,
           langs: sortedLangs,
-          countries
+          countries,
+          sortedCountries,
         })
       case 401:
         disposeSession(res)
@@ -159,9 +165,24 @@ app.get('/profile', tokenMiddleware, async (req, res) => {
 })
 
 // Update user profile
-app.put('/profile', formDecoder, (req, res) => {
+app.put('/profile', tokenMiddleware, formDecoder, async (req, res) => {
   req.log.info('Attempting to update profile')
-  res.status(503).send('Not Implemented')
+  try {
+    const apiRes = await fetch(`${API_URL}/profile`, {
+      method: 'put',
+      headers: {
+        'Authorization': req.cookies.jwt,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(req.body)
+    })
+    if (!apiRes.ok) throw new Error(`PUT /profile returned code ${apiRes.status})`)
+    req.log.info('Successfully updated profile')
+    res.redirect('/profile')
+  } catch (err) {
+    req.log.error(err)
+    return res.render('5xx', { user: !!(req.cookies.jwt) })
+  }
 })
 
 // Multiplexed news, according to user settings
