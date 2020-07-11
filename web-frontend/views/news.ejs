@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head', { title: 'News' }) %>
+<body>
+  <%- include('partials/navbar', { user }) %>
+  <div class="container">
+    <%- include('partials/banner') %>
+    <div class="container">
+      <p class="lead big-padding"></p>
+      <div class="shadow-lg p-3 mb-5 bg-white Width auto">
+        <div class="row">
+          <div class="col-sm">
+            <div class="col-sm">
+              <div class="card" style="width: 18rem;">
+                <img src="img/worldnews.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <form>
+                    <div class="form-row">
+                      <div class="col-sm">
+                        <label for="validationServer04">Categorie</label> <select class="custom-select is-valid" id="validationServer04" required="">
+                          <option selected disabled value="">
+                            Choose...
+                          </option>
+                          <option value="Prima_pagina">
+                            Prima Pagina
+                          </option>
+                          <option value="Cronaca ">
+                            Cronaca
+                          </option>
+                          <option value="Politica">
+                            Politica
+                          </option>
+                          <option value="Sport">
+                            Sport
+                          </option>
+                          <option value="Economia">
+                            Economia
+                          </option>
+                          <option value="Scienza">
+                            Scienza
+                          </option>
+                          <option value="Medicina_e_salute">
+                            Medicina e Salute
+                          </option>
+                        </select>
+                        <div class="form-row">
+                          <div class="col-sm">
+                            <label for="validationServer02">Data</label> <input type="date" class="form-control is-valid" id="validationServer02" value="" required="">
+                            <div class="valid-feedback"></div>
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="col">
+                            <label for="validationServer04">Paesi</label> <select class="custom-select is-valid" id="validationServer04" required>
+                              <!-- TODO: Countries -->
+                            <div class="invalid-feedback">
+                              Please select a valid state.
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <div class="form-check">
+                              <br>
+                              <input class="form-check-input is-valid" type="checkbox" value="" id="invalidCheck3" required=""> <label class="form-check-label" for="invalidCheck3">Agree to terms and conditions</label>
+                              <div class="invalid-feedback">
+                                You must agree before submitting.
+                              </div>
+                            </div>
+                          </div><button class="btn btn-primary" type="submit">Cerca</button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-8">
+      <div class="container">
+        <div style="width:100% ;height: 400px; overflow-x: scroll; overflow-y: scroll;border:1px solid black;">
+          <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for News..">
+          <table id="myTable">
+            <tr class="header">
+              <th style="width:40%;">Titolo</th>
+              <th style="width:30%;">Country</th>
+              <th style="width:30%;">Data</th>
+              <th style="width:30%;">Indice</th>
+            </tr>
+            <tr>
+              <td><%= news[0].title %></td>
+              <td><%= news[0].country %></td>
+              <td><%= news[0].preview %></td>
+              <td><%= news[0].score %></td>
+            </tr>
+          </table>
+        </div>
+      </div><br>
+      <br>
+      <div class="container">
+        <div class="btn-group btn-group-lg">
+          <button type="button" class="btn btn-primary">Lista</button> <button type="button" class="btn btn-primary">Analisi</button> <button type="button" class="btn btn-primary">Vota</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <center>
+    <p>©copyright2020 EchelonNEWS. All Rights Reserved</p>
+  </center>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
+  <script src="js/bootstrap.bundle.min.js"></script> 
+  <script>
+  function myFunction() {
+  // Declare variables
+  var input, filter, table, tr, td, i, txtValue;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("myTable");
+  tr = table.getElementsByTagName("tr");
+  // Loop through all table rows, and hide those who don't match the search query
+  for (i = 0; i < tr.length; i++) {
+    td = tr[i].getElementsByTagName("td")[0];
+    if (td) {
+      txtValue = td.textContent || td.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+  }
+  </script>
+</body>
+</html>
