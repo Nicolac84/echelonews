@@ -34,9 +34,11 @@ app.post("/oauth", jsonParser, async (req, res) => {
     );
     const token = jwt.sign(
       {
-        id: user.id,
-        name: user.name,
-        oauth: true,
+        user: {
+          id: user.id,
+          name: user.name,
+          oauth: true,
+        }
       },
       JWT_SECRET
     );

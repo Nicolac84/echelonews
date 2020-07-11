@@ -37,6 +37,9 @@ app.post("/register", jsonParser, Auth.middlewares.register);
 app.get("/profile", Auth.middlewares.jwt, async (req, res) => {
   try {
     const user = await fetchUser(req.user.id, req.user.oauth);
+    if (user instanceof Error) {
+      return res.status(400).json({ message: 'Malformed request' })
+    }
     res.status(200).json(user);
   } catch (err) {
     log.error(err);
@@ -290,7 +293,7 @@ if (require.main === module) {
 // Fetch a user calling the user handler
 async function fetchUser(id, oauth) {
   try {
-    if (!Number.isInteger(id)) {
+    if (!Number.isInteger(id) && ((typeof id === 'string') && !(/[0-9]+/.test(id)))) {
       return new TypeError("User ID is not an integer");
     }
     const url =
@@ -299,7 +302,7 @@ async function fetchUser(id, oauth) {
     if (!res.ok) {
       return new Error(`User handler returned status ${res.status}`);
     }
-    return await res.json();
+    return await res.json()
   } catch (err) {
     throw err;
   }
@@ -308,7 +311,7 @@ async function fetchUser(id, oauth) {
 // Update a user calling the user handler
 async function updateUser(id, body, oauth) {
   try {
-    if (!Number.isInteger(id)) {
+    if (!Number.isInteger(id) && ((typeof id === 'string') && !(/[0-9]+/.test(id)))) {
       return new TypeError("User ID is not an integer");
     }
     const url =

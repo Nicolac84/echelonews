@@ -1,4 +1,4 @@
-/** echelonews-Web frontend
+/** echelonews - Web frontend
  * @license
  * Copyright (c) 2020 Nicola Colao, Paolo Lucchesi, Dejan Nuzzi
  * All rights reserved
