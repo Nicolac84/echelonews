@@ -3,8 +3,12 @@ body {
   padding-top: 72px;
 }
 
-h1 {
-  color: white;
+form h1 {
+  display: block;
+  margin-bottom: 0.8em;
+  padding-bottom: 12px;
+  border-bottom: 1px solid gray;
+  color: black;
   text-align: center;
 }
   
@@ -33,6 +37,18 @@ p {
 
 #main-content .card img {
   height: 10rem;
+}
+
+/* Forms */
+.full-size-form {
+  display: block;
+  padding: 24px 0;
+  width: 64%;
+}
+
+.full-size-form .form-group {
+  margin: 24px auto;
+  max-width: 78%;
 }
 
 /* Google OAuth button */
