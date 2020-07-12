@@ -66,7 +66,7 @@ app.post('/login', formDecoder, async (req, res) => {
       case 200:
         req.log.info('Successfully logged in')
         res.cookie('jwt', `Bearer ${body.token}`, { maxAge: 3600000 })
-        return res.redirect('/') // TODO: Redirect to profile
+        return res.redirect('/profile')
       case 400:
         req.log.warn('Malformed login request')
         return res.status(400).redirect('/login') // TODO: Flash
@@ -103,7 +103,7 @@ app.post('/register', formDecoder, async (req, res) => {
       case 200:
         req.log.info('Successfully signed up')
         res.cookie('jwt', `Bearer ${body.token}`, { maxAge: 3600000 })
-        return res.redirect('/') // TODO: Redirect to profile
+        return res.redirect('/profile')
       case 400:
         req.log.warn('Malformed signup request')
         return res.status(400).redirect('/register') // TODO: Flash
@@ -200,7 +200,7 @@ app.get('/news', (req, res) => {
   req.log.info('Requested news page')
   res.render('news', {
     user: !!(req.cookies.jwt),
-    news: [ // TODO: This is a mock object
+    news: [ // TODO: This is a mock object (remove after implementation)
       {
         title: 'Title of article 1',
         preview: 'Some long preview for article 1',
@@ -218,21 +218,50 @@ app.get('/news', (req, res) => {
 })
 
 // Multiplexed news, according to a custom multiplex request
-app.post('/news', formDecoder, (req, res) => {
+app.post('/news', formDecoder, async (req, res) => {
   req.log.info('Attempting to fetch news with custom multiplexer parameters')
   try {
     const apiRes = await fetch(`${API_URL}/news`, {
       method: 'post',
-      headers: { 'Authorization': req.cookies.jwt }
+      headers: {
+        'Authorization': req.cookies.jwt,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(req.body)
     })
     const body = await apiRes.json()
     switch(apiRes.status) {
       case 200:
         req.log.info(`Got ${body.length} news`)
-        // TODO: Map news the right way
+
+        // Fetch newspapers
+        // TODO: Handle errors
+        const npaperIds = new Set(body.map(x => x.source))
+        const npapers = new Map()
+        for (const id of npaperIds) {
+          if (!npapers.has(id)) {
+            const np = await fetch(`${API_URL}/newspaper/${id}`, {
+              method: 'get',
+              headers: { 'Authorization': bearer }
+            })
+            if (!np.ok) throw new Error(`Unable to fetch newspaper ${id}`)
+            npapers.set(id, await np.json())
+          }
+        }
+
+        // Map news to be handled in a more elegant way
+        const news = body.map(n => {
+          const npaper = npapers.get(n.source)
+          return Object.assign({}, n, {
+            country: npaper.country,
+            title: npaper.info.title
+          })
+        })
+        log.debug('Mapped news are %o', news)
+
         res.render('news', {
           user: !!(req.cookies.jwt),
-          news: []
+          news
         })
       case 401:
         disposeSession(res)
