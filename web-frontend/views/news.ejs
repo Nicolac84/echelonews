@@ -17,32 +17,10 @@
                   <form>
                     <div class="form-row">
                       <div class="col-sm">
-                        <label for="validationServer04">Categorie</label> <select class="custom-select is-valid" id="validationServer04" required="">
-                          <option selected disabled value="">
-                            Choose...
-                          </option>
-                          <option value="Prima_pagina">
-                            Prima Pagina
-                          </option>
-                          <option value="Cronaca ">
-                            Cronaca
-                          </option>
-                          <option value="Politica">
-                            Politica
-                          </option>
-                          <option value="Sport">
-                            Sport
-                          </option>
-                          <option value="Economia">
-                            Economia
-                          </option>
-                          <option value="Scienza">
-                            Scienza
-                          </option>
-                          <option value="Medicina_e_salute">
-                            Medicina e Salute
-                          </option>
-                        </select>
+                 <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" name="name" class="form-control" placeholder="Username" required></label>
+            </div>
                         <div class="form-row">
                           <div class="col-sm">
                             <label for="validationServer02">Data</label> <input type="date" class="form-control is-valid" id="validationServer02" value="" required="">
@@ -73,8 +51,8 @@
                 </div>
               </div>
             </div>
-          </div>
- <div class="col-8">
+            </div>
+    <div class="col-8">
       <div class="container">
         <div style="width:100% ;height: 400px; overflow-x: scroll; overflow-y: scroll;border:1px solid black;">
           <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for News..">
@@ -83,13 +61,13 @@
               <th style="width:40%;">Titolo</th>
               <th style="width:30%;">Country</th>
               <th style="width:30%;">Data</th>
-              <th style="width:30%;">Punti</th>
+              <th style="width:30%;">Indice</th>
             </tr>
             <tr>
-              <td><%= news[0].title %></td>
-              <td><%= news[0].country %></td>
-              <td><%= news[0].preview %></td>
-              <td><%= news[0].score %></td>
+              <td><%= newsi.titolo %></td>
+              <td><%= newsi.paese %></td>
+              <td><%= newsi.data %></td>
+              <td><%= newsi.rank %></td>
             </tr>
           </table>
         </div>
@@ -102,9 +80,6 @@
       </div>
     </div>
   </div>
-        </div>
-      </div>
-    </div>
    
   <center>
     <p>©copyright2020 EchelonNEWS. All Rights Reserved</p>
