@@ -60,7 +60,7 @@
                           <div class="form-group">
                             <div class="form-check">
                               <br>
-                              <input class="form-check-input is-valid" type="checkbox" value="" id="invalidCheck3" required=""> <label class="form-check-label" for="invalidCheck3">Agree to terms and conditions</label>
+                         
                               <div class="invalid-feedback">
                                 You must agree before submitting.
                               </div>
@@ -74,10 +74,7 @@
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-8">
+ <div class="col-8">
       <div class="container">
         <div style="width:100% ;height: 400px; overflow-x: scroll; overflow-y: scroll;border:1px solid black;">
           <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for News..">
@@ -86,7 +83,7 @@
               <th style="width:40%;">Titolo</th>
               <th style="width:30%;">Country</th>
               <th style="width:30%;">Data</th>
-              <th style="width:30%;">Indice</th>
+              <th style="width:30%;">Punti</th>
             </tr>
             <tr>
               <td><%= news[0].title %></td>
@@ -105,32 +102,15 @@
       </div>
     </div>
   </div>
+        </div>
+      </div>
+    </div>
+   
   <center>
     <p>©copyright2020 EchelonNEWS. All Rights Reserved</p>
   </center>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
   <script src="js/bootstrap.bundle.min.js"></script> 
-  <script>
-  function myFunction() {
-  // Declare variables
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("myInput");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("myTable");
-  tr = table.getElementsByTagName("tr");
-  // Loop through all table rows, and hide those who don't match the search query
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }
-  }
-  }
-  </script>
+
 </body>
 </html>
