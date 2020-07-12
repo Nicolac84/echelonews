@@ -125,12 +125,19 @@ class RssFetcher {
    *  null if the RSS has not been modified since last fetch timestamp
    */
   static async process(source, rss) {
-    try {
-      log.debug(source);
-      log.debug(rss);
-      if (!rss) return null;
-      log.info(`Processing RSS for newspaper ${source.id}`);
+    function classify(article, npaper) {
+      const topics = article.categories
+        ? article.categories.map((e) => (e._ ? e._.split("/") : [])).flat()
+        : []
+      if (npaper.info.topics) topics.push(...npaper.info.topics)
+      return topics
+    }
 
+    try {
+      log.debug('Processing source newspaper %o', source);
+      if (!rss) return null;
+
+      log.info(`Processing RSS for newspaper ${source.id}`);
       const news = await parser.parseString(rss);
       if (!news.items) return null;
 
@@ -141,9 +148,7 @@ class RssFetcher {
           title: item.title,
           preview: item.content,
           origin: item.link,
-          topics: item.categories
-            ? item.categories.map((e) => (e._ ? e._.split("/") : [])).flat()
-            : [],
+          topics: classify(item, source),
           created: new Date(item.isoDate),
         }));
       log.info(`Processed ${ret.length} articles`);
