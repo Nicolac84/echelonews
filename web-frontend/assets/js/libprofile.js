@@ -46,3 +46,9 @@ function listTopics() {
 function removeItem(removeBtn) {
   removeBtn.parentElement.remove()
 }
+
+function updateProfile() {
+  document.profile.countries.value = listCountries()
+  document.profile.topics.value = listTopics()
+  document.profile.submit()
+}

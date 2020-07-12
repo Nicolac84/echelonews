@@ -47,6 +47,19 @@ app.get("/profile", Auth.middlewares.jwt, async (req, res) => {
   }
 });
 
+app.put("/profile", Auth.middlewares.jwt, jsonParser, async (req, res) => {
+  try {
+    const ret = await updateUser(req.user.id, req.body, req.user.oauth);
+    if (ret instanceof Error) {
+      return res.status(400).json({ message: 'Malformed request' })
+    }
+    res.sendStatus(200);
+  } catch (err) {
+    log.error(err);
+    res.status(500).json({ message: "Internal server error. Sorry" });
+  }
+});
+
 app.get("/countries", Auth.middlewares.jwt, async (req, res) => {
   try {
     const user = await fetchUser(req.user.id, req.user.oauth);
@@ -310,6 +323,7 @@ async function fetchUser(id, oauth) {
 
 // Update a user calling the user handler
 async function updateUser(id, body, oauth) {
+  log.info(`Updating user ${id} (OAuth: ${!!(oauth)})\n%o`, body)
   try {
     if (!Number.isInteger(id) && ((typeof id === 'string') && !(/[0-9]+/.test(id)))) {
       return new TypeError("User ID is not an integer");

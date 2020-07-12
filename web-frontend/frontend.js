@@ -165,9 +165,19 @@ app.get('/profile', tokenMiddleware, async (req, res) => {
 })
 
 // Update user profile
-app.put('/profile', tokenMiddleware, formDecoder, async (req, res) => {
+app.post('/profile', tokenMiddleware, formDecoder, async (req, res) => {
   req.log.info('Attempting to update profile')
   try {
+    if (!req.body.pass) delete req.body.pass
+
+    if (req.body.countries) req.body.countries = req.body.countries.split(',')
+    else req.body.countries = []
+
+    if (req.body.topics) req.body.topics = req.body.topics.split(',')
+    else req.body.topics = []
+
+    req.log.debug('Update profile body is %o', req.body)
+
     const apiRes = await fetch(`${API_URL}/profile`, {
       method: 'put',
       headers: {
