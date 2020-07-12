@@ -198,13 +198,54 @@ app.post('/profile', tokenMiddleware, formDecoder, async (req, res) => {
 // Multiplexed news, according to user settings
 app.get('/news', (req, res) => {
   req.log.info('Requested news page')
-  res.status(503).send('Not Implemented')
+  res.render('news', {
+    user: !!(req.cookies.jwt),
+    news: [ // TODO: This is a mock object
+      {
+        title: 'Title of article 1',
+        preview: 'Some long preview for article 1',
+        translatedTitle: 'Titolo dell\'articolo 1',
+        translatedPreview: 'Una lunga anteprima per l\'articolo 1',
+        ref: 'http://localhost/linkarticolocompleto',
+        created: new Date(),
+        npaper: {
+          country: 'US',
+          ref: 'http://localhost/linkallahomedelgiornale'
+        },
+      }
+    ]
+  })
 })
 
 // Multiplexed news, according to a custom multiplex request
 app.post('/news', formDecoder, (req, res) => {
   req.log.info('Attempting to fetch news with custom multiplexer parameters')
-  res.status(503).send('Not Implemented')
+  try {
+    const apiRes = await fetch(`${API_URL}/news`, {
+      method: 'post',
+      headers: { 'Authorization': req.cookies.jwt }
+    })
+    const body = await apiRes.json()
+    switch(apiRes.status) {
+      case 200:
+        req.log.info(`Got ${body.length} news`)
+        // TODO: Map news the right way
+        res.render('news', {
+          user: !!(req.cookies.jwt),
+          news: []
+        })
+      case 401:
+        disposeSession(res)
+        return res.redirect('login') // TODO: Flash 'You are not authenticated'
+      default:
+        req.log.error(`Unexpected API response status code ${apiRes.status}`)
+        return res.render('5xx', { user: !!(req.cookies.jwt) })
+    }
+  } catch (err) {
+    req.log.error(err)
+    return res.render('5xx', { user: !!(req.cookies.jwt) })
+  }
+
 })
 
 // Page not found -- THIS MUST BE THE LAST ROUTE!!!
