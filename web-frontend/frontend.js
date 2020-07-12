@@ -200,7 +200,7 @@ app.get('/news', (req, res) => {
   req.log.info('Requested news page')
   res.render('news', {
     user: !!(req.cookies.jwt),
-    news: [ // TODO: This is a mock object (remove after implementation)
+    news:  // TODO: This is a mock object (remove after implementation)
       {
         title: 'Title of article 1',
         preview: 'Some long preview for article 1',
@@ -213,7 +213,7 @@ app.get('/news', (req, res) => {
           ref: 'http://localhost/linkallahomedelgiornale'
         },
       }
-    ]
+    
   })
 })
 
