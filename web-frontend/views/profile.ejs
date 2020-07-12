@@ -35,9 +35,9 @@
               <label for="countries">Countries</label><br/>
               <ul class="list-group list-group-flush" id="countries-list">
                 <% for (const c of profile.countries) { %>
-                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <li class="list-group-item d-flex justify-content-between align-items-center" code="<%= c %>">
                     <%= countries[c].name %> (<%= countries[c].native %>)
-                    <span class="badge badge-primary">Remove</span>
+                    <span class="badge badge-primary remover">Remove</span>
                   </li>
                 <% } %>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -59,7 +59,7 @@
                 <% for (const t of profile.topics) { %>
                   <li class="list-group-item d-flex justify-content-between align-items-center">
                     <%= t %>
-                    <span class="badge badge-primary">Remove</span>
+                    <span class="badge badge-primary remover">Remove</span>
                   </li>
                 <% } %>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -83,4 +83,13 @@
     </div>
   </div>
 </body>
+<script src="/js/libprofile.js"></script>
+<script>
+  $(function() {
+    $('#countries-add').click(function(e) { addCountry() })
+    $('#topics-add').click(function(e) { addTopic() })
+    $('#countries-list span.remover').click(function(e) { removeItem(this) })
+    $('#topics-list span.remover').click(function(e) { removeItem(this) })
+  })
+</script>
 </html>
