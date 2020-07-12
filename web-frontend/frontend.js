@@ -200,20 +200,23 @@ app.get('/news', (req, res) => {
   req.log.info('Requested news page')
   res.render('news', {
     user: !!(req.cookies.jwt),
-    news:  // TODO: This is a mock object (remove after implementation)
+    langs: sortedLangs,
+    countries: sortedCountries,
+    news: [ // TODO: This is a mock object (remove after implementation)
       {
         title: 'Title of article 1',
         preview: 'Some long preview for article 1',
         translatedTitle: 'Titolo dell\'articolo 1',
         translatedPreview: 'Una lunga anteprima per l\'articolo 1',
-        ref: 'http://localhost/linkarticolocompleto',
+        origin: 'http://localhost/linkarticolocompleto',
         created: new Date(),
+        country: 'US',
         npaper: {
-          country: 'US',
+          title: 'Qualche giornale',
           ref: 'http://localhost/linkallahomedelgiornale'
         },
       }
-    
+    ]
   })
 })
 
