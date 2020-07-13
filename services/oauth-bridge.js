@@ -38,7 +38,7 @@ app.post("/oauth", jsonParser, async (req, res) => {
           id: user.id,
           name: user.name,
           oauth: true,
-        }
+        },
       },
       JWT_SECRET
     );
@@ -55,8 +55,9 @@ app.launch = function ({ port } = {}) {
 
 if (require.main === module) {
   for (const v of ["JWT_SECRET", "USER_HANDLER_URL"]) {
-    if (!process.env[v])
+    if (!process.env[v]) {
       throw new Error(`You must define environment variable ${v}`);
+    }
   }
   log.info("Launching EcheloNews RESTful API in standalone mode");
   app.launch({ port: process.env.PORT || 8080 });

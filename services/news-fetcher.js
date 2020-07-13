@@ -128,13 +128,13 @@ class RssFetcher {
     function classify(article, npaper) {
       const topics = article.categories
         ? article.categories.map((e) => (e._ ? e._.split("/") : [])).flat()
-        : []
-      if (npaper.info.topic) topics.push(npaper.info.topic)
-      return topics
+        : [];
+      if (npaper.info.topic) topics.push(npaper.info.topic);
+      return topics;
     }
 
     try {
-      log.debug('Processing source newspaper %o', source);
+      log.debug("Processing source newspaper %o", source);
       if (!rss) return null;
 
       log.info(`Processing RSS for newspaper ${source.id}`);

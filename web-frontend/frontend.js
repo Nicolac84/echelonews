@@ -196,45 +196,19 @@ app.post('/profile', tokenMiddleware, formDecoder, async (req, res) => {
 })
 
 // Multiplexed news, according to user settings
-app.get('/news', (req, res) => {
-  req.log.info('Requested news page')
+app.get('/news', tokenMiddleware, (req, res) => {
+  req.log.info('Requested news page (with simple GET)')
   res.render('news', {
     user: !!(req.cookies.jwt),
     langs: sortedLangs,
     sortedCountries: sortedCountries,
     countries: countries,
-    news: [ // TODO: This is a mock object (remove after implementation)
-      {
-        title: 'Title of article 1',
-        preview: 'Some long preview for article 1',
-        translatedTitle: 'Titolo dell\'articolo 1',
-        translatedPreview: 'Una lunga anteprima per l\'articolo 1',
-        origin: 'http://localhost/linkarticolocompleto',
-        created: new Date(),
-        country: 'US',
-        npaper: {
-          title: 'Qualche giornale',
-          ref: 'http://localhost/linkallahomedelgiornale'
-        },
-      }, {
-        title: 'Title of article 2',
-        preview: 'Some long preview for article 2',
-        translatedTitle: 'Titolo dell\'articolo 2',
-        translatedPreview: 'Una lunga anteprima per l\'articolo 2',
-        origin: 'http://localhost/linkarticolocompleto',
-        created: new Date(),
-        country: 'IT',
-        npaper: {
-          title: 'Qualche giornale',
-          ref: 'http://localhost/linkallahomedelgiornale'
-        },
-      }
-    ]
+    news: []
   })
 })
 
 // Multiplexed news, according to a custom multiplex request
-app.post('/news', formDecoder, async (req, res) => {
+app.post('/news', tokenMiddleware, formDecoder, async (req, res) => {
   req.log.info('Attempting to fetch news with custom multiplexer parameters')
   req.log.debug('Body is %o', req.body)
   if (req.body.countries) req.body.countries = req.body.countries.split(',')
@@ -273,7 +247,10 @@ app.post('/news', formDecoder, async (req, res) => {
           const npaper = npapers.get(n.source)
           return Object.assign({}, n, {
             country: npaper.country,
-            title: npaper.info.title
+            npaper: {
+              id: npaper.id,
+              title: npaper.info.title,
+            }
           })
         })
         log.debug('Mapped news are %o', news)
@@ -296,7 +273,28 @@ app.post('/news', formDecoder, async (req, res) => {
     req.log.error(err)
     return res.render('5xx', { user: !!(req.cookies.jwt) })
   }
+})
 
+// Update a feedback
+app.put('/feedback', tokenMiddleware, formDecoder, async (req, res) => {
+  try {
+    const apiRes = await fetch(`${API_URL}/feedback`, {
+      method: 'put',
+      headers: {
+        'Authorization': req.cookies.jwt,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        npaper: parseInt(req.body.npaper),
+        score: parseInt(req.body.score),
+      })
+    })
+    req.log.info(`PUT feedback request returned status code ${apiRes.status}`)
+    return res.sendStatus(apiRes.status)
+  } catch (err) {
+    req.log.error(err)
+    return res.sendStatus(500)
+  }
 })
 
 // Page not found -- THIS MUST BE THE LAST ROUTE!!!

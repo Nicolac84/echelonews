@@ -66,3 +66,32 @@ h1.no-news-heading {
   margin-top: 12px;
   margin-bottom: 4px;
 }
+
+/* News showing */
+.country-emoji {
+  text-align: center;
+  font-size: 2em;
+  margin: 0 auto;
+}
+
+.btn-rate {
+  margin: 4px auto;
+}
+
+.feedback-positive {
+  box-sizing: border-box;
+  border: 1px solid greenyellow;
+  border-radius: 16px;
+  -webkit-box-shadow: inset 0px 0px 8px -2px greenyellow;
+  -moz-box-shadow: inset 0px 0px 8px -2px greenyellow;
+  box-shadow: inset 0px 0px 8px -2px greenyellow;
+}
+
+.feedback-negative {
+  box-sizing: border-box;
+  border: 1px solid lightcoral;
+  border-radius: 16px;
+  -webkit-box-shadow: inset 0px 0px 8px -2px lightcoral;
+  -moz-box-shadow: inset 0px 0px 8px -2px lightcoral;
+  box-shadow: inset 0px 0px 8px -2px lightcoral;
+}

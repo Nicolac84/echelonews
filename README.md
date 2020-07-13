@@ -62,7 +62,6 @@ EcheloNews is shipped with a test suite, which uses the following NPM packages:
 RESTful APIs
 * [dotenv](https://github.com/motdotla/dotenv) for environment setup (parsing
 the file `.env.test`)
-* [nyc](https://istanbul.js.org/) for test coverage
 * [nock](https://www.npmjs.com/package/nock) for mocking HTTP(S) requests
 * [sinon](https://sinonjs.org/) for programmatic mocks, fakes and stubs
 
@@ -85,11 +84,7 @@ variables:
 After having done a consistent setup, you can run the entire test suite with:
 
 ```sh
-# Just run tests
 npm test 
-
-# Run tests and verify test coverage with nyc
-npm run coverage
 ```
 
 Alternatively, you can perform single tests with _mocha_:

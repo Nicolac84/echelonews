@@ -17,7 +17,7 @@ BEGIN
   WHERE art.source = np.id AND
         _country = np.country AND
         _topic = ANY(art.topics)
-  ORDER BY f.score
+  ORDER BY f.score DESC
   LIMIT 10
   ;
 END
@@ -40,7 +40,7 @@ BEGIN
   WHERE art.source = np.id AND
         _country = np.country AND
         _topic = ANY(art.topics)
-  ORDER BY f.score
+  ORDER BY f.score DESC
   LIMIT 10
   ;
 END

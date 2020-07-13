@@ -59,6 +59,25 @@ components:
       example:
         title: ['Title is too long', 'Title is not valid']
         source: ['Source is not an existing newspaper ID']
+    Article:
+      type: object
+      description: Article bound to a newspaper
+      properties:
+        id:
+          type: integer
+          description: Article ID
+        title:
+          type: string
+          description: Article title
+        preview:
+          type: string
+          description: Article preview
+        origin:
+          type: string
+          description: URL to the complete original article
+        source:
+          type: integer
+          description: Article source newspaper
   responses:
     MalformedRequest:
       description: Malformed request

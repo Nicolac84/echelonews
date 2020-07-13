@@ -294,6 +294,10 @@ components:
         score:
           type: integer
           description: Signed integer representing the feedback score
+    Topics:
+      type: array
+      items:
+        type: string
     Countries:
       type: array
       items:
@@ -310,6 +314,30 @@ components:
         info:
           type: object
           description: Newspaper additional informations
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User univocal ID
+        name:
+          type: string
+          description: User name
+        email:
+          type: string
+          description: User email
+        created:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        topics:
+          type: array
+          items:
+            type: string
+        countries:
+          type: array
+          items:
+            type: string
   responses:
     FetchedNews:
       description: An array containing the requested news
