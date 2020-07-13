@@ -129,7 +129,7 @@ class RssFetcher {
       const topics = article.categories
         ? article.categories.map((e) => (e._ ? e._.split("/") : [])).flat()
         : []
-      if (npaper.info.topics) topics.push(...npaper.info.topics)
+      if (npaper.info.topic) topics.push(npaper.info.topic)
       return topics
     }
 

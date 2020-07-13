@@ -37,7 +37,7 @@
                 <% for (const c of profile.countries) { %>
                   <li class="list-group-item d-flex justify-content-between align-items-center" code="<%= c %>">
                     <%= countries[c].name %> (<%= countries[c].native %>)
-                    <span class="badge badge-primary remover">Remove</span>
+                    <a href="#" class="badge badge-danger remover">Remove</a>
                   </li>
                 <% } %>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -48,7 +48,7 @@
                       </option>
                     <% } %>
                   </select>
-                  <span class="badge badge-primary" id="countries-add">Add</span>
+                  <a href="#" class="badge badge-success" id="countries-add">Add</a>
                 </li>
               </ul>
             </div>
@@ -59,12 +59,12 @@
                 <% for (const t of profile.topics) { %>
                   <li class="list-group-item d-flex justify-content-between align-items-center">
                     <%= t %>
-                    <span class="badge badge-primary remover">Remove</span>
+                    <a href="#" class="badge badge-danger remover">Remove</a>
                   </li>
                 <% } %>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <input type="text" class="form-control col-sm-10" placeholder="Add Topic">
-                  <span class="badge badge-primary" id="topics-add">Add</span>
+                  <a href="#" class="badge badge-success" id="topics-add">Add</a>
                 </li>
               </ul>
             </div>
@@ -91,8 +91,8 @@
   $(function() {
     $('#countries-add').click(function(e) { addCountry() })
     $('#topics-add').click(function(e) { addTopic() })
-    $('#countries-list span.remover').click(function(e) { removeItem(this) })
-    $('#topics-list span.remover').click(function(e) { removeItem(this) })
+    $('#countries-list a.remover').click(function(e) { removeItem(this) })
+    $('#topics-list a.remover').click(function(e) { removeItem(this) })
   })
 </script>
 </html>

@@ -8,10 +8,10 @@ function addCountry(addBtn) {
 `
 <li class="list-group-item d-flex justify-content-between align-items-center" code="${countryCode}">
   ${countryDesc}
-  <span class="badge badge-primary remover">Remove</span>
+  <a href="#" class="badge badge-danger remover">Remove</a>
 </li>
 `)
-  $('#countries-list span.remover').click(function(e) { removeItem(this) })
+  $('#countries-list a.remover').click(function(e) { removeItem(this) })
 }
 
 function listCountries() {
@@ -29,10 +29,10 @@ function addTopic() {
 `
 <li class="list-group-item d-flex justify-content-between align-items-center">
   ${topic}
-  <span class="badge badge-primary remover">Remove</span>
+  <a href="#" class="badge badge-danger remover">Remove</a>
 </li>
 `)
-  $('#topics-list span.remover').click(function(e) { removeItem(this) })
+  $('#topics-list a.remover').click(function(e) { removeItem(this) })
 }
 
 function listTopics() {

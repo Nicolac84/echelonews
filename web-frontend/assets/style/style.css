@@ -39,6 +39,15 @@ p {
   height: 10rem;
 }
 
+h1.no-news-heading {
+  display: block;
+  margin-top: 2.1em;
+  text-align: center;
+  color: #888;
+  font-size: 3.1em;
+  font-weight: lighter;
+}
+
 /* Forms */
 .full-size-form {
   display: block;

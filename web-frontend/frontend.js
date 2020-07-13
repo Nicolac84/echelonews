@@ -201,7 +201,8 @@ app.get('/news', (req, res) => {
   res.render('news', {
     user: !!(req.cookies.jwt),
     langs: sortedLangs,
-    countries: sortedCountries,
+    sortedCountries: sortedCountries,
+    countries: countries,
     news: [ // TODO: This is a mock object (remove after implementation)
       {
         title: 'Title of article 1',
@@ -215,6 +216,18 @@ app.get('/news', (req, res) => {
           title: 'Qualche giornale',
           ref: 'http://localhost/linkallahomedelgiornale'
         },
+      }, {
+        title: 'Title of article 2',
+        preview: 'Some long preview for article 2',
+        translatedTitle: 'Titolo dell\'articolo 2',
+        translatedPreview: 'Una lunga anteprima per l\'articolo 2',
+        origin: 'http://localhost/linkarticolocompleto',
+        created: new Date(),
+        country: 'IT',
+        npaper: {
+          title: 'Qualche giornale',
+          ref: 'http://localhost/linkallahomedelgiornale'
+        },
       }
     ]
   })
@@ -223,6 +236,9 @@ app.get('/news', (req, res) => {
 // Multiplexed news, according to a custom multiplex request
 app.post('/news', formDecoder, async (req, res) => {
   req.log.info('Attempting to fetch news with custom multiplexer parameters')
+  req.log.debug('Body is %o', req.body)
+  if (req.body.countries) req.body.countries = req.body.countries.split(',')
+  else req.body.countries = []
   try {
     const apiRes = await fetch(`${API_URL}/news`, {
       method: 'post',
@@ -245,7 +261,7 @@ app.post('/news', formDecoder, async (req, res) => {
           if (!npapers.has(id)) {
             const np = await fetch(`${API_URL}/newspaper/${id}`, {
               method: 'get',
-              headers: { 'Authorization': bearer }
+              headers: { 'Authorization': req.cookies.jwt }
             })
             if (!np.ok) throw new Error(`Unable to fetch newspaper ${id}`)
             npapers.set(id, await np.json())
@@ -262,8 +278,11 @@ app.post('/news', formDecoder, async (req, res) => {
         })
         log.debug('Mapped news are %o', news)
 
-        res.render('news', {
+        return res.render('news', {
           user: !!(req.cookies.jwt),
+          langs: sortedLangs,
+          countries,
+          sortedCountries,
           news
         })
       case 401:

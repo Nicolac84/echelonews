@@ -17,6 +17,8 @@ BEGIN
   WHERE art.source = np.id AND
         _country = np.country AND
         _topic = ANY(art.topics)
+  ORDER BY f.score
+  LIMIT 10
   ;
 END
 $$ LANGUAGE plpgsql;
@@ -38,6 +40,8 @@ BEGIN
   WHERE art.source = np.id AND
         _country = np.country AND
         _topic = ANY(art.topics)
+  ORDER BY f.score
+  LIMIT 10
   ;
 END
 $$ LANGUAGE plpgsql;
